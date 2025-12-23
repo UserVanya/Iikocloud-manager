@@ -249,13 +249,15 @@ wheels = [
 [[package]]
 name = "iikocloud-client"
 version = "0.1.0"
-source = { git = "https://github.com/UserVanya/Iikocloud-py-sdk.git#48d6ee9dafe38da6e38d8a502b038c52991d4b7b" }
+source = { git = "https://github.com/UserVanya/Iikocloud-py-sdk.git#009bb6122058c8668dd5f4b617373e67c4196b5e" }
 dependencies = [
     { name = "aiohttp" },
     { name = "aiohttp-retry" },
+    { name = "lazy-imports" },
     { name = "pydantic" },
     { name = "python-dateutil" },
     { name = "typing-extensions" },
+    { name = "urllib3" },
 ]
 
 [[package]]
@@ -288,6 +290,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/72/34/14ca021ce8e5dfedc35312d08ba8bf51fdd999c576889fc2c24cb97f4f10/iniconfig-2.3.0.tar.gz", hash = "sha256:c76315c77db068650d49c5b56314774a7804df16fee4402c1f19d6d15d8c4730", size = 20503, upload-time = "2025-10-18T21:55:43.219Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cb/b1/3846dd7f199d53cb17f49cba7e651e9ce294d8497c8c150530ed11865bb8/iniconfig-2.3.0-py3-none-any.whl", hash = "sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12", size = 7484, upload-time = "2025-10-18T21:55:41.639Z" },
+]
+
+[[package]]
+name = "lazy-imports"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ec/cd/94bf4a69be8f2ffe5584562bb4f2adcbae8004ffe1803dba118750ae17d5/lazy_imports-1.1.0.tar.gz", hash = "sha256:e6ea5a1e4f09a861357e670b7aa61efcbce6fe29361785dd253df66f8ddbc36b", size = 24601, upload-time = "2025-10-31T19:06:41.948Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/74/9d/70a2d902d0d9530f36e60d6ef2f97a47363d2f20cac02999e29cc97b0756/lazy_imports-1.1.0-py3-none-any.whl", hash = "sha256:49fb1034ffe325fbec6e1f0e1e5b47eaaf43989b17be6c090added97c2b3ec24", size = 18964, upload-time = "2025-10-31T19:06:40.707Z" },
 ]
 
 [[package]]
@@ -719,6 +730,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/55/e3/70399cb7dd41c10ac53367ae42139cf4b1ca5f36bb3dc6c9d33acdb43655/typing_inspection-0.4.2.tar.gz", hash = "sha256:ba561c48a67c5958007083d386c3295464928b01faa735ab8547c5692e87f464", size = 75949, upload-time = "2025-10-01T02:14:41.687Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/dc/9b/47798a6c91d8bdb567fe2698fe81e0c6b7cb7ef4d13da4114b41d239f65d/typing_inspection-0.4.2-py3-none-any.whl", hash = "sha256:4ed1cacbdc298c220f1bd249ed5287caa16f34d44ef4e9c3d0cbad5b521545e7", size = 14611, upload-time = "2025-10-01T02:14:40.154Z" },
+]
+
+[[package]]
+name = "urllib3"
+version = "2.6.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/24/a2a2ed9addd907787d7aa0355ba36a6cadf1768b934c652ea78acbd59dcd/urllib3-2.6.2.tar.gz", hash = "sha256:016f9c98bb7e98085cb2b4b17b87d2c702975664e4f060c6532e64d1c1a5e797", size = 432930, upload-time = "2025-12-11T15:56:40.252Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6d/b9/4095b668ea3678bf6a0af005527f39de12fb026516fb3df17495a733b7f8/urllib3-2.6.2-py3-none-any.whl", hash = "sha256:ec21cddfe7724fc7cb4ba4bea7aa8e2ef36f607a4bab81aa6ce42a13dc3f03dd", size = 131182, upload-time = "2025-12-11T15:56:38.584Z" },
 ]
 
 [[package]]

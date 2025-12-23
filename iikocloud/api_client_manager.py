@@ -40,6 +40,9 @@ from iikocloud_client import (
     TerminalsTerminalGroupsIsAliveResponse,
     TerminalsTerminalGroupsRequest,
     TerminalsTerminalGroupsResponse,
+    ExternalMenuV2,
+    ExternalMenuV3,
+    ExternalMenuV4,
 )
 from iikocloud_client.exceptions import UnauthorizedException
 
@@ -769,18 +772,16 @@ class IikoCloudApiClientManager:
 
     # ========== Вспомогательные методы: Menu ==========
 
-    async def get_menu_by_organization(
+    async def get_menu_by_id_and_organization_v2(
         self,
         organization_id: str,
         external_menu_id: str,
-        price_category_id: str | None = None,
-    ) -> MenuByIdPost200Response:
+    ) -> ExternalMenuV2:
         """Получить внешнее меню для организации.
 
         Args:
             organization_id: ID организации
             external_menu_id: ID внешнего меню
-            price_category_id: ID ценовой категории (опционально)
 
         Returns:
             Данные внешнего меню
@@ -788,8 +789,49 @@ class IikoCloudApiClientManager:
         request = NomenclatureMenuRequest(
             organizationIds=[UUID(organization_id)],
             externalMenuId=external_menu_id,
-            priceCategoryId=price_category_id,
+            version=2,
+        )
+        return await self.get_menu_by_id(request)
+
+    async def get_menu_by_id_and_organization_v3(
+        self,
+        organization_id: str,
+        external_menu_id: str,
+    ) -> ExternalMenuV3:
+        """Получить внешнее меню для организации.
+
+        Args:
+            organization_id: ID организации
+            external_menu_id: ID внешнего меню
+
+        Returns:
+            Данные внешнего меню
+        """
+        request = NomenclatureMenuRequest(
+            organizationIds=[UUID(organization_id)],
+            externalMenuId=external_menu_id,
             version=3,
+        )
+        return await self.get_menu_by_id(request)
+
+    async def get_menu_by_id_and_organization_v4(
+        self,
+        organization_id: str,
+        external_menu_id: str,
+    ) -> ExternalMenuV4:
+        """Получить внешнее меню для организации.
+
+        Args:
+            organization_id: ID организации
+            external_menu_id: ID внешнего меню
+
+        Returns:
+            Данные внешнего меню
+        """
+        request = NomenclatureMenuRequest(
+            organizationIds=[UUID(organization_id)],
+            externalMenuId=external_menu_id,
+            version=4,
         )
         return await self.get_menu_by_id(request)
 

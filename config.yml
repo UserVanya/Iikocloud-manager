@@ -17,12 +17,8 @@ iikocloud:
 
     # Organizations
     get_organizations:
-      max_requests: 2
-      time_window_seconds: 1.0
-    get_organizations_settings:
-      max_requests: 1
-      time_window_seconds: 10.0
-
+      max_requests: 100
+      time_window_seconds: 600
     # Customers: 100 запросов в минуту
     create_or_update_customer:
       max_requests: 100
@@ -48,10 +44,10 @@ iikocloud:
     # Menu
     get_external_menus:
       max_requests: 1
-      time_window_seconds: 1.0
+      time_window_seconds: 5.0
     get_menu_by_id:
       max_requests: 1
       time_window_seconds: 60.0
     get_stop_lists:
-      max_requests: 10
+      max_requests: 1
       time_window_seconds: 60.0

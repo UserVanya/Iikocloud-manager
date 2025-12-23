@@ -436,14 +436,42 @@ class TestRealApiMenu:
     # @pytest.mark.xfail(
     #     reason="iikocloud-client bug: ExternalMenuV3 не полностью определён"
     # )
-    async def test_get_menu_by_id(
+    async def test_get_menu_by_id_v2(
         self, manager: IikoCloudApiClientManager,
         menu_test_organization_id: UUID,
         menu_id: str,
     ) -> None:
         """Получение меню по ID организации с 'мигуста' в названии."""
         # Запрашиваем меню по ID
-        response = await manager.get_menu_by_organization(
+        response = await manager.get_menu_by_id_and_organization_v2(
+            organization_id=str(menu_test_organization_id),
+            external_menu_id=menu_id,
+        )
+
+        assert response is not None
+
+    async def test_get_menu_by_id_v3(
+        self, manager: IikoCloudApiClientManager,
+        menu_test_organization_id: UUID,
+        menu_id: str,
+    ) -> None:
+        """Получение меню по ID организации с 'мигуста' в названии."""
+        # Запрашиваем меню по ID
+        response = await manager.get_menu_by_id_and_organization_v3(
+            organization_id=str(menu_test_organization_id),
+            external_menu_id=menu_id,
+        )
+
+        assert response is not None
+
+    async def test_get_menu_by_id_v4(
+        self, manager: IikoCloudApiClientManager,
+        menu_test_organization_id: UUID,
+        menu_id: str,
+    ) -> None:
+        """Получение меню по ID организации с 'мигуста' в названии."""
+        # Запрашиваем меню по ID
+        response = await manager.get_menu_by_id_and_organization_v4(
             organization_id=str(menu_test_organization_id),
             external_menu_id=menu_id,
         )
