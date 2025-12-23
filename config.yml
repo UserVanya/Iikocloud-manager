@@ -1,9 +1,9 @@
 # Конфигурация iikocloud API Manager
 iikocloud:
   # API логин для получения токена (секретный)
-  #api_login: "d248d2a3-cca"
+  api_login: "d248d2a3-cca"
   #api_login: "79c35fff4a9444cdbf673570e2f9f38c"
-  api_login: "df9096bf2bde4e38858c3b60dbc14a36"
+  #api_login: "df9096bf2bde4e38858c3b60dbc14a36"
   # Уникальный идентификатор ключа (для multitone паттерна)
   key_id: "main"
 

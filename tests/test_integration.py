@@ -42,7 +42,7 @@ class TestRealApiGetOrganizations:
         from iikocloud_client import OrganizationsGetOrganizationsRequest
 
         request = OrganizationsGetOrganizationsRequest()
-        response = await manager.get_organizations(request)
+        response = await manager.organizations(request)
 
         # Проверяем структуру ответа
         assert response is not None
@@ -70,11 +70,11 @@ class TestRealApiGetOrganizations:
         request = OrganizationsGetOrganizationsRequest()
 
         # Первый запрос
-        response1 = await manager.get_organizations(request)
+        response1 = await manager.organizations(request)
         token_version_1 = manager._token_manager._token_version  # type: ignore
 
         # Второй запрос
-        response2 = await manager.get_organizations(request)
+        response2 = await manager.organizations(request)
         token_version_2 = manager._token_manager._token_version  # type: ignore
 
         # Оба запроса успешны
@@ -101,7 +101,7 @@ class TestRealApiTokenRefresh:
         request = OrganizationsGetOrganizationsRequest()
 
         # Первый успешный запрос
-        response1 = await manager.get_organizations(request)
+        response1 = await manager.organizations(request)
         assert response1 is not None
         token_version_before = manager._token_manager._token_version  # type: ignore
         token_before = manager._token_manager._token  # type: ignore
@@ -112,7 +112,7 @@ class TestRealApiTokenRefresh:
         manager._api_client.configuration.access_token = "invalid-token-12345"
 
         # Следующий запрос должен получить 401, обновить токен и повторить
-        response2 = await manager.get_organizations(request)
+        response2 = await manager.organizations(request)
 
         # Запрос успешен
         assert response2 is not None
@@ -139,9 +139,9 @@ class TestRealApiConcurrentRequests:
 
         # Запускаем 3 конкурентных запроса
         results = await asyncio.gather(
-            manager.get_organizations(request),
-            manager.get_organizations(request),
-            manager.get_organizations(request),
+            manager.organizations(request),
+            manager.organizations(request),
+            manager.organizations(request),
             return_exceptions=True,
         )
 
@@ -160,7 +160,7 @@ class TestRealApiConcurrentRequests:
         request = OrganizationsGetOrganizationsRequest()
 
         # Первый запрос для получения токена
-        await manager.get_organizations(request)
+        await manager.organizations(request)
         token_version_before = manager._token_manager._token_version  # type: ignore
 
         # Пауза чтобы не получить rate limit от iiko
@@ -172,9 +172,9 @@ class TestRealApiConcurrentRequests:
         # Запускаем несколько конкурентных запросов
         # Все получат 401, но только один должен обновить токен
         results = await asyncio.gather(
-            manager.get_organizations(request),
-            manager.get_organizations(request),
-            manager.get_organizations(request),
+            manager.organizations(request),
+            manager.organizations(request),
+            manager.organizations(request),
             return_exceptions=True,
         )
 
@@ -200,7 +200,7 @@ class TestRealApiRateLimiting:
 
         # Делаем 5 последовательных запросов
         for i in range(5):
-            response = await manager.get_organizations(request)
+            response = await manager.organizations(request)
             assert response is not None, f"Request {i} failed"
             assert len(response.organizations) > 0
 
@@ -382,7 +382,7 @@ class TestRealApiTerminalGroups:
             organizationIds=[organization_id],
             includeDisabled=True,
         )
-        response = await manager.get_terminal_groups(request)
+        response = await manager.terminal_groups(request)
 
         assert response is not None
         assert hasattr(response, "terminal_groups")
@@ -426,7 +426,7 @@ class TestRealApiMenu:
         self, manager: IikoCloudApiClientManager
     ) -> None:
         """Получение списка внешних меню."""
-        response = await manager.get_external_menus()
+        response = await manager.external_menus()
 
         assert response is not None
         assert hasattr(response, "correlation_id")
@@ -499,7 +499,7 @@ class TestRealApiMenu:
         request = StopListsStopListsRequest(
             organizationIds=[organization_id],
         )
-        response = await manager.get_stop_lists(request)
+        response = await manager.stop_lists(request)
 
         assert response is not None
         assert hasattr(response, "correlation_id")

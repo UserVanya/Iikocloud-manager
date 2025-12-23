@@ -22,7 +22,7 @@ async def main() -> None:
     try:
         # Получаем список организаций
         request = OrganizationsGetOrganizationsRequest()
-        response = await manager.get_organizations(request)
+        response = await manager.organizations(request)
         pprint(response)
     finally:
         # Закрываем все соединения

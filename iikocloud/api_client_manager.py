@@ -540,6 +540,130 @@ class IikoCloudApiClientManager:
 
         return await self.execute_with_retry(ApiMethod.RESTORE_CUSTOMERS, api_call)
 
+    # ========== Основные методы: Organizations ==========
+
+    async def organizations(
+        self,
+        request: OrganizationsGetOrganizationsRequest | None = None,
+    ) -> OrganizationsGetOrganizationsResponse:
+        """Получить список организаций.
+
+        Args:
+            request: Запрос на получение организаций
+
+        Returns:
+            Список организаций
+        """
+        if request is None:
+            request = OrganizationsGetOrganizationsRequest()
+
+        async def api_call() -> OrganizationsGetOrganizationsResponse:
+            api = await self.get_organizations_api()
+            return await api.organizations_post(
+                organizations_get_organizations_request=request
+            )
+
+        return await self.execute_with_retry(ApiMethod.GET_ORGANIZATIONS, api_call)
+
+    # ========== Основные методы: Terminal Groups ==========
+
+    async def terminal_groups(
+        self,
+        request: TerminalsTerminalGroupsRequest,
+    ) -> TerminalsTerminalGroupsResponse:
+        """Получить список терминальных групп.
+
+        Args:
+            request: Запрос с ID организаций
+
+        Returns:
+            Список терминальных групп
+        """
+
+        async def api_call() -> TerminalsTerminalGroupsResponse:
+            api = await self.get_terminal_groups_api()
+            return await api.terminal_groups_post(
+                terminals_terminal_groups_request=request
+            )
+
+        return await self.execute_with_retry(ApiMethod.GET_TERMINAL_GROUPS, api_call)
+
+    async def terminal_groups_alive(
+        self,
+        request: TerminalsTerminalGroupsIsAliveRequest,
+    ) -> TerminalsTerminalGroupsIsAliveResponse:
+        """Проверить доступность терминальных групп.
+
+        Args:
+            request: Запрос с ID терминальных групп и организаций
+
+        Returns:
+            Информация о доступности терминальных групп
+        """
+
+        async def api_call() -> TerminalsTerminalGroupsIsAliveResponse:
+            api = await self.get_terminal_groups_api()
+            return await api.terminal_groups_is_alive_post(
+                terminals_terminal_groups_is_alive_request=request
+            )
+
+        return await self.execute_with_retry(
+            ApiMethod.CHECK_TERMINAL_GROUPS_ALIVE, api_call
+        )
+
+    # ========== Основные методы: Menu ==========
+
+    async def external_menus(self) -> NomenclatureMenusDataResponse:
+        """Получить список внешних меню с ценовыми категориями.
+
+        Returns:
+            Список внешних меню
+        """
+
+        async def api_call() -> NomenclatureMenusDataResponse:
+            api = await self.get_menu_api()
+            return await api.menu_post()
+
+        return await self.execute_with_retry(ApiMethod.GET_EXTERNAL_MENUS, api_call)
+
+    async def menu_by_id(
+        self,
+        request: NomenclatureMenuRequest,
+    ) -> MenuByIdPost200Response:
+        """Получить внешнее меню по ID.
+
+        Args:
+            request: Запрос с ID организации и внешнего меню
+
+        Returns:
+            Данные внешнего меню
+        """
+
+        async def api_call() -> MenuByIdPost200Response:
+            api = await self.get_menu_api()
+            return await api.menu_by_id_post(nomenclature_menu_request=request)
+
+        return await self.execute_with_retry(ApiMethod.GET_MENU_BY_ID, api_call)
+
+    async def stop_lists(
+        self,
+        request: StopListsStopListsRequest,
+    ) -> StopListsStopListsResponse:
+        """Получить стоп-листы (товары, отсутствующие в наличии).
+
+        Args:
+            request: Запрос с ID организаций
+
+        Returns:
+            Стоп-листы организаций
+        """
+
+        async def api_call() -> StopListsStopListsResponse:
+            api = await self.get_menu_api()
+            return await api.stop_lists_post(stop_lists_stop_lists_request=request)
+
+        return await self.execute_with_retry(ApiMethod.GET_STOP_LISTS, api_call)
+
     # ========== Вспомогательные методы: Customers ==========
 
     async def get_customer_by_phone(
@@ -604,77 +728,6 @@ class IikoCloudApiClientManager:
         )
         return await self.restore_customers(request)
 
-    # ========== Основные методы: Organizations ==========
-
-    async def get_organizations(
-        self,
-        request: OrganizationsGetOrganizationsRequest | None = None,
-    ) -> OrganizationsGetOrganizationsResponse:
-        """Получить список организаций.
-
-        Args:
-            request: Запрос на получение организаций
-
-        Returns:
-            Список организаций
-        """
-        if request is None:
-            request = OrganizationsGetOrganizationsRequest()
-
-        async def api_call() -> OrganizationsGetOrganizationsResponse:
-            api = await self.get_organizations_api()
-            return await api.organizations_post(
-                organizations_get_organizations_request=request
-            )
-
-        return await self.execute_with_retry(ApiMethod.GET_ORGANIZATIONS, api_call)
-
-    # ========== Основные методы: Terminal Groups ==========
-
-    async def get_terminal_groups(
-        self,
-        request: TerminalsTerminalGroupsRequest,
-    ) -> TerminalsTerminalGroupsResponse:
-        """Получить список терминальных групп.
-
-        Args:
-            request: Запрос с ID организаций
-
-        Returns:
-            Список терминальных групп
-        """
-
-        async def api_call() -> TerminalsTerminalGroupsResponse:
-            api = await self.get_terminal_groups_api()
-            return await api.terminal_groups_post(
-                terminals_terminal_groups_request=request
-            )
-
-        return await self.execute_with_retry(ApiMethod.GET_TERMINAL_GROUPS, api_call)
-
-    async def check_terminal_groups_alive(
-        self,
-        request: TerminalsTerminalGroupsIsAliveRequest,
-    ) -> TerminalsTerminalGroupsIsAliveResponse:
-        """Проверить доступность терминальных групп.
-
-        Args:
-            request: Запрос с ID терминальных групп и организаций
-
-        Returns:
-            Информация о доступности терминальных групп
-        """
-
-        async def api_call() -> TerminalsTerminalGroupsIsAliveResponse:
-            api = await self.get_terminal_groups_api()
-            return await api.terminal_groups_is_alive_post(
-                terminals_terminal_groups_is_alive_request=request
-            )
-
-        return await self.execute_with_retry(
-            ApiMethod.CHECK_TERMINAL_GROUPS_ALIVE, api_call
-        )
-
     # ========== Вспомогательные методы: Terminal Groups ==========
 
     async def get_terminal_groups_by_organization(
@@ -695,7 +748,7 @@ class IikoCloudApiClientManager:
             organizationIds=[UUID(organization_id)],
             includeDisabled=include_disabled,
         )
-        return await self.get_terminal_groups(request)
+        return await self.terminal_groups(request)
 
     async def check_terminal_group_alive(
         self,
@@ -715,60 +768,7 @@ class IikoCloudApiClientManager:
             organizationIds=[UUID(organization_id)],
             terminalGroupIds=[UUID(terminal_group_id)],
         )
-        return await self.check_terminal_groups_alive(request)
-
-    # ========== Основные методы: Menu ==========
-
-    async def get_external_menus(self) -> NomenclatureMenusDataResponse:
-        """Получить список внешних меню с ценовыми категориями.
-
-        Returns:
-            Список внешних меню
-        """
-
-        async def api_call() -> NomenclatureMenusDataResponse:
-            api = await self.get_menu_api()
-            return await api.menu_post()
-
-        return await self.execute_with_retry(ApiMethod.GET_EXTERNAL_MENUS, api_call)
-
-    async def get_menu_by_id(
-        self,
-        request: NomenclatureMenuRequest,
-    ) -> MenuByIdPost200Response:
-        """Получить внешнее меню по ID.
-
-        Args:
-            request: Запрос с ID организации и внешнего меню
-
-        Returns:
-            Данные внешнего меню
-        """
-
-        async def api_call() -> MenuByIdPost200Response:
-            api = await self.get_menu_api()
-            return await api.menu_by_id_post(nomenclature_menu_request=request)
-
-        return await self.execute_with_retry(ApiMethod.GET_MENU_BY_ID, api_call)
-
-    async def get_stop_lists(
-        self,
-        request: StopListsStopListsRequest,
-    ) -> StopListsStopListsResponse:
-        """Получить стоп-листы (товары, отсутствующие в наличии).
-
-        Args:
-            request: Запрос с ID организаций
-
-        Returns:
-            Стоп-листы организаций
-        """
-
-        async def api_call() -> StopListsStopListsResponse:
-            api = await self.get_menu_api()
-            return await api.stop_lists_post(stop_lists_stop_lists_request=request)
-
-        return await self.execute_with_retry(ApiMethod.GET_STOP_LISTS, api_call)
+        return await self.terminal_groups_alive(request)
 
     # ========== Вспомогательные методы: Menu ==========
 
@@ -791,7 +791,7 @@ class IikoCloudApiClientManager:
             externalMenuId=external_menu_id,
             version=2,
         )
-        return await self.get_menu_by_id(request)
+        return await self.menu_by_id(request)
 
     async def get_menu_by_id_and_organization_v3(
         self,
@@ -812,7 +812,7 @@ class IikoCloudApiClientManager:
             externalMenuId=external_menu_id,
             version=3,
         )
-        return await self.get_menu_by_id(request)
+        return await self.menu_by_id(request)
 
     async def get_menu_by_id_and_organization_v4(
         self,
@@ -833,7 +833,7 @@ class IikoCloudApiClientManager:
             externalMenuId=external_menu_id,
             version=4,
         )
-        return await self.get_menu_by_id(request)
+        return await self.menu_by_id(request)
 
     async def get_stop_lists_by_organization(
         self,
@@ -850,4 +850,4 @@ class IikoCloudApiClientManager:
         request = StopListsStopListsRequest(
             organizationIds=[UUID(org_id) for org_id in organization_ids],
         )
-        return await self.get_stop_lists(request)
+        return await self.stop_lists(request)

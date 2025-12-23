@@ -140,7 +140,7 @@ class TestReadOnlyMethods:
         from iikocloud_client import OrganizationsGetOrganizationsRequest
 
         request = OrganizationsGetOrganizationsRequest()
-        result = await manager.get_organizations(request)
+        result = await manager.organizations(request)
 
         # Проверяем
         assert result == mock_response
@@ -261,7 +261,7 @@ class TestRetryOn401:
         from iikocloud_client import OrganizationsGetOrganizationsRequest
 
         request = OrganizationsGetOrganizationsRequest()
-        result = await manager.get_organizations(request)
+        result = await manager.organizations(request)
 
         # Проверяем
         assert result == mock_response
@@ -315,7 +315,7 @@ class TestRetryOn401:
         from iikocloud_client import OrganizationsGetOrganizationsRequest
 
         request = OrganizationsGetOrganizationsRequest()
-        result1 = await manager.get_organizations(request)
+        result1 = await manager.organizations(request)
         assert result1 == mock_response
         assert request_count == 1
 
@@ -323,7 +323,7 @@ class TestRetryOn401:
         manager._api_client.configuration.access_token = None
 
         # Второй запрос — должен получить 401, обновить токен и повторить
-        result2 = await manager.get_organizations(request)
+        result2 = await manager.organizations(request)
         assert result2 == mock_response
         # 2-й вызов (401) + 3-й вызов (успех после refresh) = 3 вызова всего
         assert request_count == 3
@@ -391,9 +391,9 @@ class TestConcurrentTokenRefresh:
         request = OrganizationsGetOrganizationsRequest()
 
         results = await asyncio.gather(
-            manager.get_organizations(request),
-            manager.get_organizations(request),
-            manager.get_organizations(request),
+            manager.organizations(request),
+            manager.organizations(request),
+            manager.organizations(request),
             return_exceptions=True,
         )
 
