@@ -1,0 +1,57 @@
+# Конфигурация iikocloud API Manager
+iikocloud:
+  # API логин для получения токена (секретный)
+  #api_login: "d248d2a3-cca"
+  #api_login: "79c35fff4a9444cdbf673570e2f9f38c"
+  api_login: "df9096bf2bde4e38858c3b60dbc14a36"
+  # Уникальный идентификатор ключа (для multitone паттерна)
+  key_id: "main"
+
+  # Rate limits для каждого метода API
+  # Глобальный лимит автоматически вычисляется как самый свободный
+  rate_limits:
+    # Авторизация: 1 запрос в 5 секунд
+    auth:
+      max_requests: 2
+      time_window_seconds: 1.0
+
+    # Organizations
+    get_organizations:
+      max_requests: 2
+      time_window_seconds: 1.0
+    get_organizations_settings:
+      max_requests: 1
+      time_window_seconds: 10.0
+
+    # Customers: 100 запросов в минуту
+    create_or_update_customer:
+      max_requests: 100
+      time_window_seconds: 60.0
+    get_customer_info:
+      max_requests: 100
+      time_window_seconds: 60.0
+    delete_customers:
+      max_requests: 100
+      time_window_seconds: 60.0
+    restore_customers:
+      max_requests: 100
+      time_window_seconds: 60.0
+
+    # Terminal Groups: 10 запросов в минуту
+    get_terminal_groups:
+      max_requests: 10
+      time_window_seconds: 60.0
+    check_terminal_groups_alive:
+      max_requests: 10
+      time_window_seconds: 60.0
+
+    # Menu
+    get_external_menus:
+      max_requests: 1
+      time_window_seconds: 1.0
+    get_menu_by_id:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_stop_lists:
+      max_requests: 10
+      time_window_seconds: 60.0
