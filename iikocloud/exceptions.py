@@ -1,4 +1,8 @@
-"""Исключения для работы с iikocloud API."""
+"""Исключения для работы с iikocloud API.
+
+Минимальный набор исключений для обработки ошибок аутентификации.
+Все остальные ошибки API пробрасываются из iikocloud_client напрямую.
+"""
 
 
 class IikoCloudException(Exception):
@@ -10,24 +14,9 @@ class IikoCloudException(Exception):
 
 
 class IikoCloudAuthException(IikoCloudException):
-    """Исключение при ошибках аутентификации."""
+    """Исключение при ошибках аутентификации.
 
-
-class IikoCloudConnectionException(IikoCloudException):
-    """Исключение при проблемах с подключением к iikocloud API."""
-
-
-class IikoCloudTimeoutException(IikoCloudException):
-    """Исключение при таймауте запроса к iikocloud API."""
-
-
-class IikoCloudCustomerNotFoundException(IikoCloudException):
-    """Исключение когда клиент не найден в iikocloud."""
-
-
-class IikoCloudValidationException(IikoCloudException):
-    """Исключение при ошибках валидации данных для iikocloud API."""
-
-
-class IikoCloudRateLimitException(IikoCloudException):
-    """Исключение при превышении лимита запросов."""
+    Выбрасывается при:
+    - Некорректном API-ключе (401 на запрос токена)
+    - Ошибках получения/обновления токена
+    """

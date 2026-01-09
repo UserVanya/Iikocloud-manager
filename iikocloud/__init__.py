@@ -27,12 +27,7 @@ from iikocloud.config_reader import (
 )
 from iikocloud.exceptions import (
     IikoCloudAuthException,
-    IikoCloudConnectionException,
-    IikoCloudCustomerNotFoundException,
     IikoCloudException,
-    IikoCloudRateLimitException,
-    IikoCloudTimeoutException,
-    IikoCloudValidationException,
 )
 from iikocloud.rate_limiter import (
     GlobalRateLimiter,
@@ -56,12 +51,7 @@ __all__ = [
     "parse_config_file",
     # Exceptions
     "IikoCloudAuthException",
-    "IikoCloudConnectionException",
-    "IikoCloudCustomerNotFoundException",
     "IikoCloudException",
-    "IikoCloudRateLimitException",
-    "IikoCloudTimeoutException",
-    "IikoCloudValidationException",
     # Rate Limiting
     "GlobalRateLimiter",
     "RateLimitConfig",

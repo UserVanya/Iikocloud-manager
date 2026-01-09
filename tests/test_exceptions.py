@@ -4,12 +4,7 @@ import pytest
 
 from iikocloud.exceptions import (
     IikoCloudAuthException,
-    IikoCloudConnectionException,
-    IikoCloudCustomerNotFoundException,
     IikoCloudException,
-    IikoCloudRateLimitException,
-    IikoCloudTimeoutException,
-    IikoCloudValidationException,
 )
 
 # Маркируем все тесты в этом модуле как unit-тесты
@@ -39,40 +34,30 @@ class TestIikoCloudException:
         assert exc.original_error is None
 
 
-class TestExceptionHierarchy:
-    """Тесты иерархии исключений."""
+class TestIikoCloudAuthException:
+    """Тесты для исключения аутентификации."""
 
-    @pytest.mark.parametrize(
-        "exception_class",
-        [
-            IikoCloudAuthException,
-            IikoCloudConnectionException,
-            IikoCloudTimeoutException,
-            IikoCloudCustomerNotFoundException,
-            IikoCloudValidationException,
-            IikoCloudRateLimitException,
-        ],
-    )
-    def test_inherits_from_base(
-        self, exception_class: type[IikoCloudException]
-    ) -> None:
-        """Все исключения наследуются от IikoCloudException."""
-        exc = exception_class("Test")
+    def test_inherits_from_base(self) -> None:
+        """IikoCloudAuthException наследуется от IikoCloudException."""
+        exc = IikoCloudAuthException("Auth failed")
 
         assert isinstance(exc, IikoCloudException)
         assert isinstance(exc, Exception)
 
     def test_catch_by_base_class(self) -> None:
-        """Специфичные исключения ловятся базовым классом."""
+        """IikoCloudAuthException ловится базовым классом."""
         with pytest.raises(IikoCloudException):
             raise IikoCloudAuthException("Auth failed")
 
-    def test_catch_specific_exception(self) -> None:
-        """Специфичные исключения можно ловить отдельно."""
+    def test_catch_specific(self) -> None:
+        """IikoCloudAuthException можно поймать отдельно."""
         with pytest.raises(IikoCloudAuthException):
             raise IikoCloudAuthException("Auth failed")
 
-        # Но не другие типы
-        with pytest.raises(IikoCloudConnectionException):
-            raise IikoCloudConnectionException("Connection failed")
+    def test_with_original_error(self) -> None:
+        """IikoCloudAuthException сохраняет оригинальную ошибку."""
+        original = ConnectionError("Connection refused")
+        exc = IikoCloudAuthException("Auth failed", original_error=original)
 
+        assert exc.original_error is original
+        assert str(exc) == "Auth failed"
