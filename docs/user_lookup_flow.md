@@ -15,27 +15,30 @@ flowchart TD
     ACTUAL_DATA[Вернуть актуальные данные]
     LAST_SAVED_DATA[Вернуть последние сохраненные данные]
     NO_DATA[Вернуть 404]
-    TEMPORAL_ERROR[Вернуть server error]
-    
+    TEMPORAL_ERROR[Вернуть 404 с iiko cloud server error]
+    RETURN_DATA_FOUND_BUT_USER_NOT_REGISTERED[Вернуть 404 с пояснением: Пользователь существует в iiko, но не зарегистрирован на сайте]
+    GET_FROM_CACHE[Получить данные из кэша]
+    GET_DATA_FROM_IIKO[Получить данные из iiko]
+    GET_DATA_FROM_DB[Получить данные из БД]
+    GET_FROM_CACHE --> CACHE
     CACHE -->|Да| LAST_SAVED_DATA
-    CACHE -->|Нет| DB{Есть ли в БД?}
+    CACHE -->|Нет| GET_DATA_FROM_DB --> GET_DATA_FROM_IIKO -->DB
+    DB{Есть ли в БД?}
     
-    DB -->|Да| UPDATE_PROCESS[Запустить процесс<br>обновления данных<br>из iiko о пользователе]
-    DB -->|Нет| IIKO{Есть ли в iiko?}
+    DB -->|Да| IIKO_REQUEST
+    DB -->|Нет| IIKO
     
-    IIKO -->|Есть| SAVE[Обновить запись в<br>БД и обновить кэш]
+    IIKO{"Есть ли в iiko?"}
+    IIKO -->|Есть| RETURN_DATA_FOUND_BUT_USER_NOT_REGISTERED
     IIKO -->|Нет данных о пользователе| NO_DATA
     IIKO -->|ошибка соединения с сервером iiko| TEMPORAL_ERROR
 
     SAVE --> ACTUAL_DATA
-    UPDATE_PROCESS --> SUBPROCESS
     RETURN_CONNECTION_ERROR --> LAST_SAVED_DATA
     %% Подпроцесс обновления данных из iiko
-    subgraph SUBPROCESS [Обновление данных из iiko о пользователе]
-        IIKO_REQUEST{Есть ли в iiko?}
-        IIKO_REQUEST -->|Ответ есть| SAVE[Обновить запись в<br>БД и обновить кэш]
-        IIKO_REQUEST -->|Ответа нет| RETURN_CONNECTION_ERROR[Залогировать ошибку<br>обновления и запланировать ее на время позже]
-    end
+    IIKO_REQUEST{Есть ли в iiko?}
+    IIKO_REQUEST -->|Ответ есть| SAVE[Обновить запись в<br>БД и обновить кэш]
+    IIKO_REQUEST -->|Ответа нет| RETURN_CONNECTION_ERROR[Залогировать ошибку<br>обновления и запланировать ее на время позже]
 
     %% Стили
     classDef process fill:#2d3748,stroke:#4a5568,color:#fff
