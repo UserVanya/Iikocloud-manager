@@ -17,7 +17,7 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import UUID
 
 import pytest
-from iikocloud_client.exceptions import UnauthorizedException
+from iikocloud_client.exceptions import ApiException, UnauthorizedException
 
 from iikocloud.api_client_manager import (
     ApiCredentials,
@@ -568,3 +568,94 @@ class TestExecuteWithRetry:
         assert result == "success"
         assert call_count == 2
         mock_token_manager.refresh_token_if_401_with_limits.assert_awaited_once()
+
+
+class TestRateLimitCheck:
+    """Тесты проверки блокировки API из-за rate limit."""
+
+    async def test_is_locked_returns_true_on_429(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """При 429 ошибке is_locked_because_of_iikocloud_rate_limit возвращает True."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем OrganizationsApi чтобы возвращал 429
+        mock_api = MagicMock()
+        mock_api.organizations_post = AsyncMock(
+            side_effect=ApiException(status=429, reason="Too Many Requests")
+        )
+        manager._organizations_api = mock_api
+
+        # Вызываем метод
+        result = await manager.is_locked_because_of_iikocloud_rate_limit()
+
+        # Проверяем
+        assert result is True
+        mock_api.organizations_post.assert_awaited_once()
+
+    async def test_is_locked_returns_false_on_success(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """При успешном ответе is_locked_because_of_iikocloud_rate_limit возвращает False."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем OrganizationsApi с успешным ответом
+        mock_response = MagicMock()
+        mock_api = MagicMock()
+        mock_api.organizations_post = AsyncMock(return_value=mock_response)
+        manager._organizations_api = mock_api
+
+        # Вызываем метод
+        result = await manager.is_locked_because_of_iikocloud_rate_limit()
+
+        # Проверяем
+        assert result is False
+
+    async def test_is_locked_returns_false_on_other_errors(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """При других ошибках (не 429) is_locked_because_of_iikocloud_rate_limit возвращает False."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем OrganizationsApi чтобы возвращал 500
+        mock_api = MagicMock()
+        mock_api.organizations_post = AsyncMock(
+            side_effect=ApiException(status=500, reason="Internal Server Error")
+        )
+        manager._organizations_api = mock_api
+
+        # Вызываем метод
+        result = await manager.is_locked_because_of_iikocloud_rate_limit()
+
+        # Проверяем — не 429, значит False
+        assert result is False

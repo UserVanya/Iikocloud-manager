@@ -21,7 +21,11 @@ from uuid import UUID
 
 import pytest
 
-from iikocloud import IikoCloudApiClientManager
+from iikocloud import (
+    ApiCredentials,
+    IikoCloudApiClientManager,
+    IikoCloudAuthException,
+)
 from tests.conftest import (
     EXISTING_CUSTOMER_PHONE,
     NOT_FOUND_CUSTOMER_PHONE,
@@ -30,6 +34,31 @@ from tests.conftest import (
 
 # Маркируем весь модуль как интеграционные и медленные тесты
 pytestmark = [pytest.mark.integration, pytest.mark.slow]
+
+
+class TestInvalidApiKey:
+    """Тесты с некорректным API ключом."""
+
+    async def test_invalid_api_key_raises_auth_exception(self) -> None:
+        """Некорректный API ключ выбрасывает IikoCloudAuthException."""
+        # Создаём менеджер с заведомо неверным ключом
+        credentials = ApiCredentials(
+            api_login="invalid-api-key-that-does-not-exist-12345",
+            key_id="test-invalid-key",
+        )
+        manager = await IikoCloudApiClientManager.get_instance(credentials)
+
+        try:
+            # Любой вызов должен попытаться получить токен и получить 401
+            with pytest.raises(IikoCloudAuthException) as exc_info:
+                await manager.organizations()
+
+            # Проверяем сообщение об ошибке
+            assert "Некорректный API-ключ" in str(exc_info.value)
+            assert "401" in str(exc_info.value)
+        finally:
+            # Обязательно очищаем после теста
+            await IikoCloudApiClientManager.close_all()
 
 
 class TestRealApiGetOrganizations:
@@ -409,7 +438,7 @@ class TestRealApiTerminalGroups:
             pytest.skip("Нет доступных терминальных групп")
 
         # Проверяем доступность
-        response = await manager.check_terminal_group_alive(
+        response = await manager.check_terminal_group_alive_by_organization(
             terminal_group_id=str(terminal_group.id),
             organization_id=str(organization_id),
         )

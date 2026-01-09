@@ -91,11 +91,27 @@ class TokenManager:
         request = AuthGetAccessTokenRequest(apiLogin=self._api_login)
 
         try:
+            logger.debug("Запрос токена для key_id=%s", self._key_id)
             response = await self._authorization_api.access_token_post(
                 auth_get_access_token_request=request
             )
             return response.token
+        except UnauthorizedException as exc:
+            # 401 на auth запрос = некорректный API-ключ
+            logger.error(
+                "Некорректный API-ключ для key_id=%s: получен 401 на запрос авторизации",
+                self._key_id,
+            )
+            raise IikoCloudAuthException(
+                "Некорректный API-ключ: получен 401 на запрос авторизации",
+                original_error=exc,
+            ) from exc
         except Exception as exc:
+            logger.error(
+                "Ошибка при получении токена для key_id=%s: %s",
+                self._key_id,
+                exc,
+            )
             raise IikoCloudAuthException(
                 f"Ошибка при получении токена: {exc}", original_error=exc
             ) from exc
@@ -124,8 +140,10 @@ class TokenManager:
                 self._token = await self._fetch_token(acquire_global, acquire_auth)
                 self._token_version += 1
                 self._api_client.configuration.access_token = self._token
-                logger.debug(
-                    "Токен получен успешно, версия: %d", self._token_version
+                logger.info(
+                    "Токен получен успешно для key_id=%s (версия: %d)",
+                    self._key_id,
+                    self._token_version,
                 )
             finally:
                 self._refresh_event.set()
@@ -180,8 +198,17 @@ class TokenManager:
                 self._token = await self._fetch_token(acquire_global, acquire_auth)
                 self._token_version += 1
                 self._api_client.configuration.access_token = self._token
-                logger.debug("Токен обновлён, версия: %d", self._token_version)
-            except Exception:
+                logger.info(
+                    "Токен обновлён после 401 для key_id=%s (версия: %d)",
+                    self._key_id,
+                    self._token_version,
+                )
+            except Exception as exc:
+                logger.error(
+                    "Ошибка при обновлении токена для key_id=%s: %s",
+                    self._key_id,
+                    exc,
+                )
                 self._token = None
                 self._api_client.configuration.access_token = None
                 raise

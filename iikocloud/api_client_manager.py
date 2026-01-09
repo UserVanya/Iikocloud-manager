@@ -6,6 +6,7 @@
 """
 
 import asyncio
+import logging
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from enum import Enum
@@ -14,6 +15,7 @@ from uuid import UUID
 
 from iikocloud_client import (
     ApiClient,
+    ApiException,
     Configuration,
     CustomerCreateOrUpdateCustomerRequest,
     CustomerCreateOrUpdateCustomerResponse,
@@ -53,6 +55,8 @@ from iikocloud.rate_limiter import (
     TokenBucketRateLimiter,
 )
 from iikocloud.token_manager import TokenManager
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
@@ -279,6 +283,10 @@ class IikoCloudApiClientManager:
         self._api_client = ApiClient(configuration=self._config)
 
         self._token_manager: TokenManager | None = None
+        logger.debug(
+            "Создан экземпляр IikoCloudApiClientManager для key_id=%s",
+            credentials.key_id,
+        )
         self._customers_api: CustomersApi | None = None
         self._organizations_api: OrganizationsApi | None = None
         self._terminal_groups_api: TerminalGroupsApi | None = None
@@ -334,7 +342,6 @@ class IikoCloudApiClientManager:
             api_login=config.api_login.get_secret_value(),
             key_id=config.key_id,
         )
-        print(config.api_login.get_secret_value())
         method_limits = MethodRateLimits.from_settings(config.rate_limits)
 
         return await cls.get_instance(
@@ -345,12 +352,16 @@ class IikoCloudApiClientManager:
     @classmethod
     async def close_all(cls) -> None:
         """Закрыть все соединения и сбросить экземпляры."""
+        instance_count = len(cls._instances)
         for manager in cls._instances.values():
             await manager._api_client.close()  # type: ignore[no-untyped-call]
         cls._instances.clear()
         cls._lock = None
         GlobalRateLimiter.reset_instance()
         await TokenManager.close_all()
+        logger.debug(
+            "Закрыты все соединения (%d экземпляров)", instance_count
+        )
 
     async def _ensure_token_manager(self) -> TokenManager:
         """Обеспечить наличие token manager с токеном."""
@@ -394,10 +405,17 @@ class IikoCloudApiClientManager:
             Exception: Любые ошибки кроме 401 (они обрабатываются retry)
         """
         token_manager = await self._ensure_token_manager()
+        logger.debug("Вызов API метода: %s", method.value)
 
         try:
-            return await self._with_limits(method, api_call)
+            result = await self._with_limits(method, api_call)
+            logger.debug("Метод %s выполнен успешно", method.value)
+            return result
         except UnauthorizedException as exc:
+            logger.debug(
+                "Токен истёк для метода %s, обновляем",
+                method.value,
+            )
             await token_manager.refresh_token_if_401_with_limits(
                 exc,
                 acquire_global=self._global_limiter.acquire,
@@ -407,14 +425,41 @@ class IikoCloudApiClientManager:
         except Exception as exc:
             # Проверяем на 401 в других типах исключений
             if getattr(exc, "status", None) == 401:
+                logger.debug(
+                    "Токен истёк для метода %s, обновляем",
+                    method.value,
+                )
                 await token_manager.refresh_token_if_401_with_limits(
                     exc,
                     acquire_global=self._global_limiter.acquire,
                     acquire_auth=self._method_limiters[ApiMethod.AUTH].acquire,
                 )
                 return await self._with_limits(method, api_call)
+            # Логируем ошибку API
+            logger.error(
+                "Ошибка API при вызове метода %s: %s",
+                method.value,
+                exc,
+            )
             raise
 
+    async def is_locked_because_of_iikocloud_rate_limit(self) -> bool:
+        """Проверить, заблокирован ли API из-за rate limit."""
+        request = OrganizationsGetOrganizationsRequest()
+        api = await self.get_organizations_api()
+        try:
+            await api.organizations_post(
+                organizations_get_organizations_request=request
+            )
+            return False
+        except ApiException as exc:
+            if exc.status == 429:
+                logger.warning(
+                    "API заблокирован из-за rate limit (429) для key_id=%s",
+                    self._credentials.key_id,
+                )
+                return True
+            return False
     # ========== API Клиенты ==========
 
     async def get_customers_api(self) -> CustomersApi:
@@ -750,7 +795,7 @@ class IikoCloudApiClientManager:
         )
         return await self.terminal_groups(request)
 
-    async def check_terminal_group_alive(
+    async def check_terminal_group_alive_by_organization(
         self,
         terminal_group_id: str,
         organization_id: str,
@@ -792,6 +837,7 @@ class IikoCloudApiClientManager:
             version=2,
         )
         return await self.menu_by_id(request) # type: ignore
+
     async def get_menu_by_id_and_organization_v3(
         self,
         organization_id: str,
@@ -850,3 +896,5 @@ class IikoCloudApiClientManager:
             organizationIds=[UUID(org_id) for org_id in organization_ids],
         )
         return await self.stop_lists(request)
+
+
