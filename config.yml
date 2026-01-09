@@ -51,3 +51,20 @@ iikocloud:
     get_stop_lists:
       max_requests: 1
       time_window_seconds: 60.0
+
+    # Dictionaries
+    get_delivery_cancel_causes:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_order_types:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_payment_types:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_discounts:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_removal_types:
+      max_requests: 1
+      time_window_seconds: 60.0

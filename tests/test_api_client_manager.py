@@ -63,6 +63,11 @@ def method_limits() -> MethodRateLimits:
         get_external_menus=fast_config,
         get_menu_by_id=fast_config,
         get_stop_lists=fast_config,
+        get_delivery_cancel_causes=fast_config,
+        get_order_types=fast_config,
+        get_payment_types=fast_config,
+        get_discounts=fast_config,
+        get_removal_types=fast_config,
     )
 
 
@@ -659,3 +664,258 @@ class TestRateLimitCheck:
 
         # Проверяем — не 429, значит False
         assert result is False
+
+
+class TestDictionariesApi:
+    """Тесты методов Dictionaries API."""
+
+    async def test_delivery_cancel_causes_calls_api(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """delivery_cancel_causes вызывает API и возвращает результат."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем DictionariesApi
+        mock_response = MagicMock()
+        mock_response.correlation_id = UUID("12345678-1234-1234-1234-123456789abc")
+        mock_response.cancel_causes = []
+
+        mock_api = MagicMock()
+        mock_api.cancel_causes_post = AsyncMock(return_value=mock_response)
+        manager._dictionaries_api = mock_api
+
+        # Вызываем метод
+        from iikocloud_client import CancelCausesCancelCausesRequest
+
+        request = CancelCausesCancelCausesRequest(
+            organizationIds=[UUID("12345678-1234-1234-1234-123456789abc")],
+        )
+        result = await manager.delivery_cancel_causes(request)
+
+        # Проверяем
+        assert result == mock_response
+        mock_api.cancel_causes_post.assert_awaited_once()
+
+    async def test_order_types_calls_api(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """order_types вызывает API и возвращает результат."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем DictionariesApi
+        mock_response = MagicMock()
+        mock_response.correlation_id = UUID("12345678-1234-1234-1234-123456789abc")
+        mock_response.order_types = []
+
+        mock_api = MagicMock()
+        mock_api.deliveries_order_types_post = AsyncMock(return_value=mock_response)
+        manager._dictionaries_api = mock_api
+
+        # Вызываем метод
+        from iikocloud_client import OrderTypesOrderTypesRequest
+
+        request = OrderTypesOrderTypesRequest(
+            organizationIds=[UUID("12345678-1234-1234-1234-123456789abc")],
+        )
+        result = await manager.order_types(request)
+
+        # Проверяем
+        assert result == mock_response
+        mock_api.deliveries_order_types_post.assert_awaited_once()
+
+    async def test_payment_types_calls_api(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """payment_types вызывает API и возвращает результат."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем DictionariesApi
+        mock_response = MagicMock()
+        mock_response.correlation_id = UUID("12345678-1234-1234-1234-123456789abc")
+        mock_response.payment_types = []
+
+        mock_api = MagicMock()
+        mock_api.payment_types_post = AsyncMock(return_value=mock_response)
+        manager._dictionaries_api = mock_api
+
+        # Вызываем метод
+        from iikocloud_client import PaymentTypesPaymentTypesRequest
+
+        request = PaymentTypesPaymentTypesRequest(
+            organizationIds=[UUID("12345678-1234-1234-1234-123456789abc")],
+        )
+        result = await manager.payment_types(request)
+
+        # Проверяем
+        assert result == mock_response
+        mock_api.payment_types_post.assert_awaited_once()
+
+    async def test_discounts_calls_api(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """discounts вызывает API и возвращает результат."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем DictionariesApi
+        mock_response = MagicMock()
+        mock_response.correlation_id = UUID("12345678-1234-1234-1234-123456789abc")
+        mock_response.discounts = []
+
+        mock_api = MagicMock()
+        mock_api.discounts_post = AsyncMock(return_value=mock_response)
+        manager._dictionaries_api = mock_api
+
+        # Вызываем метод
+        from iikocloud_client import DiscountsDiscountsRequest
+
+        request = DiscountsDiscountsRequest(
+            organizationIds=[UUID("12345678-1234-1234-1234-123456789abc")],
+        )
+        result = await manager.discounts(request)
+
+        # Проверяем
+        assert result == mock_response
+        mock_api.discounts_post.assert_awaited_once()
+
+    async def test_removal_types_calls_api(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """removal_types вызывает API и возвращает результат."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем DictionariesApi
+        mock_response = MagicMock()
+        mock_response.correlation_id = UUID("12345678-1234-1234-1234-123456789abc")
+        mock_response.removal_types = []
+
+        mock_api = MagicMock()
+        mock_api.removal_types_post = AsyncMock(return_value=mock_response)
+        manager._dictionaries_api = mock_api
+
+        # Вызываем метод
+        from iikocloud_client import RemovalTypesRemovalTypesRequest
+
+        request = RemovalTypesRemovalTypesRequest(
+            organizationIds=[UUID("12345678-1234-1234-1234-123456789abc")],
+        )
+        result = await manager.removal_types(request)
+
+        # Проверяем
+        assert result == mock_response
+        mock_api.removal_types_post.assert_awaited_once()
+
+    async def test_get_delivery_cancel_causes_by_organization(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """Вспомогательный метод формирует правильный запрос."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем DictionariesApi
+        mock_response = MagicMock()
+        mock_api = MagicMock()
+        mock_api.cancel_causes_post = AsyncMock(return_value=mock_response)
+        manager._dictionaries_api = mock_api
+
+        # Вызываем вспомогательный метод
+        result = await manager.get_delivery_cancel_causes_by_organization(
+            organization_id="12345678-1234-1234-1234-123456789abc"
+        )
+
+        # Проверяем
+        assert result == mock_response
+        call_args = mock_api.cancel_causes_post.call_args
+        request = call_args.kwargs["cancel_causes_cancel_causes_request"]
+        assert UUID("12345678-1234-1234-1234-123456789abc") in request.organization_ids
+
+    async def test_get_payment_types_by_organization(
+        self,
+        credentials: ApiCredentials,
+        method_limits: MethodRateLimits,
+        cleanup,
+    ) -> None:
+        """Вспомогательный метод payment_types формирует правильный запрос."""
+        manager = await IikoCloudApiClientManager.get_instance(
+            credentials, method_limits
+        )
+
+        # Мокаем TokenManager
+        mock_token_manager = MagicMock()
+        mock_token_manager.ensure_token_with_limits = AsyncMock()
+        manager._token_manager = mock_token_manager
+
+        # Мокаем DictionariesApi
+        mock_response = MagicMock()
+        mock_api = MagicMock()
+        mock_api.payment_types_post = AsyncMock(return_value=mock_response)
+        manager._dictionaries_api = mock_api
+
+        # Вызываем вспомогательный метод
+        result = await manager.get_payment_types_by_organization(
+            organization_id="12345678-1234-1234-1234-123456789abc"
+        )
+
+        # Проверяем
+        assert result == mock_response
+        call_args = mock_api.payment_types_post.call_args
+        request = call_args.kwargs["payment_types_payment_types_request"]
+        assert UUID("12345678-1234-1234-1234-123456789abc") in request.organization_ids

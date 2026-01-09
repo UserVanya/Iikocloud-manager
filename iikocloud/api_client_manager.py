@@ -36,6 +36,7 @@ from iikocloud_client import (
     NomenclatureMenusDataResponse,
     OrdersApi,
     OrganizationsApi,
+    DictionariesApi,
     OrganizationsGetOrganizationsRequest,
     OrganizationsGetOrganizationsResponse,
     StopListsStopListsRequest,
@@ -45,6 +46,16 @@ from iikocloud_client import (
     TerminalsTerminalGroupsIsAliveResponse,
     TerminalsTerminalGroupsRequest,
     TerminalsTerminalGroupsResponse,
+    CancelCausesCancelCausesRequest,
+    CancelCausesCancelCausesResponse,
+    OrderTypesOrderTypesRequest,
+    OrderTypesOrderTypesResponse,
+    PaymentTypesPaymentTypesRequest,
+    PaymentTypesPaymentTypesResponse,
+    DiscountsDiscountsRequest,
+    DiscountsDiscountsResponse,
+    RemovalTypesRemovalTypesRequest,
+    RemovalTypesRemovalTypesResponse,
 )
 from iikocloud_client.exceptions import UnauthorizedException
 
@@ -84,6 +95,13 @@ class ApiMethod(Enum):
     GET_EXTERNAL_MENUS = "get_external_menus"
     GET_MENU_BY_ID = "get_menu_by_id"
     GET_STOP_LISTS = "get_stop_lists"
+
+    # Dictionaries
+    GET_DELIVERY_CANCEL_CAUSES = "get_delivery_cancel_causes"
+    GET_ORDER_TYPES = "get_order_types"
+    GET_PAYMENT_TYPES = "get_payment_types"
+    GET_DISCOUNTS = "get_discounts"
+    GET_REMOVAL_TYPES = "get_removal_types"
 
 
 @dataclass
@@ -128,6 +146,11 @@ class MethodRateLimits:
     get_external_menus: RateLimitConfig
     get_menu_by_id: RateLimitConfig
     get_stop_lists: RateLimitConfig
+    get_delivery_cancel_causes: RateLimitConfig
+    get_order_types: RateLimitConfig
+    get_payment_types: RateLimitConfig
+    get_discounts: RateLimitConfig
+    get_removal_types: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -177,6 +200,26 @@ class MethodRateLimits:
                 max_requests=settings.get_stop_lists.max_requests,
                 time_window_seconds=settings.get_stop_lists.time_window_seconds,
             ),
+            get_delivery_cancel_causes=RateLimitConfig(
+                max_requests=settings.get_delivery_cancel_causes.max_requests,
+                time_window_seconds=settings.get_delivery_cancel_causes.time_window_seconds,
+            ),
+            get_order_types=RateLimitConfig(
+                max_requests=settings.get_order_types.max_requests,
+                time_window_seconds=settings.get_order_types.time_window_seconds,
+            ),
+            get_payment_types=RateLimitConfig(
+                max_requests=settings.get_payment_types.max_requests,
+                time_window_seconds=settings.get_payment_types.time_window_seconds,
+            ),
+            get_discounts=RateLimitConfig(
+                max_requests=settings.get_discounts.max_requests,
+                time_window_seconds=settings.get_discounts.time_window_seconds,
+            ),
+            get_removal_types=RateLimitConfig(
+                max_requests=settings.get_removal_types.max_requests,
+                time_window_seconds=settings.get_removal_types.time_window_seconds,
+            ),
         )
 
     def get_by_method(self, method: ApiMethod) -> RateLimitConfig:
@@ -193,6 +236,11 @@ class MethodRateLimits:
             ApiMethod.GET_EXTERNAL_MENUS: self.get_external_menus,
             ApiMethod.GET_MENU_BY_ID: self.get_menu_by_id,
             ApiMethod.GET_STOP_LISTS: self.get_stop_lists,
+            ApiMethod.GET_DELIVERY_CANCEL_CAUSES: self.get_delivery_cancel_causes,
+            ApiMethod.GET_ORDER_TYPES: self.get_order_types,
+            ApiMethod.GET_PAYMENT_TYPES: self.get_payment_types,
+            ApiMethod.GET_DISCOUNTS: self.get_discounts,
+            ApiMethod.GET_REMOVAL_TYPES: self.get_removal_types,
         }
         return mapping[method]
 
@@ -210,6 +258,11 @@ class MethodRateLimits:
             self.get_external_menus,
             self.get_menu_by_id,
             self.get_stop_lists,
+            self.get_delivery_cancel_causes,
+            self.get_order_types,
+            self.get_payment_types,
+            self.get_discounts,
+            self.get_removal_types,
         ]
 
         max_rate = 0.0
@@ -242,6 +295,11 @@ def _default_method_limits() -> MethodRateLimits:
         get_external_menus=RateLimitConfig(max_requests=1, time_window_seconds=1800.0),
         get_menu_by_id=RateLimitConfig(max_requests=5, time_window_seconds=60.0),
         get_stop_lists=RateLimitConfig(max_requests=10, time_window_seconds=60.0),
+        get_delivery_cancel_causes=RateLimitConfig(max_requests=1, time_window_seconds=60.0),
+        get_order_types=RateLimitConfig(max_requests=1, time_window_seconds=60.0),
+        get_payment_types=RateLimitConfig(max_requests=1, time_window_seconds=60.0),
+        get_discounts=RateLimitConfig(max_requests=1, time_window_seconds=60.0),
+        get_removal_types=RateLimitConfig(max_requests=1, time_window_seconds=60.0),
     )
 
 
@@ -292,6 +350,7 @@ class IikoCloudApiClientManager:
         self._terminal_groups_api: TerminalGroupsApi | None = None
         self._menu_api: MenuApi | None = None
         self._orders_api: OrdersApi | None = None
+        self._dictionaries_api: DictionariesApi | None = None
 
     @classmethod
     async def get_instance(
@@ -496,6 +555,13 @@ class IikoCloudApiClientManager:
         if self._terminal_groups_api is None:
             self._terminal_groups_api = TerminalGroupsApi(api_client=self._api_client)
         return self._terminal_groups_api
+
+    async def get_dictionaries_api(self) -> DictionariesApi:
+        """Получить клиент DictionariesApi."""
+        await self._ensure_token_manager()
+        if self._dictionaries_api is None:
+            self._dictionaries_api = DictionariesApi(api_client=self._api_client)
+        return self._dictionaries_api
 
     # ========== Основные методы: Customers ==========
 
@@ -709,6 +775,57 @@ class IikoCloudApiClientManager:
 
         return await self.execute_with_retry(ApiMethod.GET_STOP_LISTS, api_call)
 
+    # ========== Основные методы: Dictionaries ==========
+
+    async def delivery_cancel_causes(self, request: CancelCausesCancelCausesRequest) -> CancelCausesCancelCausesResponse:
+        """Получить список причин отмены доставки."""
+        async def api_call() -> CancelCausesCancelCausesResponse:
+            api = await self.get_dictionaries_api()
+            return await api.cancel_causes_post(
+                cancel_causes_cancel_causes_request=request
+            )
+
+        return await self.execute_with_retry(ApiMethod.GET_DELIVERY_CANCEL_CAUSES, api_call)
+
+    async def order_types(self, request: OrderTypesOrderTypesRequest) -> OrderTypesOrderTypesResponse:
+        """Получить список типов заказов."""
+        async def api_call() -> OrderTypesOrderTypesResponse:
+            api = await self.get_dictionaries_api()
+            return await api.deliveries_order_types_post(
+                order_types_order_types_request=request
+            )
+
+        return await self.execute_with_retry(ApiMethod.GET_ORDER_TYPES, api_call)
+
+    async def payment_types(self, request: PaymentTypesPaymentTypesRequest) -> PaymentTypesPaymentTypesResponse:
+        """Получить список типов платежей."""
+        async def api_call() -> PaymentTypesPaymentTypesResponse:
+            api = await self.get_dictionaries_api()
+            return await api.payment_types_post(
+                payment_types_payment_types_request=request
+            )
+
+        return await self.execute_with_retry(ApiMethod.GET_PAYMENT_TYPES, api_call)
+
+    async def discounts(self, request: DiscountsDiscountsRequest) -> DiscountsDiscountsResponse:
+        """Получить список скидок."""
+        async def api_call() -> DiscountsDiscountsResponse:
+            api = await self.get_dictionaries_api()
+            return await api.discounts_post(
+                discounts_discounts_request=request
+            )
+
+        return await self.execute_with_retry(ApiMethod.GET_DISCOUNTS, api_call)
+
+    async def removal_types(self, request: RemovalTypesRemovalTypesRequest) -> RemovalTypesRemovalTypesResponse:
+        """Получить список типов удаления."""
+        async def api_call() -> RemovalTypesRemovalTypesResponse:
+            api = await self.get_dictionaries_api()
+            return await api.removal_types_post(
+                removal_types_removal_types_request=request
+            )
+
+        return await self.execute_with_retry(ApiMethod.GET_REMOVAL_TYPES, api_call)
     # ========== Вспомогательные методы: Customers ==========
 
     async def get_customer_by_phone(
@@ -898,3 +1015,39 @@ class IikoCloudApiClientManager:
         return await self.stop_lists(request)
 
 
+    # ========== Вспомогательные методы: Dictionaries ==========
+
+    async def get_delivery_cancel_causes_by_organization(self, organization_id: str | UUID) -> CancelCausesCancelCausesResponse:
+        """Получить список причин отмены доставки."""
+        request = CancelCausesCancelCausesRequest(
+            organizationIds=[UUID(organization_id)],
+        )
+        return await self.delivery_cancel_causes(request)
+
+    async def get_order_types_by_organization(self, organization_id: str | UUID) -> OrderTypesOrderTypesResponse:
+        """Получить список типов заказов."""
+        request = OrderTypesOrderTypesRequest(
+            organizationIds=[UUID(organization_id)],
+        )
+        return await self.order_types(request)
+
+    async def get_payment_types_by_organization(self, organization_id: str | UUID) -> PaymentTypesPaymentTypesResponse:
+        """Получить список типов платежей."""
+        request = PaymentTypesPaymentTypesRequest(
+            organizationIds=[UUID(organization_id)],
+        )
+        return await self.payment_types(request)
+
+    async def get_discounts_by_organization(self, organization_id: str | UUID) -> DiscountsDiscountsResponse:
+        """Получить список скидок."""
+        request = DiscountsDiscountsRequest(
+            organizationIds=[UUID(organization_id)],
+        )
+        return await self.discounts(request)
+
+    async def get_removal_types_by_organization(self, organization_id: str | UUID) -> RemovalTypesRemovalTypesResponse:
+        """Получить список типов удаления."""
+        request = RemovalTypesRemovalTypesRequest(
+            organizationIds=[UUID(organization_id)],
+        )
+        return await self.removal_types(request)

@@ -95,6 +95,23 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=10, time_window_seconds=60.0
     )
 
+    # Dictionaries
+    get_delivery_cancel_causes: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_order_types: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_payment_types: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_discounts: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_removal_types: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 
@@ -116,6 +133,11 @@ class MethodRateLimitsSettings(BaseModel):
             self.get_external_menus,
             self.get_menu_by_id,
             self.get_stop_lists,
+            self.get_delivery_cancel_causes,
+            self.get_order_types,
+            self.get_payment_types,
+            self.get_discounts,
+            self.get_removal_types,
         ]
 
         # Находим метод с максимальным rate (requests/second)

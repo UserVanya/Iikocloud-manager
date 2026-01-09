@@ -533,3 +533,152 @@ class TestRealApiMenu:
         assert response is not None
         assert hasattr(response, "correlation_id")
         assert hasattr(response, "terminal_group_stop_lists")
+
+
+class TestRealApiDictionaries:
+    """Тесты Dictionaries API с реальным API."""
+
+    async def test_get_delivery_cancel_causes(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение причин отмены доставки для организации."""
+        response = await manager.get_delivery_cancel_causes_by_organization(
+            organization_id=str(organization_id),
+        )
+
+        # Проверяем структуру ответа
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "cancel_causes")
+        assert isinstance(response.correlation_id, UUID)
+
+    async def test_get_order_types(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение типов заказов для организации."""
+        response = await manager.get_order_types_by_organization(
+            organization_id=str(organization_id),
+        )
+
+        # Проверяем структуру ответа
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "order_types")
+        assert isinstance(response.correlation_id, UUID)
+
+    async def test_get_payment_types(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение типов платежей для организации."""
+        response = await manager.get_payment_types_by_organization(
+            organization_id=str(organization_id),
+        )
+
+        # Проверяем структуру ответа
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "payment_types")
+        assert isinstance(response.correlation_id, UUID)
+
+    async def test_get_discounts(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение скидок для организации."""
+        response = await manager.get_discounts_by_organization(
+            organization_id=str(organization_id),
+        )
+
+        # Проверяем структуру ответа
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "discounts")
+        assert isinstance(response.correlation_id, UUID)
+
+    async def test_get_removal_types(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение типов удаления для организации."""
+        response = await manager.get_removal_types_by_organization(
+            organization_id=str(organization_id),
+        )
+
+        # Проверяем структуру ответа
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "removal_types")
+        assert isinstance(response.correlation_id, UUID)
+
+    async def test_get_delivery_cancel_causes_with_request(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение причин отмены через полный запрос."""
+        from iikocloud_client import CancelCausesCancelCausesRequest
+
+        request = CancelCausesCancelCausesRequest(
+            organizationIds=[organization_id],
+        )
+        response = await manager.delivery_cancel_causes(request)
+
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "cancel_causes")
+
+    async def test_get_order_types_with_request(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение типов заказов через полный запрос."""
+        from iikocloud_client import OrderTypesOrderTypesRequest
+
+        request = OrderTypesOrderTypesRequest(
+            organizationIds=[organization_id],
+        )
+        response = await manager.order_types(request)
+
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "order_types")
+
+    async def test_get_payment_types_with_request(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение типов платежей через полный запрос."""
+        from iikocloud_client import PaymentTypesPaymentTypesRequest
+
+        request = PaymentTypesPaymentTypesRequest(
+            organizationIds=[organization_id],
+        )
+        response = await manager.payment_types(request)
+
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "payment_types")
+
+    async def test_get_discounts_with_request(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение скидок через полный запрос."""
+        from iikocloud_client import DiscountsDiscountsRequest
+
+        request = DiscountsDiscountsRequest(
+            organizationIds=[organization_id],
+        )
+        response = await manager.discounts(request)
+
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "discounts")
+
+    async def test_get_removal_types_with_request(
+        self, manager: IikoCloudApiClientManager, organization_id: UUID
+    ) -> None:
+        """Получение типов удаления через полный запрос."""
+        from iikocloud_client import RemovalTypesRemovalTypesRequest
+
+        request = RemovalTypesRemovalTypesRequest(
+            organizationIds=[organization_id],
+        )
+        response = await manager.removal_types(request)
+
+        assert response is not None
+        assert hasattr(response, "correlation_id")
+        assert hasattr(response, "removal_types")
