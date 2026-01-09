@@ -54,7 +54,6 @@ def method_limits() -> MethodRateLimits:
     return MethodRateLimits(
         auth=fast_config,
         get_organizations=fast_config,
-        get_organizations_settings=fast_config,
         create_or_update_customer=fast_config,
         get_customer_info=fast_config,
         delete_customers=fast_config,

@@ -25,6 +25,9 @@ from iikocloud_client import (
     CustomerRestoreCustomersRequest,
     CustomerRestoreCustomersResponse,
     CustomersApi,
+    ExternalMenuV2,
+    ExternalMenuV3,
+    ExternalMenuV4,
     MenuApi,
     MenuByIdPost200Response,
     NomenclatureMenuRequest,
@@ -40,9 +43,6 @@ from iikocloud_client import (
     TerminalsTerminalGroupsIsAliveResponse,
     TerminalsTerminalGroupsRequest,
     TerminalsTerminalGroupsResponse,
-    ExternalMenuV2,
-    ExternalMenuV3,
-    ExternalMenuV4,
 )
 from iikocloud_client.exceptions import UnauthorizedException
 
@@ -334,7 +334,7 @@ class IikoCloudApiClientManager:
             api_login=config.api_login.get_secret_value(),
             key_id=config.key_id,
         )
-
+        print(config.api_login.get_secret_value())
         method_limits = MethodRateLimits.from_settings(config.rate_limits)
 
         return await cls.get_instance(
@@ -791,8 +791,7 @@ class IikoCloudApiClientManager:
             externalMenuId=external_menu_id,
             version=2,
         )
-        return await self.menu_by_id(request)
-
+        return await self.menu_by_id(request) # type: ignore
     async def get_menu_by_id_and_organization_v3(
         self,
         organization_id: str,
@@ -812,7 +811,7 @@ class IikoCloudApiClientManager:
             externalMenuId=external_menu_id,
             version=3,
         )
-        return await self.menu_by_id(request)
+        return await self.menu_by_id(request) # type: ignore
 
     async def get_menu_by_id_and_organization_v4(
         self,
@@ -833,7 +832,7 @@ class IikoCloudApiClientManager:
             externalMenuId=external_menu_id,
             version=4,
         )
-        return await self.menu_by_id(request)
+        return await self.menu_by_id(request) # type: ignore
 
     async def get_stop_lists_by_organization(
         self,
