@@ -16,6 +16,8 @@ from uuid import UUID
 from iikocloud_client import (
     ApiClient,
     ApiException,
+    CancelCausesCancelCausesRequest,
+    CancelCausesCancelCausesResponse,
     Configuration,
     CustomerCreateOrUpdateCustomerRequest,
     CustomerCreateOrUpdateCustomerResponse,
@@ -27,6 +29,9 @@ from iikocloud_client import (
     CustomerRestoreCustomersRequest,
     CustomerRestoreCustomersResponse,
     CustomersApi,
+    DictionariesApi,
+    DiscountsDiscountsRequest,
+    DiscountsDiscountsResponse,
     ExternalMenuV2,
     ExternalMenuV3,
     ExternalMenuV4,
@@ -35,10 +40,15 @@ from iikocloud_client import (
     NomenclatureMenuRequest,
     NomenclatureMenusDataResponse,
     OrdersApi,
+    OrderTypesOrderTypesRequest,
+    OrderTypesOrderTypesResponse,
     OrganizationsApi,
-    DictionariesApi,
     OrganizationsGetOrganizationsRequest,
     OrganizationsGetOrganizationsResponse,
+    PaymentTypesPaymentTypesRequest,
+    PaymentTypesPaymentTypesResponse,
+    RemovalTypesRemovalTypesRequest,
+    RemovalTypesRemovalTypesResponse,
     StopListsStopListsRequest,
     StopListsStopListsResponse,
     TerminalGroupsApi,
@@ -46,16 +56,6 @@ from iikocloud_client import (
     TerminalsTerminalGroupsIsAliveResponse,
     TerminalsTerminalGroupsRequest,
     TerminalsTerminalGroupsResponse,
-    CancelCausesCancelCausesRequest,
-    CancelCausesCancelCausesResponse,
-    OrderTypesOrderTypesRequest,
-    OrderTypesOrderTypesResponse,
-    PaymentTypesPaymentTypesRequest,
-    PaymentTypesPaymentTypesResponse,
-    DiscountsDiscountsRequest,
-    DiscountsDiscountsResponse,
-    RemovalTypesRemovalTypesRequest,
-    RemovalTypesRemovalTypesResponse,
 )
 from iikocloud_client.exceptions import UnauthorizedException
 
@@ -777,7 +777,10 @@ class IikoCloudApiClientManager:
 
     # ========== Основные методы: Dictionaries ==========
 
-    async def delivery_cancel_causes(self, request: CancelCausesCancelCausesRequest) -> CancelCausesCancelCausesResponse:
+    async def delivery_cancel_causes(
+        self, 
+        request: CancelCausesCancelCausesRequest
+    ) -> CancelCausesCancelCausesResponse:
         """Получить список причин отмены доставки."""
         async def api_call() -> CancelCausesCancelCausesResponse:
             api = await self.get_dictionaries_api()
@@ -787,7 +790,10 @@ class IikoCloudApiClientManager:
 
         return await self.execute_with_retry(ApiMethod.GET_DELIVERY_CANCEL_CAUSES, api_call)
 
-    async def order_types(self, request: OrderTypesOrderTypesRequest) -> OrderTypesOrderTypesResponse:
+    async def order_types(
+        self, 
+        request: OrderTypesOrderTypesRequest,
+    ) -> OrderTypesOrderTypesResponse:
         """Получить список типов заказов."""
         async def api_call() -> OrderTypesOrderTypesResponse:
             api = await self.get_dictionaries_api()
@@ -797,7 +803,10 @@ class IikoCloudApiClientManager:
 
         return await self.execute_with_retry(ApiMethod.GET_ORDER_TYPES, api_call)
 
-    async def payment_types(self, request: PaymentTypesPaymentTypesRequest) -> PaymentTypesPaymentTypesResponse:
+    async def payment_types(
+        self, 
+        request: PaymentTypesPaymentTypesRequest
+    ) -> PaymentTypesPaymentTypesResponse:
         """Получить список типов платежей."""
         async def api_call() -> PaymentTypesPaymentTypesResponse:
             api = await self.get_dictionaries_api()
@@ -807,7 +816,10 @@ class IikoCloudApiClientManager:
 
         return await self.execute_with_retry(ApiMethod.GET_PAYMENT_TYPES, api_call)
 
-    async def discounts(self, request: DiscountsDiscountsRequest) -> DiscountsDiscountsResponse:
+    async def discounts(
+        self, 
+        request: DiscountsDiscountsRequest,
+    ) -> DiscountsDiscountsResponse:
         """Получить список скидок."""
         async def api_call() -> DiscountsDiscountsResponse:
             api = await self.get_dictionaries_api()
@@ -817,7 +829,10 @@ class IikoCloudApiClientManager:
 
         return await self.execute_with_retry(ApiMethod.GET_DISCOUNTS, api_call)
 
-    async def removal_types(self, request: RemovalTypesRemovalTypesRequest) -> RemovalTypesRemovalTypesResponse:
+    async def removal_types(
+        self, 
+        request: RemovalTypesRemovalTypesRequest,
+    ) -> RemovalTypesRemovalTypesResponse:
         """Получить список типов удаления."""
         async def api_call() -> RemovalTypesRemovalTypesResponse:
             api = await self.get_dictionaries_api()
@@ -889,6 +904,12 @@ class IikoCloudApiClientManager:
             organizationId=UUID(organization_id),
         )
         return await self.restore_customers(request)
+
+    # ========== Вспомогательные методы: Organizations ==========
+    async def get_organizations(self) -> OrganizationsGetOrganizationsResponse:
+        """Получить список организаций."""
+        request = OrganizationsGetOrganizationsRequest()
+        return await self.organizations(request)
 
     # ========== Вспомогательные методы: Terminal Groups ==========
 
@@ -1017,37 +1038,54 @@ class IikoCloudApiClientManager:
 
     # ========== Вспомогательные методы: Dictionaries ==========
 
-    async def get_delivery_cancel_causes_by_organization(self, organization_id: str | UUID) -> CancelCausesCancelCausesResponse:
+    async def get_delivery_cancel_causes_by_organization(
+        self, 
+        organization_id: str,
+    ) -> CancelCausesCancelCausesResponse:
         """Получить список причин отмены доставки."""
         request = CancelCausesCancelCausesRequest(
             organizationIds=[UUID(organization_id)],
         )
         return await self.delivery_cancel_causes(request)
 
-    async def get_order_types_by_organization(self, organization_id: str | UUID) -> OrderTypesOrderTypesResponse:
+    async def get_order_types_by_organization(
+        self, 
+        organization_id: str,
+    ) -> OrderTypesOrderTypesResponse:
         """Получить список типов заказов."""
         request = OrderTypesOrderTypesRequest(
             organizationIds=[UUID(organization_id)],
         )
         return await self.order_types(request)
 
-    async def get_payment_types_by_organization(self, organization_id: str | UUID) -> PaymentTypesPaymentTypesResponse:
+    async def get_payment_types_by_organization(
+        self, 
+        organization_id: str,
+    ) -> PaymentTypesPaymentTypesResponse:
         """Получить список типов платежей."""
         request = PaymentTypesPaymentTypesRequest(
             organizationIds=[UUID(organization_id)],
         )
         return await self.payment_types(request)
 
-    async def get_discounts_by_organization(self, organization_id: str | UUID) -> DiscountsDiscountsResponse:
+    async def get_discounts_by_organization(
+        self, 
+        organization_id: str,
+    ) -> DiscountsDiscountsResponse:
         """Получить список скидок."""
         request = DiscountsDiscountsRequest(
             organizationIds=[UUID(organization_id)],
         )
         return await self.discounts(request)
 
-    async def get_removal_types_by_organization(self, organization_id: str | UUID) -> RemovalTypesRemovalTypesResponse:
+    async def get_removal_types_by_organization(
+        self, 
+        organization_id: str,
+    ) -> RemovalTypesRemovalTypesResponse:
         """Получить список типов удаления."""
         request = RemovalTypesRemovalTypesRequest(
             organizationIds=[UUID(organization_id)],
         )
         return await self.removal_types(request)
+
+    
