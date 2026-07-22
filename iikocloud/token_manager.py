@@ -1,14 +1,14 @@
-"""Менеджер токенов для iikocloud API.
+"""Менеджер токенов для iikocloud API (auth v2).
 
-Управляет получением и обновлением Bearer-токенов.
-Токен обновляется только при получении 401 ошибки.
+Управляет получением и обновлением Bearer-токенов через authenticate_v2.
+Токен обновляется только при получении 401 ошибки (с dedup по token_version).
 """
 
 import asyncio
 import logging
 from collections.abc import Awaitable, Callable
 
-from iikocloud_client import ApiClient, AuthGetAccessTokenRequest, AuthorizationApi
+from iikocloud_client import ApiClient, AuthorizationApi, GetAccessTokenV2Request
 from iikocloud_client.exceptions import UnauthorizedException
 
 from iikocloud.exceptions import IikoCloudAuthException
@@ -27,16 +27,27 @@ class TokenManager:
     _instances: dict[str, "TokenManager"] = {}
     _global_lock: asyncio.Lock | None = None
 
-    def __init__(self, api_client: ApiClient, api_login: str, key_id: str) -> None:
+    def __init__(
+        self,
+        api_client: ApiClient,
+        api_key: str,
+        app_id: str,
+        client_secret: str,
+        key_id: str,
+    ) -> None:
         """Инициализация менеджера токенов.
 
         Args:
             api_client: Клиент API для установки токена
-            api_login: Логин для получения токена
-            key_id: Уникальный идентификатор ключа
+            api_key: API-ключ (auth v2)
+            app_id: Идентификатор приложения (UUID)
+            client_secret: Секрет клиента (auth v2)
+            key_id: Уникальный идентификатор ключа (multitone)
         """
         self._api_client = api_client
-        self._api_login = api_login
+        self._api_key = api_key
+        self._app_id = app_id
+        self._client_secret = client_secret
         self._key_id = key_id
         self._token: str | None = None
         self._token_version: int = 0
@@ -45,15 +56,27 @@ class TokenManager:
         self._refresh_event = asyncio.Event()
         self._refresh_event.set()
 
+    @property
+    def token_version(self) -> int:
+        """Текущая версия токена (увеличивается при каждом успешном fetch)."""
+        return self._token_version
+
     @classmethod
     async def get_instance(
-        cls, api_client: ApiClient, api_login: str, key_id: str
+        cls,
+        api_client: ApiClient,
+        api_key: str,
+        app_id: str,
+        client_secret: str,
+        key_id: str,
     ) -> "TokenManager":
         """Получить или создать экземпляр для данного key_id.
 
         Args:
             api_client: Клиент API
-            api_login: Логин для получения токена
+            api_key: API-ключ (auth v2)
+            app_id: Идентификатор приложения (UUID)
+            client_secret: Секрет клиента (auth v2)
             key_id: Уникальный идентификатор ключа
 
         Returns:
@@ -64,7 +87,9 @@ class TokenManager:
 
         async with cls._global_lock:
             if key_id not in cls._instances:
-                cls._instances[key_id] = cls(api_client, api_login, key_id)
+                cls._instances[key_id] = cls(
+                    api_client, api_key, app_id, client_secret, key_id
+                )
             return cls._instances[key_id]
 
     async def _fetch_token(
@@ -72,7 +97,7 @@ class TokenManager:
         acquire_global: Callable[[], Awaitable[None]],
         acquire_auth: Callable[[], Awaitable[None]],
     ) -> str:
-        """Получить новый токен от API.
+        """Получить новый токен от API через authenticate_v2.
 
         Args:
             acquire_global: Функция получения глобального rate limit токена
@@ -88,22 +113,26 @@ class TokenManager:
         await acquire_auth()
 
         self._api_client.configuration.access_token = None
-        request = AuthGetAccessTokenRequest(apiLogin=self._api_login)
+        request = GetAccessTokenV2Request(
+            apiKey=self._api_key,
+            appId=self._app_id,
+            clientSecret=self._client_secret,
+        )
 
         try:
             logger.debug("Запрос токена для key_id=%s", self._key_id)
-            response = await self._authorization_api.access_token_post(
-                auth_get_access_token_request=request
+            response = await self._authorization_api.authenticate_v2(
+                get_access_token_v2_request=request
             )
             return response.token
         except UnauthorizedException as exc:
-            # 401 на auth запрос = некорректный API-ключ
+            # 401 на auth запрос = некорректные credentials
             logger.error(
-                "Некорректный API-ключ для key_id=%s: получен 401 на запрос авторизации",
+                "Некорректные credentials для key_id=%s: получен 401 на запрос авторизации",
                 self._key_id,
             )
             raise IikoCloudAuthException(
-                "Некорректный API-ключ: получен 401 на запрос авторизации",
+                "Некорректные credentials: получен 401 на запрос авторизации",
                 original_error=exc,
             ) from exc
         except Exception as exc:
@@ -148,34 +177,48 @@ class TokenManager:
             finally:
                 self._refresh_event.set()
 
-    async def refresh_token_if_401_with_limits(
+    async def refresh_token_if_401(
         self,
         error: Exception,
         acquire_global: Callable[[], Awaitable[None]],
         acquire_auth: Callable[[], Awaitable[None]],
+        version_before: int | None = None,
     ) -> bool:
-        """Обновить токен при 401 ошибке.
+        """Обновить токен при 401 ошибке (dedup по token_version).
 
         Args:
             error: Исключение, которое может быть 401
             acquire_global: Функция получения глобального rate limit токена
             acquire_auth: Функция получения auth rate limit токена
+            version_before: Версия токена до неудачного запроса;
+                если уже изменилась — refresh пропускается
 
         Returns:
-            True если токен был обновлён, False если ошибка не 401
+            True если токен был обновлён (или уже обновлён другим),
+            False если ошибка не 401
 
         Raises:
             IikoCloudAuthException: При ошибке обновления токена
         """
-        # Проверяем, что это действительно 401
         error_status = getattr(error, "status", None)
         is_401 = isinstance(error, UnauthorizedException) or error_status == 401
         if not is_401:
             logger.debug("Не 401 ошибка, пропускаем обновление токена")
             return False
 
-        version_before = self._token_version
+        if version_before is None:
+            version_before = self._token_version
+
         logger.debug("Получена 401 ошибка, версия токена: %d", version_before)
+
+        # Быстрый путь: кто-то уже обновил токен после нашего запроса
+        if self._token_version != version_before:
+            logger.debug(
+                "Токен уже обновлён другой корутиной: %d -> %d",
+                version_before,
+                self._token_version,
+            )
+            return True
 
         # Если кто-то уже обновляет — ждём
         if not self._refresh_event.is_set():
