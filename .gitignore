@@ -1,2 +1,12 @@
 **/__pycache__/
 config.yml
+config.test.yml
+.env
+*.secret
+app.secret
+.venv/
+dist/
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
