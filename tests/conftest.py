@@ -8,16 +8,15 @@ from __future__ import annotations
 import random
 import re
 from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 import pytest
 
-from iikocloud import (
-    IikoCloudApiClientManager,
-    get_iikocloud_config,
-)
 from iikocloud.rate_limiter import GlobalRateLimiter
-from iikocloud.token_manager import TokenManager
+
+if TYPE_CHECKING:
+    from iikocloud.api_client_manager import IikoCloudApiClientManager
 
 # Константы для тестов Customer API
 EXISTING_CUSTOMER_PHONE = "+79858038700"
@@ -39,6 +38,10 @@ def generate_random_phone() -> str:
 @pytest.fixture
 async def manager() -> AsyncGenerator[IikoCloudApiClientManager, None]:
     """Создать менеджер из реальной конфигурации."""
+    from iikocloud.api_client_manager import IikoCloudApiClientManager
+    from iikocloud.config_reader import get_iikocloud_config
+    from iikocloud.token_manager import TokenManager
+
     config = get_iikocloud_config()
     mgr = await IikoCloudApiClientManager.from_config(config)
     yield mgr

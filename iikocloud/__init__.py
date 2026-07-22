@@ -1,22 +1,9 @@
 """Модуль для работы с iikocloud API.
 
-Предоставляет клиента с автоматическим управлением токенами,
-rate limiting и retry при 401 ошибках.
-
-Пример использования:
-    from iikocloud import get_iikocloud_config, IikoCloudApiClientManager
-
-    config = get_iikocloud_config()
-    manager = await IikoCloudApiClientManager.from_config(config)
-    orgs = await manager.get_organizations(request)
+Task 10 restores full package exports (ApiClientManager, TokenManager, etc.).
+Until then, only submodules that do not pull broken SDK symbols are re-exported.
 """
 
-from iikocloud.api_client_manager import (
-    ApiCredentials,
-    ApiMethod,
-    IikoCloudApiClientManager,
-    MethodRateLimits,
-)
 from iikocloud.config_reader import (
     IikoCloudConfig,
     MethodRateLimitsSettings,
@@ -34,14 +21,8 @@ from iikocloud.rate_limiter import (
     RateLimitConfig,
     TokenBucketRateLimiter,
 )
-from iikocloud.token_manager import TokenManager
 
 __all__ = [
-    # API Client Manager
-    "ApiCredentials",
-    "ApiMethod",
-    "IikoCloudApiClientManager",
-    "MethodRateLimits",
     # Configuration
     "IikoCloudConfig",
     "MethodRateLimitsSettings",
@@ -56,6 +37,4 @@ __all__ = [
     "GlobalRateLimiter",
     "RateLimitConfig",
     "TokenBucketRateLimiter",
-    # Token Management
-    "TokenManager",
 ]
