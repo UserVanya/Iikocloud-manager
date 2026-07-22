@@ -1,0 +1,9 @@
+read:
+  api_key: "read_api_key"
+  app_id: "read_app_id"
+  client_secret: "read_client_secret"
+
+write:
+  api_key: "write_api_key"
+  app_id: "write_app_id"
+  client_secret: "write_client_secret"

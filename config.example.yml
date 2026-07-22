@@ -1,26 +1,17 @@
-# Конфигурация iikocloud API Manager
-# Скопируйте этот файл в config.yml и заполните значения
 iikocloud:
-  # API логин для получения токена (секретный)
-  api_login: "your_api_login_here"
-
-  # Уникальный идентификатор ключа (для multitone паттерна)
-  key_id: "main"
-
-  # Rate limits для каждого метода API
-  # Глобальный лимит автоматически вычисляется как самый свободный из всех методов
+  api_key: "your_api_key"
+  app_id: "your_app_id"
+  client_secret: "your_client_secret"
   rate_limits:
-    # Авторизация: 1 запрос в 5 секунд
     auth:
       max_requests: 1
       time_window_seconds: 5.0
-
-    # Organizations
     get_organizations:
       max_requests: 1
       time_window_seconds: 10.0
-
-    # Customers: 100 запросов в минуту
+    get_organization_settings:
+      max_requests: 1
+      time_window_seconds: 10.0
     create_or_update_customer:
       max_requests: 100
       time_window_seconds: 60.0
@@ -33,31 +24,25 @@ iikocloud:
     restore_customers:
       max_requests: 100
       time_window_seconds: 60.0
-
-    # Terminal Groups: 10 запросов в минуту
     get_terminal_groups:
       max_requests: 10
       time_window_seconds: 60.0
-    check_terminal_groups_alive:
+    check_terminal_groups_availability:
       max_requests: 10
       time_window_seconds: 60.0
-
-    # Menu
     get_external_menus:
       max_requests: 1
       time_window_seconds: 1800.0
-    get_menu_by_id:
+    get_external_menu_by_id:
       max_requests: 5
       time_window_seconds: 60.0
     get_stop_lists:
       max_requests: 10
       time_window_seconds: 60.0
-
-    # Dictionaries
-    get_delivery_cancel_causes:
+    get_cancel_causes:
       max_requests: 1
       time_window_seconds: 60.0
-    get_order_types:
+    get_delivery_order_types:
       max_requests: 1
       time_window_seconds: 60.0
     get_payment_types:
@@ -67,5 +52,8 @@ iikocloud:
       max_requests: 1
       time_window_seconds: 60.0
     get_removal_types:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_tips_types:
       max_requests: 1
       time_window_seconds: 60.0
