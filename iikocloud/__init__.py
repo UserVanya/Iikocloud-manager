@@ -1,32 +1,35 @@
-"""Модуль для работы с iikocloud API.
+"""Модуль для работы с iikocloud API."""
 
-Task 10 restores full package exports (ApiClientManager, TokenManager, etc.).
-Until then, only submodules that do not pull broken SDK symbols are re-exported.
-"""
-
+from iikocloud.api_client_manager import (
+    ApiCredentials,
+    ApiMethod,
+    IikoCloudApiClientManager,
+    MethodRateLimits,
+)
 from iikocloud.config_reader import (
     IikoCloudConfig,
     MethodRateLimitsSettings,
     RateLimitSettings,
+    clear_config_cache,
     get_config,
     get_iikocloud_config,
     parse_config_file,
 )
-from iikocloud.exceptions import (
-    IikoCloudAuthException,
-    IikoCloudException,
-)
-from iikocloud.rate_limiter import (
-    GlobalRateLimiter,
-    RateLimitConfig,
-    TokenBucketRateLimiter,
-)
+from iikocloud.exceptions import IikoCloudAuthException, IikoCloudException
+from iikocloud.rate_limiter import GlobalRateLimiter, RateLimitConfig, TokenBucketRateLimiter
+from iikocloud.token_manager import TokenManager
 
 __all__ = [
+    # API Client
+    "ApiCredentials",
+    "ApiMethod",
+    "IikoCloudApiClientManager",
+    "MethodRateLimits",
     # Configuration
     "IikoCloudConfig",
     "MethodRateLimitsSettings",
     "RateLimitSettings",
+    "clear_config_cache",
     "get_config",
     "get_iikocloud_config",
     "parse_config_file",
@@ -37,4 +40,6 @@ __all__ = [
     "GlobalRateLimiter",
     "RateLimitConfig",
     "TokenBucketRateLimiter",
+    # Token Management
+    "TokenManager",
 ]
