@@ -1,7 +1,7 @@
 # Iikocloud-manager MVP — Design
 
 Date: 2026-07-23  
-Status: approved in discussion; awaiting final review of this document  
+Status: approved  
 Reference: `/home/ivan/programming/Iikoserver-manager` + current `/home/ivan/programming/Iikocloud-py-sdk`
 
 ## Goal
