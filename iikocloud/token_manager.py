@@ -195,7 +195,7 @@ class TokenManager:
 
         Returns:
             True если токен был обновлён (или уже обновлён другим),
-            False если ошибка не 401
+            False если ошибка не 401 или параллельный refresh не сдвинул версию
 
         Raises:
             IikoCloudAuthException: При ошибке обновления токена
@@ -220,11 +220,11 @@ class TokenManager:
             )
             return True
 
-        # Если кто-то уже обновляет — ждём
+        # Если кто-то уже обновляет — ждём и проверяем, что версия реально сдвинулась
         if not self._refresh_event.is_set():
             logger.debug("Другая корутина обновляет токен, ожидаем...")
             await self._refresh_event.wait()
-            return True
+            return self._token_version != version_before
 
         async with self._lock:
             # Проверяем, не обновил ли кто-то токен пока мы ждали lock

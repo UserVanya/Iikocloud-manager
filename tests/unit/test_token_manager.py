@@ -315,6 +315,58 @@ class TestRefreshToken:
         assert token_manager.token_version == 2
         assert mock_api_client.configuration.access_token == "new-token"
 
+    async def test_concurrent_refresh_waiter_false_when_leader_fails(
+        self, token_manager: TokenManager
+    ) -> None:
+        """Waiter returns False when the leader's authenticate_v2 fails."""
+        token_manager._token = "old-token"
+        token_manager._token_version = 1
+
+        leader_started = asyncio.Event()
+        allow_fail = asyncio.Event()
+
+        async def failing_auth(*args, **kwargs):
+            leader_started.set()
+            await allow_fail.wait()
+            raise RuntimeError("auth failed")
+
+        error = MagicMock()
+        error.status = 401
+
+        with patch.object(
+            token_manager._authorization_api,
+            "authenticate_v2",
+            side_effect=failing_auth,
+        ):
+            acquire_global = AsyncMock()
+            acquire_auth = AsyncMock()
+
+            async def leader() -> None:
+                with pytest.raises(IikoCloudAuthException):
+                    await token_manager.refresh_token_if_401(
+                        error, acquire_global, acquire_auth, version_before=1
+                    )
+
+            async def waiter() -> bool:
+                await leader_started.wait()
+                return await token_manager.refresh_token_if_401(
+                    error, acquire_global, acquire_auth, version_before=1
+                )
+
+            leader_task = asyncio.create_task(leader())
+            waiter_task = asyncio.create_task(waiter())
+
+            await leader_started.wait()
+            # Let the waiter enter the refresh_event.wait() path
+            await asyncio.sleep(0.01)
+            allow_fail.set()
+
+            waiter_result = await waiter_task
+            await leader_task
+
+        assert waiter_result is False
+        assert token_manager.token_version == 1
+
 
 class TestCloseAll:
     """close_all clears the multitone registry."""
