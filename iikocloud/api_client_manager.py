@@ -1,7 +1,4 @@
-"""Фасад iikocloud API: Multitone + rate-limited execute_with_retry.
-
-Domain mixins подключаются в Tasks 5–9; здесь только тонкая оболочка.
-"""
+"""Фасад iikocloud API: Multitone + rate-limited execute_with_retry."""
 
 import asyncio
 import logging
@@ -18,6 +15,7 @@ from iikocloud_client import (
 )
 
 from iikocloud.config_reader import IikoCloudConfig
+from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
 from iikocloud.mixins._base import (
     ApiCredentials,
     ApiMethod,
@@ -39,11 +37,14 @@ __all__ = [
 ]
 
 
-class IikoCloudApiClientManager(_ManagerBase):
+class IikoCloudApiClientManager(
+    OrganizationsHelpersMixin,
+    _ManagerBase,
+):
     """Multitone-фасад для работы с iikocloud API.
 
     Содержит: ApiClient, TokenManager, глобальный лимитер, лимитеры по методам.
-    Domain-методы появятся через mixins в последующих задачах.
+    Domain-методы подключаются через mixins (organizations — Task 5; остальные — Tasks 6–9).
 
     Конкурентность:
         Экземпляр безопасен для параллельных вызовов из нескольких задач
