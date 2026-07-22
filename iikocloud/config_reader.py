@@ -58,7 +58,7 @@ class MethodRateLimitsSettings(BaseModel):
     get_organizations: RateLimitSettings = RateLimitSettings(
         max_requests=1, time_window_seconds=10.0
     )
-    get_organizations_settings: RateLimitSettings = RateLimitSettings(
+    get_organization_settings: RateLimitSettings = RateLimitSettings(
         max_requests=1, time_window_seconds=10.0
     )
 
@@ -80,7 +80,7 @@ class MethodRateLimitsSettings(BaseModel):
     get_terminal_groups: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0
     )
-    check_terminal_groups_alive: RateLimitSettings = RateLimitSettings(
+    check_terminal_groups_availability: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0
     )
 
@@ -88,7 +88,7 @@ class MethodRateLimitsSettings(BaseModel):
     get_external_menus: RateLimitSettings = RateLimitSettings(
         max_requests=1, time_window_seconds=1800.0
     )
-    get_menu_by_id: RateLimitSettings = RateLimitSettings(
+    get_external_menu_by_id: RateLimitSettings = RateLimitSettings(
         max_requests=5, time_window_seconds=60.0
     )
     get_stop_lists: RateLimitSettings = RateLimitSettings(
@@ -96,10 +96,10 @@ class MethodRateLimitsSettings(BaseModel):
     )
 
     # Dictionaries
-    get_delivery_cancel_causes: RateLimitSettings = RateLimitSettings(
+    get_cancel_causes: RateLimitSettings = RateLimitSettings(
         max_requests=1, time_window_seconds=60.0
     )
-    get_order_types: RateLimitSettings = RateLimitSettings(
+    get_delivery_order_types: RateLimitSettings = RateLimitSettings(
         max_requests=1, time_window_seconds=60.0
     )
     get_payment_types: RateLimitSettings = RateLimitSettings(
@@ -109,6 +109,9 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=1, time_window_seconds=60.0
     )
     get_removal_types: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_tips_types: RateLimitSettings = RateLimitSettings(
         max_requests=1, time_window_seconds=60.0
     )
 
@@ -123,21 +126,22 @@ class MethodRateLimitsSettings(BaseModel):
         all_limits = [
             self.auth,
             self.get_organizations,
-            self.get_organizations_settings,
+            self.get_organization_settings,
             self.create_or_update_customer,
             self.get_customer_info,
             self.delete_customers,
             self.restore_customers,
             self.get_terminal_groups,
-            self.check_terminal_groups_alive,
+            self.check_terminal_groups_availability,
             self.get_external_menus,
-            self.get_menu_by_id,
+            self.get_external_menu_by_id,
             self.get_stop_lists,
-            self.get_delivery_cancel_causes,
-            self.get_order_types,
+            self.get_cancel_causes,
+            self.get_delivery_order_types,
             self.get_payment_types,
             self.get_discounts,
             self.get_removal_types,
+            self.get_tips_types,
         ]
 
         # Находим метод с максимальным rate (requests/second)
@@ -156,11 +160,9 @@ class MethodRateLimitsSettings(BaseModel):
 class IikoCloudConfig(BaseModel):
     """Конфигурация для подключения к iikocloud API."""
 
-    # API логин для получения токена
-    api_login: SecretStr
-
-    # Уникальный идентификатор ключа (для multitone паттерна)
-    key_id: str
+    api_key: SecretStr
+    app_id: str
+    client_secret: SecretStr
 
     # Rate limits для каждого метода API
     rate_limits: MethodRateLimitsSettings = MethodRateLimitsSettings()
@@ -223,3 +225,9 @@ def get_iikocloud_config() -> IikoCloudConfig:
         Экземпляр IikoCloudConfig
     """
     return cast(IikoCloudConfig, get_config(IikoCloudConfig, "iikocloud"))
+
+
+def clear_config_cache() -> None:
+    """Сбросить кэш конфигурации (для тестов)."""
+    parse_config_file.cache_clear()
+    get_config.cache_clear()
