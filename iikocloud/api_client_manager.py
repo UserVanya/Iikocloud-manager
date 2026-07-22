@@ -15,6 +15,7 @@ from iikocloud_client import (
 )
 
 from iikocloud.config_reader import IikoCloudConfig
+from iikocloud.mixins.customers.helpers import CustomersHelpersMixin
 from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
 from iikocloud.mixins._base import (
     ApiCredentials,
@@ -38,13 +39,14 @@ __all__ = [
 
 
 class IikoCloudApiClientManager(
+    CustomersHelpersMixin,
     OrganizationsHelpersMixin,
     _ManagerBase,
 ):
     """Multitone-фасад для работы с iikocloud API.
 
     Содержит: ApiClient, TokenManager, глобальный лимитер, лимитеры по методам.
-    Domain-методы подключаются через mixins (organizations — Task 5; остальные — Tasks 6–9).
+    Domain-методы подключаются через mixins (organizations — Task 5; customers — Task 6; остальные — Tasks 7–9).
 
     Конкурентность:
         Экземпляр безопасен для параллельных вызовов из нескольких задач
