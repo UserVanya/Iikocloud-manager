@@ -9,6 +9,10 @@ from iikocloud_client import (
     CreateOrUpdateCustomerResponse,
     DeleteCustomersRequest,
     DeleteCustomersResponse,
+    GetCustomerInfoByCardNumberRequest,
+    GetCustomerInfoByCardTrackRequest,
+    GetCustomerInfoByEmailRequest,
+    GetCustomerInfoByIdRequest,
     GetCustomerInfoByPhoneRequest,
     GetCustomerInfoResponse,
     RestoreCustomersRequest,
@@ -172,6 +176,68 @@ async def test_get_customer_by_phone_accepts_str_organization_id() -> None:
     call_kwargs = mock_api.get_customer_info.await_args.kwargs
     request = call_kwargs["get_customer_info_request"]
     assert request.organization_id == ORG_ID
+
+
+async def test_get_customer_by_id_builds_request() -> None:
+    """get_customer_by_id builds GetCustomerInfoByIdRequest and calls core."""
+    manager, mock_api = await _manager_with_mock_customers_api()
+    mock_api.get_customer_info = AsyncMock(return_value=MagicMock())
+    customer_id = UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+
+    await manager.get_customer_by_id(ORG_ID, customer_id)
+
+    request = mock_api.get_customer_info.await_args.kwargs[
+        "get_customer_info_request"
+    ]
+    assert isinstance(request, GetCustomerInfoByIdRequest)
+    assert request.type == "id"
+    assert request.id == str(customer_id)
+    assert request.organization_id == ORG_ID
+
+
+async def test_get_customer_by_email_builds_request() -> None:
+    """get_customer_by_email builds GetCustomerInfoByEmailRequest and calls core."""
+    manager, mock_api = await _manager_with_mock_customers_api()
+    mock_api.get_customer_info = AsyncMock(return_value=MagicMock())
+
+    await manager.get_customer_by_email(ORG_ID, "user@example.com")
+
+    request = mock_api.get_customer_info.await_args.kwargs[
+        "get_customer_info_request"
+    ]
+    assert isinstance(request, GetCustomerInfoByEmailRequest)
+    assert request.type == "email"
+    assert request.email == "user@example.com"
+
+
+async def test_get_customer_by_card_number_builds_request() -> None:
+    """get_customer_by_card_number builds cardNumber discriminator request."""
+    manager, mock_api = await _manager_with_mock_customers_api()
+    mock_api.get_customer_info = AsyncMock(return_value=MagicMock())
+
+    await manager.get_customer_by_card_number(ORG_ID, "1234567890")
+
+    request = mock_api.get_customer_info.await_args.kwargs[
+        "get_customer_info_request"
+    ]
+    assert isinstance(request, GetCustomerInfoByCardNumberRequest)
+    assert request.type == "cardNumber"
+    assert request.card_number == "1234567890"
+
+
+async def test_get_customer_by_card_track_builds_request() -> None:
+    """get_customer_by_card_track builds cardTrack discriminator request."""
+    manager, mock_api = await _manager_with_mock_customers_api()
+    mock_api.get_customer_info = AsyncMock(return_value=MagicMock())
+
+    await manager.get_customer_by_card_track(ORG_ID, ";1234567890?")
+
+    request = mock_api.get_customer_info.await_args.kwargs[
+        "get_customer_info_request"
+    ]
+    assert isinstance(request, GetCustomerInfoByCardTrackRequest)
+    assert request.type == "cardTrack"
+    assert request.card_track == ";1234567890?"
 
 
 async def test_create_or_update_customer_uses_execute_with_retry() -> None:
