@@ -5,10 +5,14 @@ from uuid import UUID
 
 import pytest
 from iikocloud_client import (
+    AddCustomerToProgramRequest,
+    AddCustomerToProgramResponse,
+    AddMagnetCardRequest,
     CreateOrUpdateCustomerRequest,
     CreateOrUpdateCustomerResponse,
     DeleteCustomersRequest,
     DeleteCustomersResponse,
+    DeleteMagnetCardRequest,
     GetCustomerInfoByCardNumberRequest,
     GetCustomerInfoByCardTrackRequest,
     GetCustomerInfoByEmailRequest,
@@ -193,6 +197,62 @@ async def test_get_customer_by_card_track_builds_request() -> None:
     assert isinstance(request, GetCustomerInfoByCardTrackRequest)
     assert request.type == "cardTrack"
     assert request.card_track == ";1234567890?"
+
+
+async def test_add_customer_magnet_card_calls_api() -> None:
+    """add_customer_magnet_card delegates to SDK; empty object -> None."""
+    manager, mock_api = await manager_with_stub_api("_customers_api")
+    mock_api.add_customer_magnet_card = AsyncMock(return_value={})
+
+    request = AddMagnetCardRequest(
+        card_number="123456",
+        card_track="track-1",
+        customer_id=ORG_ID,
+        organization_id=ORG_ID,
+    )
+    result = await manager.add_customer_magnet_card(request)
+
+    assert result is None
+    mock_api.add_customer_magnet_card.assert_awaited_once_with(
+        add_magnet_card_request=request
+    )
+
+
+async def test_remove_customer_magnet_card_calls_api() -> None:
+    """remove_customer_magnet_card delegates to SDK; empty object -> None."""
+    manager, mock_api = await manager_with_stub_api("_customers_api")
+    mock_api.remove_customer_magnet_card = AsyncMock(return_value={})
+
+    request = DeleteMagnetCardRequest(
+        card_track="track-1",
+        customer_id=ORG_ID,
+        organization_id=ORG_ID,
+    )
+    result = await manager.remove_customer_magnet_card(request)
+
+    assert result is None
+    mock_api.remove_customer_magnet_card.assert_awaited_once_with(
+        delete_magnet_card_request=request
+    )
+
+
+async def test_add_customer_to_program_returns_response() -> None:
+    """add_customer_to_program proxies AddCustomerToProgramResponse."""
+    manager, mock_api = await manager_with_stub_api("_customers_api")
+    mock_response = MagicMock(spec=AddCustomerToProgramResponse)
+    mock_api.add_customer_to_program = AsyncMock(return_value=mock_response)
+
+    request = AddCustomerToProgramRequest(
+        customer_id=ORG_ID,
+        organization_id=ORG_ID,
+        program_id=ORG_ID,
+    )
+    result = await manager.add_customer_to_program(request)
+
+    assert result is mock_response
+    mock_api.add_customer_to_program.assert_awaited_once_with(
+        add_customer_to_program_request=request
+    )
 
 
 async def test_create_or_update_customer_uses_execute_with_retry() -> None:
