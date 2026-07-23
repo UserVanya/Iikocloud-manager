@@ -8,6 +8,8 @@ from iikocloud_client import (
     AddCustomerToProgramRequest,
     AddCustomerToProgramResponse,
     AddMagnetCardRequest,
+    CancelHoldMoneyRequest,
+    ChangeUserBalanceRequest,
     CreateOrUpdateCustomerRequest,
     CreateOrUpdateCustomerResponse,
     DeleteCustomersRequest,
@@ -19,6 +21,8 @@ from iikocloud_client import (
     GetCustomerInfoByIdRequest,
     GetCustomerInfoByPhoneRequest,
     GetCustomerInfoResponse,
+    HoldMoneyRequest,
+    HoldMoneyResponse,
     RestoreCustomersRequest,
     RestoreCustomersResponse,
 )
@@ -272,3 +276,97 @@ async def test_create_or_update_customer_uses_execute_with_retry() -> None:
     manager.execute_with_retry.assert_awaited_once()
     method_arg = manager.execute_with_retry.await_args.args[0]
     assert method_arg is ApiMethod.CREATE_OR_UPDATE_CUSTOMER
+
+
+async def test_hold_customer_balance_returns_transaction() -> None:
+    """hold_customer_balance proxies HoldMoneyResponse."""
+    manager, mock_api = await manager_with_stub_api("_customers_api")
+    mock_response = MagicMock(spec=HoldMoneyResponse)
+    mock_api.hold_customer_balance = AsyncMock(return_value=mock_response)
+
+    request = HoldMoneyRequest(
+        customer_id=ORG_ID,
+        organization_id=ORG_ID,
+        wallet_id=ORG_ID,
+        sum=100.0,
+    )
+    result = await manager.hold_customer_balance(request)
+
+    assert result is mock_response
+    mock_api.hold_customer_balance.assert_awaited_once_with(
+        hold_money_request=request
+    )
+
+
+async def test_cancel_customer_balance_hold_calls_api() -> None:
+    """cancel_customer_balance_hold delegates to SDK; empty object -> None."""
+    manager, mock_api = await manager_with_stub_api("_customers_api")
+    mock_api.cancel_customer_balance_hold = AsyncMock(return_value={})
+
+    request = CancelHoldMoneyRequest(
+        organization_id=ORG_ID,
+        transaction_id=ORG_ID,
+    )
+    result = await manager.cancel_customer_balance_hold(request)
+
+    assert result is None
+    mock_api.cancel_customer_balance_hold.assert_awaited_once_with(
+        cancel_hold_money_request=request
+    )
+
+
+async def test_top_up_customer_balance_calls_api() -> None:
+    """top_up_customer_balance delegates to SDK; empty object -> None."""
+    manager, mock_api = await manager_with_stub_api("_customers_api")
+    mock_api.top_up_customer_balance = AsyncMock(return_value={})
+
+    request = ChangeUserBalanceRequest(
+        organization_id=ORG_ID,
+        customer_id=ORG_ID,
+        wallet_id=ORG_ID,
+        sum=50.0,
+    )
+    result = await manager.top_up_customer_balance(request)
+
+    assert result is None
+    mock_api.top_up_customer_balance.assert_awaited_once_with(
+        change_user_balance_request=request
+    )
+
+
+async def test_withdraw_customer_balance_calls_api() -> None:
+    """withdraw_customer_balance delegates to SDK; empty object -> None."""
+    manager, mock_api = await manager_with_stub_api("_customers_api")
+    mock_api.withdraw_customer_balance = AsyncMock(return_value={})
+
+    request = ChangeUserBalanceRequest(
+        organization_id=ORG_ID,
+        customer_id=ORG_ID,
+        wallet_id=ORG_ID,
+        sum=50.0,
+    )
+    result = await manager.withdraw_customer_balance(request)
+
+    assert result is None
+    mock_api.withdraw_customer_balance.assert_awaited_once_with(
+        change_user_balance_request=request
+    )
+
+
+@pytest.mark.parametrize(
+    "method_name", ["top_up_customer_balance", "withdraw_customer_balance"]
+)
+async def test_balance_change_requires_customer_and_wallet(method_name: str) -> None:
+    """top_up/withdraw без customer_id или wallet_id -> ValueError, SDK не вызывается."""
+    manager, mock_api = await manager_with_stub_api("_customers_api")
+
+    for kwargs in (
+        {"customer_id": None, "wallet_id": ORG_ID},
+        {"customer_id": ORG_ID, "wallet_id": None},
+    ):
+        request = ChangeUserBalanceRequest(
+            organization_id=ORG_ID, sum=10.0, **kwargs
+        )
+        with pytest.raises(ValueError, match="customer_id"):
+            await getattr(manager, method_name)(request)
+    mock_api.assert_not_called()

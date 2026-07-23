@@ -4,6 +4,8 @@ from iikocloud_client import (
     AddCustomerToProgramRequest,
     AddCustomerToProgramResponse,
     AddMagnetCardRequest,
+    CancelHoldMoneyRequest,
+    ChangeUserBalanceRequest,
     CreateOrUpdateCustomerRequest,
     CreateOrUpdateCustomerResponse,
     DeleteCustomersRequest,
@@ -11,6 +13,8 @@ from iikocloud_client import (
     DeleteMagnetCardRequest,
     GetCustomerInfoRequest,
     GetCustomerInfoResponse,
+    HoldMoneyRequest,
+    HoldMoneyResponse,
     RestoreCustomersRequest,
     RestoreCustomersResponse,
 )
@@ -168,4 +172,80 @@ class CustomersCoreMixin(_ManagerBase):
 
         return await self.execute_with_retry(
             ApiMethod.RESTORE_CUSTOMERS, api_call
+        )
+
+    @staticmethod
+    def _require_balance_fields(request: ChangeUserBalanceRequest) -> None:
+        """customerId/walletId в SDK optional, но семантически обязательны."""
+        if request.customer_id is None or request.wallet_id is None:
+            raise ValueError(
+                "customer_id и wallet_id обязательны для операций с балансом"
+            )
+
+    async def hold_customer_balance(
+        self,
+        request: HoldMoneyRequest,
+    ) -> HoldMoneyResponse:
+        """Захолдировать средства на кошельке клиента.
+
+        Идемпотентность — через request.transaction_id
+        (если не задан, сервер сгенерирует и вернёт в ответе).
+        """
+
+        async def api_call() -> HoldMoneyResponse:
+            api = await self.get_customers_api()
+            return await api.hold_customer_balance(hold_money_request=request)
+
+        return await self.execute_with_retry(
+            ApiMethod.HOLD_CUSTOMER_BALANCE, api_call
+        )
+
+    async def cancel_customer_balance_hold(
+        self,
+        request: CancelHoldMoneyRequest,
+    ) -> None:
+        """Отменить холд по transactionId."""
+
+        async def api_call() -> None:
+            api = await self.get_customers_api()
+            await api.cancel_customer_balance_hold(
+                cancel_hold_money_request=request
+            )
+
+        return await self.execute_with_retry(
+            ApiMethod.CANCEL_CUSTOMER_BALANCE_HOLD, api_call
+        )
+
+    async def top_up_customer_balance(
+        self,
+        request: ChangeUserBalanceRequest,
+    ) -> None:
+        """Пополнить кошелёк клиента (sum строго положительная)."""
+
+        async def api_call() -> None:
+            api = await self.get_customers_api()
+            await api.top_up_customer_balance(
+                change_user_balance_request=request
+            )
+
+        self._require_balance_fields(request)
+        return await self.execute_with_retry(
+            ApiMethod.TOP_UP_CUSTOMER_BALANCE, api_call
+        )
+
+    async def withdraw_customer_balance(
+        self,
+        request: ChangeUserBalanceRequest,
+    ) -> None:
+        """Списать средства с кошелька клиента (sum строго положительная)."""
+
+        async def api_call() -> None:
+            api = await self.get_customers_api()
+            await api.withdraw_customer_balance(
+                change_user_balance_request=request
+            )
+
+        self._require_balance_fields(request)
+        return await self.execute_with_retry(
+            ApiMethod.WITHDRAW_CUSTOMER_BALANCE, api_call
         )
