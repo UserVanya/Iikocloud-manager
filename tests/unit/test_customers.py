@@ -10,11 +10,15 @@ from iikocloud_client import (
     AddMagnetCardRequest,
     CancelHoldMoneyRequest,
     ChangeUserBalanceRequest,
+    CounterMetric,
+    CounterPeriod,
     CreateOrUpdateCustomerRequest,
     CreateOrUpdateCustomerResponse,
     DeleteCustomersRequest,
     DeleteCustomersResponse,
     DeleteMagnetCardRequest,
+    GetCountersRequest,
+    GetCountersResponse,
     GetCustomerInfoByCardNumberRequest,
     GetCustomerInfoByCardTrackRequest,
     GetCustomerInfoByEmailRequest,
@@ -350,6 +354,26 @@ async def test_withdraw_customer_balance_calls_api() -> None:
     assert result is None
     mock_api.withdraw_customer_balance.assert_awaited_once_with(
         change_user_balance_request=request
+    )
+
+
+async def test_get_loyalty_counters_returns_response() -> None:
+    """get_loyalty_counters proxies GetCountersResponse."""
+    manager, mock_api = await manager_with_stub_api("_customers_api")
+    mock_response = MagicMock(spec=GetCountersResponse)
+    mock_api.get_loyalty_counters = AsyncMock(return_value=mock_response)
+
+    request = GetCountersRequest(
+        organization_id=ORG_ID,
+        guest_ids=[ORG_ID],
+        metrics=[CounterMetric.NUMBER_0],
+        periods=[CounterPeriod.NUMBER_0],
+    )
+    result = await manager.get_loyalty_counters(request)
+
+    assert result is mock_response
+    mock_api.get_loyalty_counters.assert_awaited_once_with(
+        get_counters_request=request
     )
 
 

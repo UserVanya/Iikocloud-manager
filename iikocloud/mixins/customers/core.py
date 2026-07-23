@@ -11,6 +11,8 @@ from iikocloud_client import (
     DeleteCustomersRequest,
     DeleteCustomersResponse,
     DeleteMagnetCardRequest,
+    GetCountersRequest,
+    GetCountersResponse,
     GetCustomerInfoRequest,
     GetCustomerInfoResponse,
     HoldMoneyRequest,
@@ -248,4 +250,22 @@ class CustomersCoreMixin(_ManagerBase):
         self._require_balance_fields(request)
         return await self.execute_with_retry(
             ApiMethod.WITHDRAW_CUSTOMER_BALANCE, api_call
+        )
+
+    async def get_loyalty_counters(
+        self,
+        request: GetCountersRequest,
+    ) -> GetCountersResponse:
+        """Счётчики лояльности гостей (кол-во заказов/суммы за периоды).
+
+        metrics/periods — числовые enum'ы SDK (CounterMetric 0..3,
+        CounterPeriod 0..12); семантика значений — по документации iiko.
+        """
+
+        async def api_call() -> GetCountersResponse:
+            api = await self.get_customers_api()
+            return await api.get_loyalty_counters(get_counters_request=request)
+
+        return await self.execute_with_retry(
+            ApiMethod.GET_LOYALTY_COUNTERS, api_call
         )
