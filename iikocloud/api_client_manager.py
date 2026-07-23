@@ -32,7 +32,7 @@ from iikocloud.token_manager import TokenManager
 
 logger = logging.getLogger(__name__)
 
-# Re-export for callers / later tasks that import from this module.
+# Re-export for callers that import credentials / enums from this module.
 __all__ = [
     "ApiCredentials",
     "ApiMethod",
@@ -52,8 +52,8 @@ class IikoCloudApiClientManager(
     """Multitone-фасад для работы с iikocloud API.
 
     Содержит: ApiClient, TokenManager, глобальный лимитер, лимитеры по методам.
-    Domain-методы подключаются через mixins (organizations — Task 5; customers — Task 6;
-    terminal_groups — Task 7; menu — Task 8; dictionaries — Task 9).
+    Domain-методы — через mixins: organizations, customers, terminal_groups,
+    menu, dictionaries.
 
     Конкурентность:
         Экземпляр безопасен для параллельных вызовов из нескольких задач

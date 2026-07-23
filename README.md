@@ -87,3 +87,7 @@ uv run pytest -m "integration and not slow" -v
 ```
 
 Для интеграционных тестов скопируйте `config.test.example.yml` → `config.test.yml` и задайте секции `read` / `write` с полными v2-тройками credentials. Без файла или env тесты пропускаются через `pytest.skip`.
+
+**Write-секция / customer lifecycle:** credentials для `write` должны иметь доступ к Loyalty/CRM на организации стенда — иначе lifecycle-тесты (create/get/delete/restore) будут `pytest.skip` с пометкой о недоступности CRM.
+
+**Нестабильные read-эндпоинты:** на части стендов `get_organization_settings` и `get_external_menu_by_id` могут быть недоступны или зависать; интеграционные проверки для них при необходимости пропускаются (`skip`), а не считаются обязательным зелёным прогоном.
