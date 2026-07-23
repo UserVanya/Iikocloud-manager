@@ -393,4 +393,5 @@ async def test_balance_change_requires_customer_and_wallet(method_name: str) -> 
         )
         with pytest.raises(ValueError, match="customer_id"):
             await getattr(manager, method_name)(request)
-    mock_api.assert_not_called()
+    mock_api.top_up_customer_balance.assert_not_called()
+    mock_api.withdraw_customer_balance.assert_not_called()

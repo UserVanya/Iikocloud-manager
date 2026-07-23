@@ -53,6 +53,9 @@ class TestGetLoyaltyCounters:
                 )
             )
         except BadRequestException as exc:
+            body = getattr(exc, "body", None) or str(exc)
+            if "Counter" not in body:
+                raise
             pytest.skip(
                 "SDK CounterMetric/CounterPeriod — числовые enum'ы, а API "
                 "принимает только строки (OrdersCount/OrdersSum, Week/...): "

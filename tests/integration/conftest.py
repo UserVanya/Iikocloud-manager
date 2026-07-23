@@ -76,7 +76,10 @@ def load_test_config(role: str) -> IikoCloudConfig:
 
 
 def _section_for(request: pytest.FixtureRequest) -> str:
-    """Выбрать сервер по маркеру теста: write/test_server/danger_write → write, иначе read."""
+    """Выбрать сервер по маркеру теста.
+
+    write/test_server/danger_write → write, иначе read.
+    """
     node = request.node
     if (
         node.get_closest_marker("write")

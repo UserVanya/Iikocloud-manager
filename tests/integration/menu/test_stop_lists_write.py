@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from uuid import UUID
 
 import pytest
@@ -31,6 +32,8 @@ from iikocloud_client import (
 from iikocloud_client.exceptions import ApiException
 
 from iikocloud import IikoCloudApiClientManager
+
+logger = logging.getLogger(__name__)
 
 _API_PAUSE_SEC = 1.0
 _POLL_ATTEMPTS = 10
@@ -134,6 +137,16 @@ class TestStopListLifecycle:
                     items=[RemoveProductsFromStopListItem(product_id=product_id)],
                 )
             )
+
+            # 4. check — продукт исчез (поллинг: мутация асинхронная)
+            for _ in range(_POLL_ATTEMPTS):
+                await asyncio.sleep(_POLL_INTERVAL_SEC)
+                rejected = await _rejected()
+                if not any(item.product_id == product_id for item in rejected):
+                    break
+            assert not any(item.product_id == product_id for item in rejected), (
+                "Продукт не исчез из стоп-листа после remove"
+            )
         except ApiException as exc:
             if _is_stop_list_unavailable(exc):
                 pytest.skip(f"Стенд не поддерживает мутации стоп-листов: {exc}")
@@ -148,6 +161,4 @@ class TestStopListLifecycle:
                     )
                 )
             except Exception as exc:  # noqa: BLE001
-                import logging
-
-                logging.getLogger(__name__).warning("clear_stop_list cleanup: %s", exc)
+                logger.warning("clear_stop_list cleanup: %s", exc)
