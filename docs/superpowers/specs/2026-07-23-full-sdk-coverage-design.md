@@ -32,18 +32,22 @@
 
 ### Добор методов в покрытых классах (отдельные модули-расширения)
 
-- `CustomersApi`: `add_customer_magnet_card`, `add_customer_to_program`,
-  `hold/cancel/top_up/withdraw_customer_balance`, `get_loyalty_counters`,
-  `remove_customer_magnet_card` и др. неиспользуемые
-- `MenuApi`: stop-list мутации, `get_nomenclature`, `get_combos_info`,
-  `calculate_combo_price` и др.
-- `TerminalGroupsApi`: `awake_terminal_groups`
+- `CustomersApi`: `add_customer_magnet_card`, `remove_customer_magnet_card`,
+  `add_customer_to_program`, `hold_customer_balance`,
+  `cancel_customer_balance_hold`, `top_up_customer_balance`,
+  `withdraw_customer_balance`, `get_loyalty_counters`
+- `MenuApi`: `add_products_to_stop_list`, `remove_products_from_stop_list`,
+  `clear_stop_list`, `check_products_in_stop_list`, `get_nomenclature`,
+  `get_combos_info`, `calculate_combo_price`
+
+`TerminalGroupsApi.awake_terminal_groups` — исключён из scope
+(не нужен пользователю).
 
 ## 2. Гранулярность: один модуль = один API-класс SDK
 
 Каждый класс — отдельный модуль с собственным циклом
 «обсуждение → спека → план → реализация». Доборы методов — модули-расширения
-существующих доменов (`customers+`, `menu+`, `terminal_groups+`).
+существующих доменов (`customers+`, `menu+`).
 
 ## 3. Структура модуля (конвенция)
 
@@ -63,7 +67,7 @@
 1. Deliveries-блок: `deliveries_create_and_update`, `deliveries_retrieve`,
    `delivery_restrictions`, `drafts`, `orders`, `addresses`
 2. Лояльность и добор: `customer_categories`, `discounts_and_promotions`,
-   `marketing_sources`, `customers+`, `menu+`, `terminal_groups+`
+   `marketing_sources`, `customers+`, `menu+`
 3. Прочее: `employees`, `messages`, `notifications`, `operations`, `report`,
    `webhooks`, `banquets_reserves`
 4. Invoice Processing: 16 классов (порядок внутри блока определяется
