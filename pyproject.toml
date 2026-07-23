@@ -59,6 +59,7 @@ markers = [
     "lifecycle: Full create-edit-delete-restore cycles",
     "write: Write tests that modify Cloud state",
     "test_server: Route non-write integration test to config.test.yml 'write' section",
+    "danger_write: Write tests that create/cancel orders, mutate stop lists or balances on the dedicated write organization",
 ]
 
 [tool.ruff]
