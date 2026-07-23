@@ -112,14 +112,16 @@ class TokenManager:
         await acquire_global()
         await acquire_auth()
 
-        self._api_client.configuration.access_token = None
-        request = GetAccessTokenV2Request(
-            apiKey=self._api_key,
-            appId=self._app_id,
-            clientSecret=self._client_secret,
-        )
-
+        # Токен НЕ сбрасывается перед запросом: authenticate_v2 не использует
+        # auth_settings (Bearer туда не уходит), а configuration разделяется
+        # со всеми параллельными запросами этого ApiClient — обнуление здесь
+        # заставило бы их уйти без Authorization и получить 401.
         try:
+            request = GetAccessTokenV2Request(
+                apiKey=self._api_key,
+                appId=self._app_id,
+                clientSecret=self._client_secret,
+            )
             logger.debug("Запрос токена для key_id=%s", self._key_id)
             response = await self._authorization_api.authenticate_v2(
                 get_access_token_v2_request=request

@@ -4,14 +4,8 @@ from uuid import UUID
 
 from iikocloud_client import StopListsRequest, StopListsResponse
 
+from iikocloud.mixins._base import as_uuid
 from iikocloud.mixins.menu.core import MenuCoreMixin
-
-
-def _as_uuid(value: str | UUID) -> UUID:
-    """Привести organization_id к UUID."""
-    if isinstance(value, UUID):
-        return value
-    return UUID(value)
 
 
 class MenuHelpersMixin(MenuCoreMixin):
@@ -30,6 +24,6 @@ class MenuHelpersMixin(MenuCoreMixin):
             Ответ со стоп-листами организации
         """
         request = StopListsRequest(
-            organization_ids=[_as_uuid(organization_id)],
+            organization_ids=[as_uuid(organization_id)],
         )
         return await self.get_stop_lists(request)

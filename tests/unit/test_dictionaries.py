@@ -18,62 +18,17 @@ from iikocloud_client import (
     TipsTypesResponse,
 )
 
-from iikocloud.api_client_manager import IikoCloudApiClientManager
-from iikocloud.config_reader import MethodRateLimitsSettings
-from iikocloud.mixins._base import ApiCredentials, ApiMethod, MethodRateLimits
-from iikocloud.rate_limiter import GlobalRateLimiter
-from iikocloud.token_manager import TokenManager
+from iikocloud.mixins._base import ApiMethod
+from tests.unit.conftest import manager_with_stub_api
 
 pytestmark = pytest.mark.unit
 
-APP_ID = "00000000-0000-0000-0000-000000000001"
 ORG_ID = UUID("12345678-1234-1234-1234-123456789abc")
-
-
-def _credentials() -> ApiCredentials:
-    """Build v2 ApiCredentials for dictionaries tests."""
-    return ApiCredentials(
-        api_key="test-api-key",
-        app_id=APP_ID,
-        client_secret="test-client-secret",
-    )
-
-
-def _limits() -> MethodRateLimits:
-    """Default MethodRateLimits from settings defaults."""
-    return MethodRateLimits.from_settings(MethodRateLimitsSettings())
-
-
-@pytest.fixture(autouse=True)
-async def cleanup_singletons() -> None:
-    """Reset Multitone registries between tests."""
-    await IikoCloudApiClientManager.close_all()
-    yield
-    await IikoCloudApiClientManager.close_all()
-    GlobalRateLimiter.reset_instance()
-    await TokenManager.close_all()
-
-
-async def _manager_with_mock_dictionaries_api() -> tuple[
-    IikoCloudApiClientManager, MagicMock
-]:
-    """Create manager with mocked TokenManager and DictionariesApi."""
-    manager = await IikoCloudApiClientManager.get_instance(
-        _credentials(), _limits()
-    )
-
-    mock_token_manager = MagicMock()
-    mock_token_manager.token_version = 1
-    manager._token_manager = mock_token_manager
-
-    mock_api = MagicMock()
-    manager._dictionaries_api = mock_api
-    return manager, mock_api
 
 
 async def test_get_cancel_causes_calls_api_with_request() -> None:
     """get_cancel_causes delegates to SDK with CancelCausesRequest."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_response = MagicMock(spec=CancelCausesResponse)
     mock_api.get_cancel_causes = AsyncMock(return_value=mock_response)
@@ -89,7 +44,7 @@ async def test_get_cancel_causes_calls_api_with_request() -> None:
 
 async def test_get_delivery_order_types_calls_api_with_request() -> None:
     """get_delivery_order_types delegates to SDK with OrderTypesRequest."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_response = MagicMock(spec=OrderTypesResponse)
     mock_api.get_delivery_order_types = AsyncMock(return_value=mock_response)
@@ -105,7 +60,7 @@ async def test_get_delivery_order_types_calls_api_with_request() -> None:
 
 async def test_get_payment_types_calls_api_with_request() -> None:
     """get_payment_types delegates to SDK with PaymentTypesRequest."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_response = MagicMock(spec=PaymentTypesResponse)
     mock_api.get_payment_types = AsyncMock(return_value=mock_response)
@@ -121,7 +76,7 @@ async def test_get_payment_types_calls_api_with_request() -> None:
 
 async def test_get_discounts_calls_api_with_request() -> None:
     """get_discounts delegates to SDK with DiscountsRequest."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_response = MagicMock(spec=DiscountsResponse)
     mock_api.get_discounts = AsyncMock(return_value=mock_response)
@@ -137,7 +92,7 @@ async def test_get_discounts_calls_api_with_request() -> None:
 
 async def test_get_removal_types_calls_api_with_request() -> None:
     """get_removal_types delegates to SDK with RemovalTypesRequest."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_response = MagicMock(spec=RemovalTypesResponse)
     mock_api.get_removal_types = AsyncMock(return_value=mock_response)
@@ -153,7 +108,7 @@ async def test_get_removal_types_calls_api_with_request() -> None:
 
 async def test_get_tips_types_calls_api_without_request() -> None:
     """get_tips_types delegates to SDK without a request body."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_response = MagicMock(spec=TipsTypesResponse)
     mock_api.get_tips_types = AsyncMock(return_value=mock_response)
@@ -166,7 +121,7 @@ async def test_get_tips_types_calls_api_without_request() -> None:
 
 async def test_get_cancel_causes_by_organization_builds_request() -> None:
     """get_cancel_causes_by_organization builds CancelCausesRequest."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_response = MagicMock(spec=CancelCausesResponse)
     mock_api.get_cancel_causes = AsyncMock(return_value=mock_response)
@@ -183,7 +138,7 @@ async def test_get_cancel_causes_by_organization_builds_request() -> None:
 
 async def test_get_delivery_order_types_by_organization_builds_request() -> None:
     """get_delivery_order_types_by_organization builds OrderTypesRequest."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_response = MagicMock(spec=OrderTypesResponse)
     mock_api.get_delivery_order_types = AsyncMock(return_value=mock_response)
@@ -200,7 +155,7 @@ async def test_get_delivery_order_types_by_organization_builds_request() -> None
 
 async def test_get_payment_types_by_organization_accepts_str_id() -> None:
     """get_payment_types_by_organization converts string organization_id."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_api.get_payment_types = AsyncMock(return_value=MagicMock())
 
@@ -213,7 +168,7 @@ async def test_get_payment_types_by_organization_accepts_str_id() -> None:
 
 async def test_get_discounts_by_organization_builds_request() -> None:
     """get_discounts_by_organization builds DiscountsRequest."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_api.get_discounts = AsyncMock(return_value=MagicMock())
 
@@ -227,7 +182,7 @@ async def test_get_discounts_by_organization_builds_request() -> None:
 
 async def test_get_removal_types_by_organization_builds_request() -> None:
     """get_removal_types_by_organization builds RemovalTypesRequest."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
 
     mock_api.get_removal_types = AsyncMock(return_value=MagicMock())
 
@@ -241,7 +196,7 @@ async def test_get_removal_types_by_organization_builds_request() -> None:
 
 async def test_get_tips_types_uses_execute_with_retry() -> None:
     """get_tips_types routes through execute_with_retry."""
-    manager, mock_api = await _manager_with_mock_dictionaries_api()
+    manager, mock_api = await manager_with_stub_api("_dictionaries_api")
     mock_api.get_tips_types = AsyncMock(return_value=MagicMock())
 
     async def _passthrough(method, api_call):  # noqa: ANN001

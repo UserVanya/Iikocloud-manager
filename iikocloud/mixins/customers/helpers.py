@@ -11,14 +11,8 @@ from iikocloud_client import (
     GetCustomerInfoResponse,
 )
 
+from iikocloud.mixins._base import as_uuid
 from iikocloud.mixins.customers.core import CustomersCoreMixin
-
-
-def _as_uuid(value: str | UUID) -> UUID:
-    """Привести id к UUID."""
-    if isinstance(value, UUID):
-        return value
-    return UUID(value)
 
 
 class CustomersHelpersMixin(CustomersCoreMixin):
@@ -35,7 +29,7 @@ class CustomersHelpersMixin(CustomersCoreMixin):
     ) -> GetCustomerInfoResponse:
         """Получить клиента по номеру телефона."""
         request = GetCustomerInfoByPhoneRequest(
-            organization_id=_as_uuid(organization_id),
+            organization_id=as_uuid(organization_id),
             type="phone",
             phone=phone,
         )
@@ -48,7 +42,7 @@ class CustomersHelpersMixin(CustomersCoreMixin):
     ) -> GetCustomerInfoResponse:
         """Получить клиента по ID (loyalty customer id)."""
         request = GetCustomerInfoByIdRequest(
-            organization_id=_as_uuid(organization_id),
+            organization_id=as_uuid(organization_id),
             type="id",
             id=str(customer_id),
         )
@@ -61,7 +55,7 @@ class CustomersHelpersMixin(CustomersCoreMixin):
     ) -> GetCustomerInfoResponse:
         """Получить клиента по email."""
         request = GetCustomerInfoByEmailRequest(
-            organization_id=_as_uuid(organization_id),
+            organization_id=as_uuid(organization_id),
             type="email",
             email=email,
         )
@@ -74,7 +68,7 @@ class CustomersHelpersMixin(CustomersCoreMixin):
     ) -> GetCustomerInfoResponse:
         """Получить клиента по номеру карты лояльности."""
         request = GetCustomerInfoByCardNumberRequest(
-            organization_id=_as_uuid(organization_id),
+            organization_id=as_uuid(organization_id),
             type="cardNumber",
             card_number=card_number,
         )
@@ -87,7 +81,7 @@ class CustomersHelpersMixin(CustomersCoreMixin):
     ) -> GetCustomerInfoResponse:
         """Получить клиента по магнитной дорожке карты."""
         request = GetCustomerInfoByCardTrackRequest(
-            organization_id=_as_uuid(organization_id),
+            organization_id=as_uuid(organization_id),
             type="cardTrack",
             card_track=card_track,
         )

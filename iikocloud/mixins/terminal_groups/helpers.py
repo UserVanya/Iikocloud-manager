@@ -4,14 +4,8 @@ from uuid import UUID
 
 from iikocloud_client import TerminalGroupsRequest, TerminalGroupsResponse
 
+from iikocloud.mixins._base import as_uuid
 from iikocloud.mixins.terminal_groups.core import TerminalGroupsCoreMixin
-
-
-def _as_uuid(value: str | UUID) -> UUID:
-    """Привести organization_id к UUID."""
-    if isinstance(value, UUID):
-        return value
-    return UUID(value)
 
 
 class TerminalGroupsHelpersMixin(TerminalGroupsCoreMixin):
@@ -30,6 +24,6 @@ class TerminalGroupsHelpersMixin(TerminalGroupsCoreMixin):
             Ответ со списком терминальных групп
         """
         request = TerminalGroupsRequest(
-            organization_ids=[_as_uuid(organization_id)],
+            organization_ids=[as_uuid(organization_id)],
         )
         return await self.get_terminal_groups(request)

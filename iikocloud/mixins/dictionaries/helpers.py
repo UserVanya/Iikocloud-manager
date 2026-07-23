@@ -15,14 +15,8 @@ from iikocloud_client import (
     RemovalTypesResponse,
 )
 
+from iikocloud.mixins._base import as_uuid
 from iikocloud.mixins.dictionaries.core import DictionariesCoreMixin
-
-
-def _as_uuid(value: str | UUID) -> UUID:
-    """Привести organization_id к UUID."""
-    if isinstance(value, UUID):
-        return value
-    return UUID(value)
 
 
 class DictionariesHelpersMixin(DictionariesCoreMixin):
@@ -41,7 +35,7 @@ class DictionariesHelpersMixin(DictionariesCoreMixin):
             Ответ со списком причин отмены организации
         """
         request = CancelCausesRequest(
-            organization_ids=[_as_uuid(organization_id)],
+            organization_ids=[as_uuid(organization_id)],
         )
         return await self.get_cancel_causes(request)
 
@@ -58,7 +52,7 @@ class DictionariesHelpersMixin(DictionariesCoreMixin):
             Ответ со списком типов заказов организации
         """
         request = OrderTypesRequest(
-            organization_ids=[_as_uuid(organization_id)],
+            organization_ids=[as_uuid(organization_id)],
         )
         return await self.get_delivery_order_types(request)
 
@@ -75,7 +69,7 @@ class DictionariesHelpersMixin(DictionariesCoreMixin):
             Ответ со списком типов оплаты организации
         """
         request = PaymentTypesRequest(
-            organization_ids=[_as_uuid(organization_id)],
+            organization_ids=[as_uuid(organization_id)],
         )
         return await self.get_payment_types(request)
 
@@ -92,7 +86,7 @@ class DictionariesHelpersMixin(DictionariesCoreMixin):
             Ответ со списком скидок организации
         """
         request = DiscountsRequest(
-            organization_ids=[_as_uuid(organization_id)],
+            organization_ids=[as_uuid(organization_id)],
         )
         return await self.get_discounts(request)
 
@@ -109,6 +103,6 @@ class DictionariesHelpersMixin(DictionariesCoreMixin):
             Ответ со списком типов списания организации
         """
         request = RemovalTypesRequest(
-            organization_ids=[_as_uuid(organization_id)],
+            organization_ids=[as_uuid(organization_id)],
         )
         return await self.get_removal_types(request)

@@ -11,61 +11,15 @@ from iikocloud_client import (
     OrganizationsSettingsResponse,
 )
 
-from iikocloud.api_client_manager import IikoCloudApiClientManager
-from iikocloud.config_reader import MethodRateLimitsSettings
-from iikocloud.mixins._base import ApiCredentials, ApiMethod, MethodRateLimits
-from iikocloud.rate_limiter import GlobalRateLimiter
-from iikocloud.token_manager import TokenManager
+from iikocloud.mixins._base import ApiMethod
+from tests.unit.conftest import manager_with_stub_api
 
 pytestmark = pytest.mark.unit
-
-APP_ID = "00000000-0000-0000-0000-000000000001"
-
-
-def _credentials() -> ApiCredentials:
-    """Build v2 ApiCredentials for organization tests."""
-    return ApiCredentials(
-        api_key="test-api-key",
-        app_id=APP_ID,
-        client_secret="test-client-secret",
-    )
-
-
-def _limits() -> MethodRateLimits:
-    """Default MethodRateLimits from settings defaults."""
-    return MethodRateLimits.from_settings(MethodRateLimitsSettings())
-
-
-@pytest.fixture(autouse=True)
-async def cleanup_singletons() -> None:
-    """Reset Multitone registries between tests."""
-    await IikoCloudApiClientManager.close_all()
-    yield
-    await IikoCloudApiClientManager.close_all()
-    GlobalRateLimiter.reset_instance()
-    await TokenManager.close_all()
-
-
-async def _manager_with_mock_orgs_api() -> tuple[
-    IikoCloudApiClientManager, MagicMock
-]:
-    """Create manager with mocked TokenManager and OrganizationsApi."""
-    manager = await IikoCloudApiClientManager.get_instance(
-        _credentials(), _limits()
-    )
-
-    mock_token_manager = MagicMock()
-    mock_token_manager.token_version = 1
-    manager._token_manager = mock_token_manager
-
-    mock_api = MagicMock()
-    manager._organizations_api = mock_api
-    return manager, mock_api
 
 
 async def test_get_organizations_calls_api_with_request() -> None:
     """get_organizations delegates to SDK with the given request."""
-    manager, mock_api = await _manager_with_mock_orgs_api()
+    manager, mock_api = await manager_with_stub_api("_organizations_api")
 
     mock_response = MagicMock(spec=GetOrganizationsResponse)
     mock_api.get_organizations = AsyncMock(return_value=mock_response)
@@ -83,7 +37,7 @@ async def test_get_organizations_calls_api_with_request() -> None:
 
 async def test_get_organizations_defaults_empty_request() -> None:
     """get_organizations() without request builds empty GetOrganizationsRequest."""
-    manager, mock_api = await _manager_with_mock_orgs_api()
+    manager, mock_api = await manager_with_stub_api("_organizations_api")
 
     mock_response = MagicMock(spec=GetOrganizationsResponse)
     mock_api.get_organizations = AsyncMock(return_value=mock_response)
@@ -98,7 +52,7 @@ async def test_get_organizations_defaults_empty_request() -> None:
 
 async def test_get_organization_settings_calls_api_with_request() -> None:
     """get_organization_settings delegates to SDK with the given request."""
-    manager, mock_api = await _manager_with_mock_orgs_api()
+    manager, mock_api = await manager_with_stub_api("_organizations_api")
 
     mock_response = MagicMock(spec=OrganizationsSettingsResponse)
     mock_api.get_organization_settings = AsyncMock(return_value=mock_response)
@@ -116,7 +70,7 @@ async def test_get_organization_settings_calls_api_with_request() -> None:
 
 async def test_get_organization_settings_defaults_empty_request() -> None:
     """get_organization_settings() without request builds empty request."""
-    manager, mock_api = await _manager_with_mock_orgs_api()
+    manager, mock_api = await manager_with_stub_api("_organizations_api")
 
     mock_response = MagicMock(spec=OrganizationsSettingsResponse)
     mock_api.get_organization_settings = AsyncMock(return_value=mock_response)
@@ -134,7 +88,7 @@ async def test_get_organization_settings_defaults_empty_request() -> None:
 
 async def test_get_organizations_uses_execute_with_retry() -> None:
     """get_organizations routes through execute_with_retry with GET_ORGANIZATIONS."""
-    manager, mock_api = await _manager_with_mock_orgs_api()
+    manager, mock_api = await manager_with_stub_api("_organizations_api")
     mock_api.get_organizations = AsyncMock(return_value=MagicMock())
 
     async def _passthrough(method, api_call):  # noqa: ANN001

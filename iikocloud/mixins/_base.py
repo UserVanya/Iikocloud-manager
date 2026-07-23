@@ -4,9 +4,10 @@ import asyncio
 import hashlib
 import logging
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from enum import Enum
-from typing import TypeVar
+from typing import TypeVar, cast
+from uuid import UUID
 
 from iikocloud_client import (
     ApiClient,
@@ -31,6 +32,25 @@ from iikocloud.token_manager import TokenManager
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
+
+
+def as_uuid(value: str | UUID) -> UUID:
+    """Привести идентификатор (organization_id, customer_id, ...) к UUID."""
+    if isinstance(value, UUID):
+        return value
+    return UUID(value)
+
+
+def _requests_per_second(config: RateLimitConfig) -> float:
+    """Скорость лимита в запросах в секунду."""
+    return config.max_requests / config.time_window_seconds
+
+
+def _is_unauthorized(error: BaseException) -> bool:
+    """401 ли это (типизированное исключение SDK или любое со ``status == 401``)."""
+    return isinstance(error, UnauthorizedException) or (
+        getattr(error, "status", None) == 401
+    )
 
 
 class ApiMethod(Enum):
@@ -113,95 +133,33 @@ class MethodRateLimits:
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
-        """Создать из Pydantic settings."""
-
-        def _cfg(field_name: str) -> RateLimitConfig:
-            field = getattr(settings, field_name)
-            return RateLimitConfig(
-                max_requests=field.max_requests,
-                time_window_seconds=field.time_window_seconds,
-            )
-
+        """Создать из Pydantic settings (имена полей совпадают 1:1)."""
         return cls(
-            auth=_cfg("auth"),
-            get_organizations=_cfg("get_organizations"),
-            get_organization_settings=_cfg("get_organization_settings"),
-            create_or_update_customer=_cfg("create_or_update_customer"),
-            get_customer_info=_cfg("get_customer_info"),
-            delete_customers=_cfg("delete_customers"),
-            restore_customers=_cfg("restore_customers"),
-            get_terminal_groups=_cfg("get_terminal_groups"),
-            check_terminal_groups_availability=_cfg(
-                "check_terminal_groups_availability"
-            ),
-            get_external_menus=_cfg("get_external_menus"),
-            get_external_menu_by_id=_cfg("get_external_menu_by_id"),
-            get_stop_lists=_cfg("get_stop_lists"),
-            get_cancel_causes=_cfg("get_cancel_causes"),
-            get_delivery_order_types=_cfg("get_delivery_order_types"),
-            get_payment_types=_cfg("get_payment_types"),
-            get_discounts=_cfg("get_discounts"),
-            get_removal_types=_cfg("get_removal_types"),
-            get_tips_types=_cfg("get_tips_types"),
+            **{
+                field.name: RateLimitConfig(
+                    max_requests=getattr(settings, field.name).max_requests,
+                    time_window_seconds=getattr(
+                        settings, field.name
+                    ).time_window_seconds,
+                )
+                for field in fields(cls)
+            }
         )
 
     def for_method(self, method: ApiMethod) -> RateLimitConfig:
-        """Получить конфигурацию rate limit для метода."""
-        mapping = {
-            ApiMethod.AUTH: self.auth,
-            ApiMethod.GET_ORGANIZATIONS: self.get_organizations,
-            ApiMethod.GET_ORGANIZATION_SETTINGS: self.get_organization_settings,
-            ApiMethod.CREATE_OR_UPDATE_CUSTOMER: self.create_or_update_customer,
-            ApiMethod.GET_CUSTOMER_INFO: self.get_customer_info,
-            ApiMethod.DELETE_CUSTOMERS: self.delete_customers,
-            ApiMethod.RESTORE_CUSTOMERS: self.restore_customers,
-            ApiMethod.GET_TERMINAL_GROUPS: self.get_terminal_groups,
-            ApiMethod.CHECK_TERMINAL_GROUPS_AVAILABILITY: (
-                self.check_terminal_groups_availability
-            ),
-            ApiMethod.GET_EXTERNAL_MENUS: self.get_external_menus,
-            ApiMethod.GET_EXTERNAL_MENU_BY_ID: self.get_external_menu_by_id,
-            ApiMethod.GET_STOP_LISTS: self.get_stop_lists,
-            ApiMethod.GET_CANCEL_CAUSES: self.get_cancel_causes,
-            ApiMethod.GET_DELIVERY_ORDER_TYPES: self.get_delivery_order_types,
-            ApiMethod.GET_PAYMENT_TYPES: self.get_payment_types,
-            ApiMethod.GET_DISCOUNTS: self.get_discounts,
-            ApiMethod.GET_REMOVAL_TYPES: self.get_removal_types,
-            ApiMethod.GET_TIPS_TYPES: self.get_tips_types,
-        }
-        return mapping[method]
+        """Получить конфигурацию rate limit для метода.
+
+        ``ApiMethod.<X>.value`` совпадает с именем поля (Locked Names),
+        поэтому отдельная таблица соответствия не нужна.
+        """
+        return cast(RateLimitConfig, getattr(self, method.value))
 
     def compute_global_limit(self) -> RateLimitConfig:
         """Вычислить глобальный лимит как самый свободный (max RPS)."""
-        all_limits = [
-            self.auth,
-            self.get_organizations,
-            self.get_organization_settings,
-            self.create_or_update_customer,
-            self.get_customer_info,
-            self.delete_customers,
-            self.restore_customers,
-            self.get_terminal_groups,
-            self.check_terminal_groups_availability,
-            self.get_external_menus,
-            self.get_external_menu_by_id,
-            self.get_stop_lists,
-            self.get_cancel_causes,
-            self.get_delivery_order_types,
-            self.get_payment_types,
-            self.get_discounts,
-            self.get_removal_types,
-            self.get_tips_types,
-        ]
-
-        max_rate = 0.0
-        best_limit = all_limits[0]
-        for limit in all_limits:
-            rate = limit.max_requests / limit.time_window_seconds
-            if rate > max_rate:
-                max_rate = rate
-                best_limit = limit
-        return best_limit
+        limits = (
+            cast(RateLimitConfig, getattr(self, field.name)) for field in fields(self)
+        )
+        return max(limits, key=_requests_per_second)
 
 
 def default_method_limits() -> MethodRateLimits:
@@ -283,13 +241,10 @@ class _ManagerBase:
         """Получить лимитер для метода API."""
         return self._method_limiters[method]
 
-    async def _with_limits(
-        self, method: ApiMethod, func: Callable[[], Awaitable[T]]
-    ) -> T:
-        """Выполнить функцию с глобальным и per-method rate limits."""
+    async def _acquire_limits(self, method: ApiMethod) -> None:
+        """Занять слот в глобальном и per-method rate limits."""
         await self._global_limiter.acquire()
         await self._get_method_limiter(method).acquire()
-        return await func()
 
     async def _ensure_token_manager(self) -> TokenManager:
         """Обеспечить TokenManager с валидным токеном (double-check lock)."""
@@ -321,36 +276,35 @@ class _ManagerBase:
         """Выполнить API-вызов с rate limits и одним retry при 401.
 
         1. ensure token
-        2. capture token_version
-        3. acquire global + method limits
+        2. acquire global + method limits
+        3. capture token_version (именно здесь: ожидание лимитера может длиться
+           минуты, и версия, снятая до ожидания, устареет — тогда refresh был бы
+           ошибочно пропущен как «уже обновлён другой корутиной»)
         4. call
         5. on 401 → refresh_token_if_401(version_before); retry once if refreshed
         6. other errors re-raise
         """
         token_manager = await self._ensure_token_manager()
-        version_before = token_manager.token_version
         logger.debug("Вызов API метода: %s", method.value)
 
-        try:
-            result = await self._with_limits(method, api_call)
-            logger.debug("Метод %s выполнен успешно", method.value)
-            return result
-        except UnauthorizedException as exc:
-            refreshed = await token_manager.refresh_token_if_401(
-                exc,
-                acquire_global=self._global_limiter.acquire,
-                acquire_auth=self._method_limiters[ApiMethod.AUTH].acquire,
-                version_before=version_before,
-            )
-            if not refreshed:
-                raise
-            logger.debug(
-                "Токен обновлён для метода %s, повторяем запрос",
-                method.value,
-            )
-            return await self._with_limits(method, api_call)
-        except Exception as exc:
-            if getattr(exc, "status", None) == 401:
+        retried = False
+        while True:
+            await self._acquire_limits(method)
+            version_before = token_manager.token_version
+            try:
+                result = await api_call()
+            except Exception as exc:
+                if not _is_unauthorized(exc):
+                    logger.error(
+                        "Ошибка API при вызове метода %s: %s",
+                        method.value,
+                        exc,
+                    )
+                    raise
+                if retried:
+                    # Один retry уже был — второй 401 отдаём наверх.
+                    raise
+
                 refreshed = await token_manager.refresh_token_if_401(
                     exc,
                     acquire_global=self._global_limiter.acquire,
@@ -363,11 +317,7 @@ class _ManagerBase:
                     "Токен обновлён для метода %s, повторяем запрос",
                     method.value,
                 )
-                return await self._with_limits(method, api_call)
-
-            logger.error(
-                "Ошибка API при вызове метода %s: %s",
-                method.value,
-                exc,
-            )
-            raise
+                retried = True
+            else:
+                logger.debug("Метод %s выполнен успешно", method.value)
+                return result

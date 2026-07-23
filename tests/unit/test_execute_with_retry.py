@@ -6,51 +6,16 @@ import pytest
 from iikocloud_client.exceptions import UnauthorizedException
 
 from iikocloud.api_client_manager import IikoCloudApiClientManager
-from iikocloud.config_reader import MethodRateLimitsSettings
-from iikocloud.mixins._base import ApiCredentials, ApiMethod, MethodRateLimits
-from iikocloud.rate_limiter import GlobalRateLimiter
-from iikocloud.token_manager import TokenManager
+from iikocloud.mixins._base import ApiMethod
+from tests.unit.conftest import manager_with_stub_token
 
 pytestmark = pytest.mark.unit
 
-APP_ID = "00000000-0000-0000-0000-000000000001"
 
-
-def _credentials() -> ApiCredentials:
-    """Build v2 ApiCredentials for execute_with_retry tests."""
-    return ApiCredentials(
-        api_key="test-api-key",
-        app_id=APP_ID,
-        client_secret="test-client-secret",
-    )
-
-
-def _limits() -> MethodRateLimits:
-    """Default MethodRateLimits from settings defaults."""
-    return MethodRateLimits.from_settings(MethodRateLimitsSettings())
-
-
-@pytest.fixture(autouse=True)
-async def cleanup_singletons() -> None:
-    """Reset Multitone registries between tests."""
-    await IikoCloudApiClientManager.close_all()
-    yield
-    await IikoCloudApiClientManager.close_all()
-    GlobalRateLimiter.reset_instance()
-    await TokenManager.close_all()
-
-
-async def _manager_with_mock_token() -> tuple[
-    IikoCloudApiClientManager, MagicMock
-]:
-    """Real manager with TokenManager stubbed (skip auth / ensure)."""
-    manager = await IikoCloudApiClientManager.get_instance(
-        _credentials(), _limits()
-    )
-    mock_token_manager = MagicMock()
-    mock_token_manager.token_version = 1
+async def _manager_with_mock_token() -> tuple[IikoCloudApiClientManager, MagicMock]:
+    """Stubbed manager whose refresh_token_if_401 defaults to False."""
+    manager, mock_token_manager = await manager_with_stub_token()
     mock_token_manager.refresh_token_if_401 = AsyncMock(return_value=False)
-    manager._token_manager = mock_token_manager
     return manager, mock_token_manager
 
 
@@ -107,6 +72,36 @@ async def test_401_then_refresh_retries_once_and_returns() -> None:
     mock_tm.refresh_token_if_401.assert_awaited_once()
     assert manager._global_limiter.acquire.await_count == 2
     assert method_limiter.acquire.await_count == 2
+
+
+async def test_token_version_captured_after_rate_limit_wait() -> None:
+    """version_before is sampled after the limiter wait, not before it.
+
+    Waiting on a method bucket can take minutes; if another coroutine refreshes
+    the token meanwhile, a version captured before the wait would make
+    refresh_token_if_401 take the "already refreshed by someone else" shortcut
+    and skip the refresh this request actually needs.
+    """
+    manager, mock_tm = await _manager_with_mock_token()
+    method = ApiMethod.GET_ORGANIZATIONS
+
+    async def _bump_version_while_waiting() -> None:
+        # Another coroutine refreshed the token while we were throttled.
+        mock_tm.token_version = 7
+
+    manager._global_limiter.acquire = AsyncMock()
+    method_limiter = MagicMock()
+    method_limiter.acquire = AsyncMock(side_effect=_bump_version_while_waiting)
+    manager._method_limiters[method] = method_limiter
+
+    api_call = AsyncMock(
+        side_effect=UnauthorizedException(status=401, reason="Unauthorized")
+    )
+
+    with pytest.raises(UnauthorizedException):
+        await manager.execute_with_retry(method, api_call)
+
+    assert mock_tm.refresh_token_if_401.await_args.kwargs["version_before"] == 7
 
 
 async def test_401_then_refresh_false_reraises_without_retry() -> None:

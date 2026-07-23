@@ -8,11 +8,9 @@ from iikocloud_client.exceptions import UnauthorizedException
 
 from iikocloud.exceptions import IikoCloudAuthException
 from iikocloud.token_manager import TokenManager
+from tests.unit.conftest import APP_ID
 
 pytestmark = pytest.mark.unit
-
-# Valid UUID required by GetAccessTokenV2Request.appId
-APP_ID = "00000000-0000-0000-0000-000000000001"
 
 
 @pytest.fixture
@@ -248,6 +246,42 @@ class TestRefreshToken:
             assert token_manager._token == "refreshed-token"
             assert token_manager.token_version == 2
             assert mock_api_client.configuration.access_token == "refreshed-token"
+
+    async def test_refresh_keeps_access_token_until_new_one_arrives(
+        self, token_manager: TokenManager, mock_api_client: MagicMock
+    ) -> None:
+        """Refresh must not blank the shared access_token while auth is in flight.
+
+        configuration is shared with every concurrent request on this ApiClient,
+        and authenticate_v2 sends no Bearer anyway — blanking it would make all
+        in-flight requests go out unauthenticated and 401.
+        """
+        token_manager._token = "old-token"
+        token_manager._token_version = 1
+        mock_api_client.configuration.access_token = "old-token"
+
+        token_during_auth: list[str | None] = []
+
+        async def capture_auth(*args, **kwargs):
+            token_during_auth.append(mock_api_client.configuration.access_token)
+            response = MagicMock()
+            response.token = "refreshed-token"
+            return response
+
+        with patch.object(
+            token_manager._authorization_api,
+            "authenticate_v2",
+            side_effect=capture_auth,
+        ):
+            error = MagicMock()
+            error.status = 401
+
+            await token_manager.refresh_token_if_401(
+                error, AsyncMock(), AsyncMock(), version_before=1
+            )
+
+        assert token_during_auth == ["old-token"]
+        assert mock_api_client.configuration.access_token == "refreshed-token"
 
     async def test_dedup_skips_fetch_when_version_already_bumped(
         self, token_manager: TokenManager

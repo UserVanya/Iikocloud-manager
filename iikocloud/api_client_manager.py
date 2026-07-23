@@ -15,11 +15,6 @@ from iikocloud_client import (
 )
 
 from iikocloud.config_reader import IikoCloudConfig
-from iikocloud.mixins.customers.helpers import CustomersHelpersMixin
-from iikocloud.mixins.dictionaries.helpers import DictionariesHelpersMixin
-from iikocloud.mixins.menu.helpers import MenuHelpersMixin
-from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
-from iikocloud.mixins.terminal_groups.helpers import TerminalGroupsHelpersMixin
 from iikocloud.mixins._base import (
     ApiCredentials,
     ApiMethod,
@@ -27,6 +22,11 @@ from iikocloud.mixins._base import (
     _ManagerBase,
     default_method_limits,
 )
+from iikocloud.mixins.customers.helpers import CustomersHelpersMixin
+from iikocloud.mixins.dictionaries.helpers import DictionariesHelpersMixin
+from iikocloud.mixins.menu.helpers import MenuHelpersMixin
+from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
+from iikocloud.mixins.terminal_groups.helpers import TerminalGroupsHelpersMixin
 from iikocloud.rate_limiter import GlobalRateLimiter, TokenBucketRateLimiter
 from iikocloud.token_manager import TokenManager
 
@@ -149,13 +149,20 @@ class IikoCloudApiClientManager(
         """
         instance_count = len(cls._instances)
 
-        # Logout / clear tokens first while sessions may still be open
+        # Сбрасываем токены до закрытия сессий, пока они ещё живы
         await TokenManager.close_all()
 
-        for manager in cls._instances.values():
-            await manager._api_client.close()  # type: ignore[no-untyped-call]
+        try:
+            for manager in cls._instances.values():
+                try:
+                    await manager._api_client.close()  # type: ignore[no-untyped-call]
+                except Exception as exc:  # noqa: BLE001
+                    logger.warning("Не удалось закрыть ApiClient: %s", exc)
+        finally:
+            # Реестр сбрасывается всегда: иначе get_instance() вернёт менеджер
+            # с уже закрытым HTTP-клиентом.
+            cls._instances.clear()
+            cls._lock = None
+            GlobalRateLimiter.reset_instance()
 
-        cls._instances.clear()
-        cls._lock = None
-        GlobalRateLimiter.reset_instance()
         logger.debug("Закрыты все соединения (%d экземпляров)", instance_count)

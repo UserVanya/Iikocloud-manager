@@ -16,7 +16,11 @@ from iikocloud.config_reader import (
     parse_config_file,
 )
 from iikocloud.exceptions import IikoCloudAuthException, IikoCloudException
-from iikocloud.rate_limiter import GlobalRateLimiter, RateLimitConfig, TokenBucketRateLimiter
+from iikocloud.rate_limiter import (
+    GlobalRateLimiter,
+    RateLimitConfig,
+    TokenBucketRateLimiter,
+)
 from iikocloud.token_manager import TokenManager
 
 __all__ = [

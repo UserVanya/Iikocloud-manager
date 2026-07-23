@@ -1,15 +1,12 @@
-"""Shared helpers for legacy root-level tests.
+"""Helpers shared by every test package.
 
-Integration fixtures live under tests/integration/conftest.py.
+Integration fixtures live in tests/integration/conftest.py, unit helpers
+in tests/unit/conftest.py.
 """
 
 from __future__ import annotations
 
 import random
-
-# Константы для тестов Customer API
-EXISTING_CUSTOMER_PHONE = "+79858038700"
-NOT_FOUND_CUSTOMER_PHONE = "+71234567890"
 
 
 def generate_random_phone() -> str:

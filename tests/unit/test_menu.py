@@ -12,63 +12,18 @@ from iikocloud_client import (
     StopListsResponse,
 )
 
-from iikocloud.api_client_manager import IikoCloudApiClientManager
-from iikocloud.config_reader import MethodRateLimitsSettings
-from iikocloud.mixins._base import ApiCredentials, ApiMethod, MethodRateLimits
-from iikocloud.rate_limiter import GlobalRateLimiter
-from iikocloud.token_manager import TokenManager
+from iikocloud.mixins._base import ApiMethod
+from tests.unit.conftest import manager_with_stub_api
 
 pytestmark = pytest.mark.unit
 
-APP_ID = "00000000-0000-0000-0000-000000000001"
 ORG_ID = UUID("12345678-1234-1234-1234-123456789abc")
 MENU_ID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
 
 
-def _credentials() -> ApiCredentials:
-    """Build v2 ApiCredentials for menu tests."""
-    return ApiCredentials(
-        api_key="test-api-key",
-        app_id=APP_ID,
-        client_secret="test-client-secret",
-    )
-
-
-def _limits() -> MethodRateLimits:
-    """Default MethodRateLimits from settings defaults."""
-    return MethodRateLimits.from_settings(MethodRateLimitsSettings())
-
-
-@pytest.fixture(autouse=True)
-async def cleanup_singletons() -> None:
-    """Reset Multitone registries between tests."""
-    await IikoCloudApiClientManager.close_all()
-    yield
-    await IikoCloudApiClientManager.close_all()
-    GlobalRateLimiter.reset_instance()
-    await TokenManager.close_all()
-
-
-async def _manager_with_mock_menu_api() -> tuple[
-    IikoCloudApiClientManager, MagicMock
-]:
-    """Create manager with mocked TokenManager and MenuApi."""
-    manager = await IikoCloudApiClientManager.get_instance(
-        _credentials(), _limits()
-    )
-
-    mock_token_manager = MagicMock()
-    mock_token_manager.token_version = 1
-    manager._token_manager = mock_token_manager
-
-    mock_api = MagicMock()
-    manager._menu_api = mock_api
-    return manager, mock_api
-
-
 async def test_get_external_menus_calls_api() -> None:
     """get_external_menus delegates to SDK without a request body."""
-    manager, mock_api = await _manager_with_mock_menu_api()
+    manager, mock_api = await manager_with_stub_api("_menu_api")
 
     mock_response = MagicMock(spec=MenusDataResponse)
     mock_api.get_external_menus = AsyncMock(return_value=mock_response)
@@ -81,7 +36,7 @@ async def test_get_external_menus_calls_api() -> None:
 
 async def test_get_external_menu_by_id_calls_api_with_request() -> None:
     """get_external_menu_by_id delegates to SDK with MenuRequest."""
-    manager, mock_api = await _manager_with_mock_menu_api()
+    manager, mock_api = await manager_with_stub_api("_menu_api")
 
     mock_response = MagicMock(spec=ExternalMenuResponse)
     mock_api.get_external_menu_by_id = AsyncMock(return_value=mock_response)
@@ -100,7 +55,7 @@ async def test_get_external_menu_by_id_calls_api_with_request() -> None:
 
 async def test_get_stop_lists_calls_api_with_request() -> None:
     """get_stop_lists delegates to SDK with StopListsRequest."""
-    manager, mock_api = await _manager_with_mock_menu_api()
+    manager, mock_api = await manager_with_stub_api("_menu_api")
 
     mock_response = MagicMock(spec=StopListsResponse)
     mock_api.get_stop_lists = AsyncMock(return_value=mock_response)
@@ -116,7 +71,7 @@ async def test_get_stop_lists_calls_api_with_request() -> None:
 
 async def test_get_stop_lists_by_organization_builds_request() -> None:
     """get_stop_lists_by_organization builds StopListsRequest."""
-    manager, mock_api = await _manager_with_mock_menu_api()
+    manager, mock_api = await manager_with_stub_api("_menu_api")
 
     mock_response = MagicMock(spec=StopListsResponse)
     mock_api.get_stop_lists = AsyncMock(return_value=mock_response)
@@ -133,7 +88,7 @@ async def test_get_stop_lists_by_organization_builds_request() -> None:
 
 async def test_get_stop_lists_by_organization_accepts_str_id() -> None:
     """get_stop_lists_by_organization converts string organization_id."""
-    manager, mock_api = await _manager_with_mock_menu_api()
+    manager, mock_api = await manager_with_stub_api("_menu_api")
 
     mock_api.get_stop_lists = AsyncMock(return_value=MagicMock())
 
@@ -146,7 +101,7 @@ async def test_get_stop_lists_by_organization_accepts_str_id() -> None:
 
 async def test_get_external_menus_uses_execute_with_retry() -> None:
     """get_external_menus routes through execute_with_retry."""
-    manager, mock_api = await _manager_with_mock_menu_api()
+    manager, mock_api = await manager_with_stub_api("_menu_api")
     mock_api.get_external_menus = AsyncMock(return_value=MagicMock())
 
     async def _passthrough(method, api_call):  # noqa: ANN001

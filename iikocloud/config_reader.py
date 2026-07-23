@@ -119,42 +119,17 @@ class MethodRateLimitsSettings(BaseModel):
         """Вычислить глобальный лимит как самый свободный из всех методов.
 
         Самый свободный = максимальный rate (requests per second).
+        Перебираются все поля модели, поэтому новый метод не нужно
+        добавлять в отдельный список вручную.
 
         Returns:
             RateLimitSettings с самым свободным лимитом
         """
-        all_limits = [
-            self.auth,
-            self.get_organizations,
-            self.get_organization_settings,
-            self.create_or_update_customer,
-            self.get_customer_info,
-            self.delete_customers,
-            self.restore_customers,
-            self.get_terminal_groups,
-            self.check_terminal_groups_availability,
-            self.get_external_menus,
-            self.get_external_menu_by_id,
-            self.get_stop_lists,
-            self.get_cancel_causes,
-            self.get_delivery_order_types,
-            self.get_payment_types,
-            self.get_discounts,
-            self.get_removal_types,
-            self.get_tips_types,
-        ]
-
-        # Находим метод с максимальным rate (requests/second)
-        max_rate = 0.0
-        best_limit = all_limits[0]
-
-        for limit in all_limits:
-            rate = limit.max_requests / limit.time_window_seconds
-            if rate > max_rate:
-                max_rate = rate
-                best_limit = limit
-
-        return best_limit
+        limits = (
+            cast(RateLimitSettings, getattr(self, name))
+            for name in type(self).model_fields
+        )
+        return max(limits, key=lambda s: s.max_requests / s.time_window_seconds)
 
 
 class IikoCloudConfig(BaseModel):
