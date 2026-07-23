@@ -7,14 +7,20 @@ import pytest
 from iikocloud_client import (
     AddProductsToStopListItem,
     AddProductsToStopListRequest,
+    CalculateComboPriceRequest,
+    CalculateComboPriceResponse,
     CheckStopListRequest,
     CheckStopListResponse,
     ClearStopListRequest,
     CorrelationIdResponse,
     DeliveryOrderCreateProductItem,
     ExternalMenuResponse,
+    GetCombosInfoRequest,
+    GetCombosInfoResponse,
     MenuRequest,
     MenusDataResponse,
+    NomenclatureRequest,
+    NomenclatureResponse,
     RemoveProductsFromStopListItem,
     RemoveProductsFromStopListRequest,
     StopListsRequest,
@@ -204,4 +210,59 @@ async def test_check_products_in_stop_list_returns_response() -> None:
     assert result is mock_response
     mock_api.check_products_in_stop_list.assert_awaited_once_with(
         check_stop_list_request=request
+    )
+
+
+async def test_get_nomenclature_returns_response() -> None:
+    """get_nomenclature proxies NomenclatureResponse."""
+    manager, mock_api = await manager_with_stub_api("_menu_api")
+    mock_response = MagicMock(spec=NomenclatureResponse)
+    mock_api.get_nomenclature = AsyncMock(return_value=mock_response)
+
+    request = NomenclatureRequest(organization_id=ORG_ID, start_revision=0)
+    result = await manager.get_nomenclature(request)
+
+    assert result is mock_response
+    mock_api.get_nomenclature.assert_awaited_once_with(
+        nomenclature_request=request
+    )
+
+
+async def test_get_combos_info_returns_response() -> None:
+    """get_combos_info proxies GetCombosInfoResponse."""
+    manager, mock_api = await manager_with_stub_api("_menu_api")
+    mock_response = MagicMock(spec=GetCombosInfoResponse)
+    mock_api.get_combos_info = AsyncMock(return_value=mock_response)
+
+    request = GetCombosInfoRequest(organization_id=ORG_ID)
+    result = await manager.get_combos_info(request)
+
+    assert result is mock_response
+    mock_api.get_combos_info.assert_awaited_once_with(
+        get_combos_info_request=request
+    )
+
+
+async def test_calculate_combo_price_returns_response() -> None:
+    """calculate_combo_price proxies CalculateComboPriceResponse."""
+    manager, mock_api = await manager_with_stub_api("_menu_api")
+    mock_response = MagicMock(spec=CalculateComboPriceResponse)
+    mock_api.calculate_combo_price = AsyncMock(return_value=mock_response)
+
+    request = CalculateComboPriceRequest(
+        organization_id=ORG_ID,
+        items=[
+            DeliveryOrderCreateProductItem(
+                type="Product",
+                product_id=ORG_ID,
+                amount=1.0,
+                price=1.0,
+            )
+        ],
+    )
+    result = await manager.calculate_combo_price(request)
+
+    assert result is mock_response
+    mock_api.calculate_combo_price.assert_awaited_once_with(
+        calculate_combo_price_request=request
     )

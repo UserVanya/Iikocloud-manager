@@ -2,13 +2,19 @@
 
 from iikocloud_client import (
     AddProductsToStopListRequest,
+    CalculateComboPriceRequest,
+    CalculateComboPriceResponse,
     CheckStopListRequest,
     CheckStopListResponse,
     ClearStopListRequest,
     CorrelationIdResponse,
     ExternalMenuResponse,
+    GetCombosInfoRequest,
+    GetCombosInfoResponse,
     MenuRequest,
     MenusDataResponse,
+    NomenclatureRequest,
+    NomenclatureResponse,
     RemoveProductsFromStopListRequest,
     StopListsRequest,
     StopListsResponse,
@@ -145,4 +151,54 @@ class MenuCoreMixin(_ManagerBase):
 
         return await self.execute_with_retry(
             ApiMethod.CHECK_PRODUCTS_IN_STOP_LIST, api_call
+        )
+
+    async def get_nomenclature(
+        self,
+        request: NomenclatureRequest,
+    ) -> NomenclatureResponse:
+        """Номенклатура организации (группы, продукты, размеры).
+
+        Дельта-синхронизация: start_revision=0 — полная выгрузка;
+        далее — revision из предыдущего ответа. Если revision ответа
+        == start_revision, меню не менялось (списки пустые).
+        Лимит iiko: не более 5 организаций за раз от одного API-логина,
+        не чаще раза в минуту.
+        """
+
+        async def api_call() -> NomenclatureResponse:
+            api = await self.get_menu_api()
+            return await api.get_nomenclature(nomenclature_request=request)
+
+        return await self.execute_with_retry(ApiMethod.GET_NOMENCLATURE, api_call)
+
+    async def get_combos_info(
+        self,
+        request: GetCombosInfoRequest,
+    ) -> GetCombosInfoResponse:
+        """Все комбо организации (категории и спецификации)."""
+
+        async def api_call() -> GetCombosInfoResponse:
+            api = await self.get_menu_api()
+            return await api.get_combos_info(get_combos_info_request=request)
+
+        return await self.execute_with_retry(ApiMethod.GET_COMBOS_INFO, api_call)
+
+    async def calculate_combo_price(
+        self,
+        request: CalculateComboPriceRequest,
+    ) -> CalculateComboPriceResponse:
+        """Расчёт цены комбо по позициям.
+
+        Если incorrectlyFilledGroups не пуст — price будет 0.
+        """
+
+        async def api_call() -> CalculateComboPriceResponse:
+            api = await self.get_menu_api()
+            return await api.calculate_combo_price(
+                calculate_combo_price_request=request
+            )
+
+        return await self.execute_with_retry(
+            ApiMethod.CALCULATE_COMBO_PRICE, api_call
         )
