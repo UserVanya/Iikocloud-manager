@@ -1,9 +1,15 @@
 """Menu core mixin — прямые обёртки SDK через execute_with_retry."""
 
 from iikocloud_client import (
+    AddProductsToStopListRequest,
+    CheckStopListRequest,
+    CheckStopListResponse,
+    ClearStopListRequest,
+    CorrelationIdResponse,
     ExternalMenuResponse,
     MenuRequest,
     MenusDataResponse,
+    RemoveProductsFromStopListRequest,
     StopListsRequest,
     StopListsResponse,
 )
@@ -71,4 +77,72 @@ class MenuCoreMixin(_ManagerBase):
 
         return await self.execute_with_retry(
             ApiMethod.GET_STOP_LISTS, api_call
+        )
+
+    async def add_products_to_stop_list(
+        self,
+        request: AddProductsToStopListRequest,
+    ) -> CorrelationIdResponse:
+        """Добавить продукты в стоп-лист (async-операция, iiko >= 8.6.1).
+
+        Returns:
+            CorrelationIdResponse — статус применения через /api/1/commands/status
+        """
+
+        async def api_call() -> CorrelationIdResponse:
+            api = await self.get_menu_api()
+            return await api.add_products_to_stop_list(
+                add_products_to_stop_list_request=request
+            )
+
+        return await self.execute_with_retry(
+            ApiMethod.ADD_PRODUCTS_TO_STOP_LIST, api_call
+        )
+
+    async def remove_products_from_stop_list(
+        self,
+        request: RemoveProductsFromStopListRequest,
+    ) -> CorrelationIdResponse:
+        """Убрать продукты из стоп-листа (async-операция, iiko >= 8.6.1)."""
+
+        async def api_call() -> CorrelationIdResponse:
+            api = await self.get_menu_api()
+            return await api.remove_products_from_stop_list(
+                remove_products_from_stop_list_request=request
+            )
+
+        return await self.execute_with_retry(
+            ApiMethod.REMOVE_PRODUCTS_FROM_STOP_LIST, api_call
+        )
+
+    async def clear_stop_list(
+        self,
+        request: ClearStopListRequest,
+    ) -> CorrelationIdResponse:
+        """Очистить стоп-лист терминальной группы (async-операция)."""
+
+        async def api_call() -> CorrelationIdResponse:
+            api = await self.get_menu_api()
+            return await api.clear_stop_list(clear_stop_list_request=request)
+
+        return await self.execute_with_retry(ApiMethod.CLEAR_STOP_LIST, api_call)
+
+    async def check_products_in_stop_list(
+        self,
+        request: CheckStopListRequest,
+    ) -> CheckStopListResponse:
+        """Проверить позиции заказа на наличие в стоп-листе.
+
+        items — DeliveryOrderCreateProductItem (type="Product").
+        rejectedItems == None означает «ничего не в стоп-листе».
+        """
+
+        async def api_call() -> CheckStopListResponse:
+            api = await self.get_menu_api()
+            return await api.check_products_in_stop_list(
+                check_stop_list_request=request
+            )
+
+        return await self.execute_with_retry(
+            ApiMethod.CHECK_PRODUCTS_IN_STOP_LIST, api_call
         )

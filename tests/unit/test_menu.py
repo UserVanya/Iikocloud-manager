@@ -5,9 +5,18 @@ from uuid import UUID
 
 import pytest
 from iikocloud_client import (
+    AddProductsToStopListItem,
+    AddProductsToStopListRequest,
+    CheckStopListRequest,
+    CheckStopListResponse,
+    ClearStopListRequest,
+    CorrelationIdResponse,
+    DeliveryOrderCreateProductItem,
     ExternalMenuResponse,
     MenuRequest,
     MenusDataResponse,
+    RemoveProductsFromStopListItem,
+    RemoveProductsFromStopListRequest,
     StopListsRequest,
     StopListsResponse,
 )
@@ -114,3 +123,85 @@ async def test_get_external_menus_uses_execute_with_retry() -> None:
     manager.execute_with_retry.assert_awaited_once()
     method_arg = manager.execute_with_retry.await_args.args[0]
     assert method_arg is ApiMethod.GET_EXTERNAL_MENUS
+
+
+async def test_add_products_to_stop_list_returns_correlation() -> None:
+    """add_products_to_stop_list proxies CorrelationIdResponse."""
+    manager, mock_api = await manager_with_stub_api("_menu_api")
+    mock_response = MagicMock(spec=CorrelationIdResponse)
+    mock_api.add_products_to_stop_list = AsyncMock(return_value=mock_response)
+
+    request = AddProductsToStopListRequest(
+        organization_id=ORG_ID,
+        terminal_group_id=ORG_ID,
+        items=[AddProductsToStopListItem(product_id=ORG_ID, balance=0.0)],
+    )
+    result = await manager.add_products_to_stop_list(request)
+
+    assert result is mock_response
+    mock_api.add_products_to_stop_list.assert_awaited_once_with(
+        add_products_to_stop_list_request=request
+    )
+
+
+async def test_remove_products_from_stop_list_returns_correlation() -> None:
+    """remove_products_from_stop_list proxies CorrelationIdResponse."""
+    manager, mock_api = await manager_with_stub_api("_menu_api")
+    mock_response = MagicMock(spec=CorrelationIdResponse)
+    mock_api.remove_products_from_stop_list = AsyncMock(return_value=mock_response)
+
+    request = RemoveProductsFromStopListRequest(
+        organization_id=ORG_ID,
+        terminal_group_id=ORG_ID,
+        items=[RemoveProductsFromStopListItem(product_id=ORG_ID)],
+    )
+    result = await manager.remove_products_from_stop_list(request)
+
+    assert result is mock_response
+    mock_api.remove_products_from_stop_list.assert_awaited_once_with(
+        remove_products_from_stop_list_request=request
+    )
+
+
+async def test_clear_stop_list_returns_correlation() -> None:
+    """clear_stop_list proxies CorrelationIdResponse."""
+    manager, mock_api = await manager_with_stub_api("_menu_api")
+    mock_response = MagicMock(spec=CorrelationIdResponse)
+    mock_api.clear_stop_list = AsyncMock(return_value=mock_response)
+
+    request = ClearStopListRequest(
+        organization_id=ORG_ID,
+        terminal_group_id=ORG_ID,
+    )
+    result = await manager.clear_stop_list(request)
+
+    assert result is mock_response
+    mock_api.clear_stop_list.assert_awaited_once_with(
+        clear_stop_list_request=request
+    )
+
+
+async def test_check_products_in_stop_list_returns_response() -> None:
+    """check_products_in_stop_list proxies CheckStopListResponse."""
+    manager, mock_api = await manager_with_stub_api("_menu_api")
+    mock_response = MagicMock(spec=CheckStopListResponse)
+    mock_api.check_products_in_stop_list = AsyncMock(return_value=mock_response)
+
+    request = CheckStopListRequest(
+        organization_id=ORG_ID,
+        terminal_group_id=ORG_ID,
+        items=[
+            DeliveryOrderCreateProductItem(
+                type="Product",
+                product_id=ORG_ID,
+                amount=1.0,
+                price=1.0,
+            )
+        ],
+    )
+    result = await manager.check_products_in_stop_list(request)
+
+    assert result is mock_response
+    mock_api.check_products_in_stop_list.assert_awaited_once_with(
+        check_stop_list_request=request
+    )
