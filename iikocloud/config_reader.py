@@ -76,6 +76,32 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=100, time_window_seconds=60.0
     )
 
+    # Customers — cards / programs / wallets
+    add_customer_magnet_card: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    remove_customer_magnet_card: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    add_customer_to_program: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    hold_customer_balance: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    cancel_customer_balance_hold: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    top_up_customer_balance: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    withdraw_customer_balance: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_loyalty_counters: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+
     # Terminal Groups
     get_terminal_groups: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0
@@ -92,6 +118,29 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=5, time_window_seconds=60.0
     )
     get_stop_lists: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+
+    # Menu — stop lists / nomenclature / combos
+    add_products_to_stop_list: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    remove_products_from_stop_list: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    clear_stop_list: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    check_products_in_stop_list: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_nomenclature: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_combos_info: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    calculate_combo_price: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0
     )
 

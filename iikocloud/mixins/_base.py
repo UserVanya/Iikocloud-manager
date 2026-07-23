@@ -68,6 +68,16 @@ class ApiMethod(Enum):
     DELETE_CUSTOMERS = "delete_customers"
     RESTORE_CUSTOMERS = "restore_customers"
 
+    # Customers — cards / programs / wallets
+    ADD_CUSTOMER_MAGNET_CARD = "add_customer_magnet_card"
+    REMOVE_CUSTOMER_MAGNET_CARD = "remove_customer_magnet_card"
+    ADD_CUSTOMER_TO_PROGRAM = "add_customer_to_program"
+    HOLD_CUSTOMER_BALANCE = "hold_customer_balance"
+    CANCEL_CUSTOMER_BALANCE_HOLD = "cancel_customer_balance_hold"
+    TOP_UP_CUSTOMER_BALANCE = "top_up_customer_balance"
+    WITHDRAW_CUSTOMER_BALANCE = "withdraw_customer_balance"
+    GET_LOYALTY_COUNTERS = "get_loyalty_counters"
+
     # Terminal Groups
     GET_TERMINAL_GROUPS = "get_terminal_groups"
     CHECK_TERMINAL_GROUPS_AVAILABILITY = "check_terminal_groups_availability"
@@ -76,6 +86,15 @@ class ApiMethod(Enum):
     GET_EXTERNAL_MENUS = "get_external_menus"
     GET_EXTERNAL_MENU_BY_ID = "get_external_menu_by_id"
     GET_STOP_LISTS = "get_stop_lists"
+
+    # Menu — stop lists / nomenclature / combos
+    ADD_PRODUCTS_TO_STOP_LIST = "add_products_to_stop_list"
+    REMOVE_PRODUCTS_FROM_STOP_LIST = "remove_products_from_stop_list"
+    CLEAR_STOP_LIST = "clear_stop_list"
+    CHECK_PRODUCTS_IN_STOP_LIST = "check_products_in_stop_list"
+    GET_NOMENCLATURE = "get_nomenclature"
+    GET_COMBOS_INFO = "get_combos_info"
+    CALCULATE_COMBO_PRICE = "calculate_combo_price"
 
     # Dictionaries
     GET_CANCEL_CAUSES = "get_cancel_causes"
@@ -119,11 +138,26 @@ class MethodRateLimits:
     get_customer_info: RateLimitConfig
     delete_customers: RateLimitConfig
     restore_customers: RateLimitConfig
+    add_customer_magnet_card: RateLimitConfig
+    remove_customer_magnet_card: RateLimitConfig
+    add_customer_to_program: RateLimitConfig
+    hold_customer_balance: RateLimitConfig
+    cancel_customer_balance_hold: RateLimitConfig
+    top_up_customer_balance: RateLimitConfig
+    withdraw_customer_balance: RateLimitConfig
+    get_loyalty_counters: RateLimitConfig
     get_terminal_groups: RateLimitConfig
     check_terminal_groups_availability: RateLimitConfig
     get_external_menus: RateLimitConfig
     get_external_menu_by_id: RateLimitConfig
     get_stop_lists: RateLimitConfig
+    add_products_to_stop_list: RateLimitConfig
+    remove_products_from_stop_list: RateLimitConfig
+    clear_stop_list: RateLimitConfig
+    check_products_in_stop_list: RateLimitConfig
+    get_nomenclature: RateLimitConfig
+    get_combos_info: RateLimitConfig
+    calculate_combo_price: RateLimitConfig
     get_cancel_causes: RateLimitConfig
     get_delivery_order_types: RateLimitConfig
     get_payment_types: RateLimitConfig

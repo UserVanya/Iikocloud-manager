@@ -24,6 +24,30 @@ iikocloud:
     restore_customers:
       max_requests: 100
       time_window_seconds: 60.0
+    add_customer_magnet_card:
+      max_requests: 100
+      time_window_seconds: 60.0
+    remove_customer_magnet_card:
+      max_requests: 100
+      time_window_seconds: 60.0
+    add_customer_to_program:
+      max_requests: 100
+      time_window_seconds: 60.0
+    hold_customer_balance:
+      max_requests: 100
+      time_window_seconds: 60.0
+    cancel_customer_balance_hold:
+      max_requests: 100
+      time_window_seconds: 60.0
+    top_up_customer_balance:
+      max_requests: 100
+      time_window_seconds: 60.0
+    withdraw_customer_balance:
+      max_requests: 100
+      time_window_seconds: 60.0
+    get_loyalty_counters:
+      max_requests: 10
+      time_window_seconds: 60.0
     get_terminal_groups:
       max_requests: 10
       time_window_seconds: 60.0
@@ -37,6 +61,27 @@ iikocloud:
       max_requests: 5
       time_window_seconds: 60.0
     get_stop_lists:
+      max_requests: 10
+      time_window_seconds: 60.0
+    add_products_to_stop_list:
+      max_requests: 1
+      time_window_seconds: 60.0
+    remove_products_from_stop_list:
+      max_requests: 1
+      time_window_seconds: 60.0
+    clear_stop_list:
+      max_requests: 1
+      time_window_seconds: 60.0
+    check_products_in_stop_list:
+      max_requests: 10
+      time_window_seconds: 60.0
+    get_nomenclature:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_combos_info:
+      max_requests: 10
+      time_window_seconds: 60.0
+    calculate_combo_price:
       max_requests: 10
       time_window_seconds: 60.0
     get_cancel_causes:
