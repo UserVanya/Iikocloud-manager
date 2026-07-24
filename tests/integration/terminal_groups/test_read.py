@@ -33,7 +33,8 @@ def _first_terminal_group_id(groups_response: object) -> UUID | None:
     for org_groups in terminal_groups:
         items = getattr(org_groups, "items", None) or []
         if items:
-            return items[0].id
+            group_id: UUID = items[0].id
+            return group_id
     return None
 
 

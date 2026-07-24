@@ -27,6 +27,8 @@ from iikocloud_client import (
     NomenclatureRequest,
     RemoveProductsFromStopListItem,
     RemoveProductsFromStopListRequest,
+    StopListItem,
+    TerminalGroupsIsAliveRequest,
     TerminalGroupsRequest,
 )
 from iikocloud_client.exceptions import ApiException
@@ -56,14 +58,32 @@ def _is_stop_list_unavailable(exc: BaseException) -> bool:
 async def terminal_group_id(
     manager: IikoCloudApiClientManager, organization_id: UUID
 ) -> UUID:
-    """Первая терминальная группа организации (не в sleep)."""
+    """Первая терминальная группа организации (не в sleep).
+
+    Мутации стоп-листа — асинхронные команды, которые применяет живой
+    iiko Front терминальной группы. Если фронт офлайн (is_alive=False),
+    команда принимается, но никогда не исполняется — тест скипается.
+    """
     response = await manager.get_terminal_groups(
         TerminalGroupsRequest(organization_ids=[organization_id])
     )
     groups = [g for org in response.terminal_groups for g in org.items]
     if not groups:
         pytest.skip("Нет терминальных групп на write-стенде")
-    return groups[0].id
+    group_id = groups[0].id
+
+    alive = await manager.check_terminal_groups_availability(
+        TerminalGroupsIsAliveRequest(
+            organization_ids=[organization_id],
+            terminal_group_ids=[group_id],
+        )
+    )
+    if not any(s.is_alive for s in alive.is_alive_status):
+        pytest.skip(
+            "Терминальная группа write-стенда офлайн (is_alive=False) — "
+            "async-команды стоп-листа некому исполнять"
+        )
+    return group_id
 
 
 @pytest_asyncio.fixture(loop_scope="session")
@@ -101,7 +121,7 @@ class TestStopListLifecycle:
             )
 
             # 2. check — продукт появился (поллинг: мутация асинхронная)
-            async def _rejected() -> list:
+            async def _rejected() -> list[StopListItem]:
                 resp = await manager.check_products_in_stop_list(
                     CheckStopListRequest(
                         organization_id=organization_id,

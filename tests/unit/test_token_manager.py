@@ -1,6 +1,7 @@
 """Unit tests for TokenManager (auth v2)."""
 
 import asyncio
+from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -23,7 +24,9 @@ def mock_api_client() -> MagicMock:
 
 
 @pytest.fixture
-async def token_manager(mock_api_client: MagicMock) -> TokenManager:
+async def token_manager(
+    mock_api_client: MagicMock,
+) -> AsyncGenerator[TokenManager, None]:
     """Create a TokenManager instance with v2 credentials."""
     await TokenManager.close_all()
 

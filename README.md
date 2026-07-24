@@ -86,6 +86,23 @@ uv run pytest -m integration -v
 uv run pytest -m "integration and not write" -v
 ```
 
+## Линт и типы
+
+Ruff и mypy входят в dev-зависимости (`uv sync` ставит их автоматически).
+
+```bash
+uv run ruff check .
+uv run mypy iikocloud tests
+```
+
+- Ruff: `line-length = 92`, правила `E, F, I, UP, B, SIM` (`pyproject.toml`).
+- mypy: `strict = true` для пакета `iikocloud`, плагин `pydantic.mypy`
+  (иначе mypy требует camelCase-алиасы SDK в конструкторах моделей).
+  Для `tests.*` strict ослаблен: без обязательных аннотаций вложенных
+  helper'ов и с отключёнными `method-assign` / `union-attr` /
+  `func-returns-value` — эти правила конфликтуют с идиоматикой моков
+  (подмена методов менеджера, `await_args.args`, side_effect-заглушки).
+
 Все интеграционные тесты помечены `slow` (каждый ходит в реальный API), поэтому `-m "integration and not slow"` не выберет ничего.
 
 Для интеграционных тестов скопируйте `config.test.example.yml` → `config.test.yml` и задайте секции `read` / `write` с полными v2-тройками credentials. Без файла или env тесты пропускаются через `pytest.skip`.

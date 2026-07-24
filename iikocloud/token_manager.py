@@ -118,9 +118,9 @@ class TokenManager:
         # заставило бы их уйти без Authorization и получить 401.
         try:
             request = GetAccessTokenV2Request(
-                apiKey=self._api_key,
-                appId=self._app_id,
-                clientSecret=self._client_secret,
+                api_key=self._api_key,
+                app_id=self._app_id,
+                client_secret=self._client_secret,
             )
             logger.debug("Запрос токена для key_id=%s", self._key_id)
             response = await self._authorization_api.authenticate_v2(

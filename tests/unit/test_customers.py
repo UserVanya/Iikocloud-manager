@@ -366,8 +366,8 @@ async def test_get_loyalty_counters_returns_response() -> None:
     request = GetCountersRequest(
         organization_id=ORG_ID,
         guest_ids=[ORG_ID],
-        metrics=[CounterMetric.NUMBER_0],
-        periods=[CounterPeriod.NUMBER_0],
+        metrics=[CounterMetric.ORDERSCOUNT],
+        periods=[CounterPeriod.WEEK],
     )
     result = await manager.get_loyalty_counters(request)
 

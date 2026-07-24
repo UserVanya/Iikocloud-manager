@@ -42,8 +42,10 @@ allow-direct-references = true
 
 [dependency-groups]
 dev = [
+    "mypy>=1.15.0",
     "pytest>=8.0.0",
     "pytest-asyncio>=1.3.0",
+    "ruff>=0.12.0",
     "types-pyyaml>=6.0.12",
 ]
 
@@ -71,4 +73,16 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.mypy]
 python_version = "3.12"
+plugins = ["pydantic.mypy"]
 strict = true
+
+# Тесты: strict ослаблен там, где правила конфликтуют с идиоматикой pytest/mock.
+# Пакет iikocloud проверяется в полном strict-режиме.
+[[tool.mypy.overrides]]
+module = "tests.*"
+# Вложенные helper'ы и side_effect'ы в тестах не обязаны иметь полные аннотации.
+disallow_untyped_defs = false
+# method-assign: подмена методов менеджера моками (manager.execute_with_retry = AsyncMock()).
+# union-attr: Optional у mock.await_args.args — в тесте None невозможен по построению.
+# func-returns-value: side_effect-заглушки, объявленные как возвращающие SDK-ответ.
+disable_error_code = ["method-assign", "union-attr", "func-returns-value"]

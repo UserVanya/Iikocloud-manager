@@ -16,7 +16,6 @@ from iikocloud_client import (
     CounterPeriod,
     GetCountersRequest,
 )
-from iikocloud_client.exceptions import BadRequestException
 
 from iikocloud import IikoCloudApiClientManager
 
@@ -35,32 +34,15 @@ class TestGetLoyaltyCounters:
         manager: IikoCloudApiClientManager,
         organization_id: UUID,
     ) -> None:
-        """Запрос по несуществующему guest -> валидный ответ со списком counters.
-
-        Ограничение SDK: реальное API требует строковые metrics
-        (OrdersCount/OrdersSum) и periods (Week/Month/...), а SDK-enum'ы
-        CounterMetric/CounterPeriod — числовые (int), поэтому любой запрос
-        через SDK получает 400 Validation_CounterValidationError. В этом
-        случае тест скипается; если SDK починят — начнёт выполняться.
-        """
-        try:
-            response = await manager.get_loyalty_counters(
-                GetCountersRequest(
-                    organization_id=organization_id,
-                    guest_ids=[UUID("00000000-0000-0000-0000-000000000001")],
-                    metrics=[CounterMetric.NUMBER_0],
-                    periods=[CounterPeriod.NUMBER_0],
-                )
+        """Запрос по несуществующему guest -> валидный ответ со списком counters."""
+        response = await manager.get_loyalty_counters(
+            GetCountersRequest(
+                organization_id=organization_id,
+                guest_ids=[UUID("00000000-0000-0000-0000-000000000001")],
+                metrics=[CounterMetric.ORDERSCOUNT],
+                periods=[CounterPeriod.WEEK],
             )
-        except BadRequestException as exc:
-            body = getattr(exc, "body", None) or str(exc)
-            if "Counter" not in body:
-                raise
-            pytest.skip(
-                "SDK CounterMetric/CounterPeriod — числовые enum'ы, а API "
-                "принимает только строки (OrdersCount/OrdersSum, Week/...): "
-                f"{exc}"
-            )
+        )
 
         assert response is not None
         assert response.counters is not None

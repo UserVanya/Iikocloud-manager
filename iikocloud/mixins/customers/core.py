@@ -258,8 +258,8 @@ class CustomersCoreMixin(_ManagerBase):
     ) -> GetCountersResponse:
         """Счётчики лояльности гостей (кол-во заказов/суммы за периоды).
 
-        metrics/periods — числовые enum'ы SDK (CounterMetric 0..3,
-        CounterPeriod 0..12); семантика значений — по документации iiko.
+        metrics — CounterMetric (OrdersCount/OrdersSum),
+        periods — CounterPeriod (AllTime/Day/Week/Month/Quarter/Year).
         """
 
         async def api_call() -> GetCountersResponse:
