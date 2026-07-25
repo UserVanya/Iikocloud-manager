@@ -146,6 +146,21 @@ def test_deliveries_retrieve_methods_have_limits() -> None:
         )
 
 
+def test_customer_categories_methods_have_limits() -> None:
+    """3 метода customer_categories есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    expected = {
+        "get_customer_categories": 1 / 60.0,
+        "add_customer_category": 100 / 60.0,
+        "remove_customer_category": 100 / 60.0,
+    }
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name, rps in expected.items():
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
+
+
 def test_addresses_methods_have_limits() -> None:
     """4 метода addresses есть в ApiMethod и MethodRateLimits."""
     from iikocloud.mixins._base import ApiMethod, MethodRateLimits

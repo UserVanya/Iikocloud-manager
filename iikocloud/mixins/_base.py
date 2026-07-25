@@ -14,6 +14,7 @@ from iikocloud_client import (
     ApiClient,
     AuthorizationApi,
     Configuration,
+    CustomerCategoriesApi,
     CustomersApi,
     DeliveriesCreateAndUpdateApi,
     DeliveriesRetrieveApi,
@@ -82,6 +83,11 @@ class ApiMethod(Enum):
     TOP_UP_CUSTOMER_BALANCE = "top_up_customer_balance"
     WITHDRAW_CUSTOMER_BALANCE = "withdraw_customer_balance"
     GET_LOYALTY_COUNTERS = "get_loyalty_counters"
+
+    # Customer Categories
+    GET_CUSTOMER_CATEGORIES = "get_customer_categories"
+    ADD_CUSTOMER_CATEGORY = "add_customer_category"
+    REMOVE_CUSTOMER_CATEGORY = "remove_customer_category"
 
     # Terminal Groups
     GET_TERMINAL_GROUPS = "get_terminal_groups"
@@ -207,6 +213,9 @@ class MethodRateLimits:
     top_up_customer_balance: RateLimitConfig
     withdraw_customer_balance: RateLimitConfig
     get_loyalty_counters: RateLimitConfig
+    get_customer_categories: RateLimitConfig
+    add_customer_category: RateLimitConfig
+    remove_customer_category: RateLimitConfig
     get_terminal_groups: RateLimitConfig
     check_terminal_groups_availability: RateLimitConfig
     get_external_menus: RateLimitConfig
@@ -322,6 +331,7 @@ class _ManagerBase:
     _authorization_api: AuthorizationApi | None
     _organizations_api: OrganizationsApi | None
     _customers_api: CustomersApi | None
+    _customer_categories_api: CustomerCategoriesApi | None
     _terminal_groups_api: TerminalGroupsApi | None
     _menu_api: MenuApi | None
     _dictionaries_api: DictionariesApi | None
@@ -353,6 +363,15 @@ class _ManagerBase:
         if self._customers_api is None:
             self._customers_api = CustomersApi(api_client=self._api_client)
         return self._customers_api
+
+    async def get_customer_categories_api(self) -> CustomerCategoriesApi:
+        """Получить клиент CustomerCategoriesApi."""
+        await self._ensure_token_manager()
+        if self._customer_categories_api is None:
+            self._customer_categories_api = CustomerCategoriesApi(
+                api_client=self._api_client
+            )
+        return self._customer_categories_api
 
     async def get_terminal_groups_api(self) -> TerminalGroupsApi:
         """Получить клиент TerminalGroupsApi."""

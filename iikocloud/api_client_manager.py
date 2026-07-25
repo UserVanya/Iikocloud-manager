@@ -8,6 +8,7 @@ from iikocloud_client import (
     ApiClient,
     AuthorizationApi,
     Configuration,
+    CustomerCategoriesApi,
     CustomersApi,
     DeliveriesCreateAndUpdateApi,
     DeliveriesRetrieveApi,
@@ -113,6 +114,7 @@ class IikoCloudApiClientManager(
         self._authorization_api: AuthorizationApi | None = None
         self._organizations_api: OrganizationsApi | None = None
         self._customers_api: CustomersApi | None = None
+        self._customer_categories_api: CustomerCategoriesApi | None = None
         self._terminal_groups_api: TerminalGroupsApi | None = None
         self._menu_api: MenuApi | None = None
         self._dictionaries_api: DictionariesApi | None = None

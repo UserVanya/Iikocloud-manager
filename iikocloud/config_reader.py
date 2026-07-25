@@ -102,6 +102,17 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=10, time_window_seconds=60.0
     )
 
+    # Customer Categories
+    get_customer_categories: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    add_customer_category: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    remove_customer_category: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+
     # Terminal Groups
     get_terminal_groups: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0

@@ -48,6 +48,15 @@ iikocloud:
     get_loyalty_counters:
       max_requests: 10
       time_window_seconds: 60.0
+    get_customer_categories:
+      max_requests: 1
+      time_window_seconds: 60.0
+    add_customer_category:
+      max_requests: 100
+      time_window_seconds: 60.0
+    remove_customer_category:
+      max_requests: 100
+      time_window_seconds: 60.0
     get_terminal_groups:
       max_requests: 10
       time_window_seconds: 60.0
