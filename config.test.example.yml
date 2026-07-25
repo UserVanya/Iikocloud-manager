@@ -7,3 +7,6 @@ write:
   api_key: "write_api_key"
   app_id: "write_app_id"
   client_secret: "write_client_secret"
+  # id программы лояльности стенда — для теста add_customer_to_program
+  # (API требует явный programId; без ключа тест скипается)
+  program_id: "00000000-0000-0000-0000-000000000000"

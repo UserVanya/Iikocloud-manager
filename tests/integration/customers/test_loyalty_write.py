@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 from uuid import UUID, uuid4
 
 import pytest
@@ -29,6 +30,8 @@ from iikocloud_client import (
     HoldMoneyRequest,
 )
 from iikocloud_client.exceptions import ApiException
+from yaml import CSafeLoader
+from yaml import load as yaml_load
 
 from iikocloud import IikoCloudApiClientManager
 from tests.conftest import generate_random_phone
@@ -251,23 +254,40 @@ class TestBalance:
             raise
 
 
+@pytest.fixture
+def loyalty_program_id() -> UUID:
+    """id программы лояльности из write-секции config.test.yml.
+
+    API требует явный programId (без него ищет corporate nutrition
+    с пустым GUID и падает с 400). Программы стенда через покрытые
+    методы менеджера не перечислить, поэтому id живёт в конфиге.
+    """
+    path = os.getenv("IIKOCLOUD_TEST_CONFIG")
+    if not path:
+        pytest.skip("IIKOCLOUD_TEST_CONFIG не задан")
+    with open(path, "rb") as file:
+        data = yaml_load(file, Loader=CSafeLoader)
+    program_id = (data.get("write") or {}).get("program_id")
+    if not program_id:
+        pytest.skip("В write-секции config.test.yml не задан program_id")
+    return UUID(str(program_id))
+
+
 class TestAddCustomerToProgram:
     async def test_add_customer_to_default_program(
         self,
         manager: IikoCloudApiClientManager,
         organization_id: UUID,
         test_customer: UUID,
+        loyalty_program_id: UUID,
     ) -> None:
-        """Добавление в программу по умолчанию (program_id не задан).
-
-        programId в модели optional — сервер привязывает к программе
-        по умолчанию. Если на стенде нет программ лояльности — skip.
-        """
+        """Добавление клиента в программу лояльности стенда (явный programId)."""
         try:
             response = await manager.add_customer_to_program(
                 AddCustomerToProgramRequest(
                     customer_id=test_customer,
                     organization_id=organization_id,
+                    program_id=loyalty_program_id,
                 )
             )
             assert response is not None
