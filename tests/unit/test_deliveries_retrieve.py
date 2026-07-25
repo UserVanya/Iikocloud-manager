@@ -5,6 +5,7 @@ from uuid import UUID
 
 import pytest
 from iikocloud_client import (
+    OrderInfo,
     OrdersByDeliveryDateAndFilterRequest,
     OrdersByDeliveryDateAndPhoneRequest,
     OrdersByDeliveryDateAndStatusRequest,
@@ -136,3 +137,63 @@ async def test_history_rejects_bad_rows_count(rows_count: int) -> None:
     with pytest.raises(ValueError, match="rows_count"):
         await manager.get_delivery_history_by_delivery_date_and_phone(request)
     mock_api.get_delivery_history_by_delivery_date_and_phone.assert_not_called()
+
+
+async def test_get_delivery_by_id_returns_first_order() -> None:
+    """get_delivery_by_id возвращает единственный заказ из плоского ответа."""
+    manager, mock_api = await manager_with_stub_api(API_SLOT)
+    order_info = MagicMock(spec=OrderInfo)
+    mock_response = MagicMock(spec=OrdersResponse)
+    mock_response.orders = [order_info]
+    mock_api.get_deliveries_by_id = AsyncMock(return_value=mock_response)
+
+    result = await manager.get_delivery_by_id(str(ORG_ID), ORG_ID)
+
+    assert result is order_info
+    call_kwargs = mock_api.get_deliveries_by_id.await_args.kwargs
+    request = call_kwargs["orders_by_id_request"]
+    assert isinstance(request, OrdersByIdRequest)
+    assert request.organization_id == ORG_ID
+    assert request.order_ids == [ORG_ID]
+
+
+async def test_get_delivery_by_id_returns_none_when_missing() -> None:
+    """get_delivery_by_id -> None, если заказ не найден."""
+    manager, mock_api = await manager_with_stub_api(API_SLOT)
+    mock_response = MagicMock(spec=OrdersResponse)
+    mock_response.orders = []
+    mock_api.get_deliveries_by_id = AsyncMock(return_value=mock_response)
+
+    result = await manager.get_delivery_by_id(ORG_ID, ORG_ID)
+
+    assert result is None
+
+
+async def test_get_customer_deliveries_builds_date_window() -> None:
+    """get_customer_deliveries собирает период и выравнивает ответ."""
+    manager, mock_api = await manager_with_stub_api(API_SLOT)
+    order_info = MagicMock(spec=OrderInfo)
+    org_orders = MagicMock()
+    org_orders.orders = [order_info]
+    mock_response = MagicMock(spec=OrdersWithRevisionResponse)
+    mock_response.orders_by_organizations = [org_orders]
+    mock_api.get_deliveries_by_delivery_date_and_phone = AsyncMock(
+        return_value=mock_response
+    )
+
+    result = await manager.get_customer_deliveries(
+        [str(ORG_ID)], phone="+79990001122", days=3
+    )
+
+    assert result == [order_info]
+    call_kwargs = (
+        mock_api.get_deliveries_by_delivery_date_and_phone.await_args.kwargs
+    )
+    request = call_kwargs["orders_by_delivery_date_and_phone_request"]
+    assert isinstance(request, OrdersByDeliveryDateAndPhoneRequest)
+    assert request.organization_ids == [ORG_ID]
+    assert request.phone == "+79990001122"
+    # delivery_date_from заполнен и раньше delivery_date_to
+    assert request.delivery_date_from is not None
+    assert request.delivery_date_to is not None
+    assert request.delivery_date_from < request.delivery_date_to

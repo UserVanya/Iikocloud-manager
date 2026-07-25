@@ -26,7 +26,7 @@ from iikocloud.mixins._base import (
 )
 from iikocloud.mixins.customers.helpers import CustomersHelpersMixin
 from iikocloud.mixins.deliveries.helpers import DeliveriesHelpersMixin
-from iikocloud.mixins.deliveries_retrieve.core import DeliveriesRetrieveCoreMixin
+from iikocloud.mixins.deliveries_retrieve.helpers import DeliveriesRetrieveHelpersMixin
 from iikocloud.mixins.dictionaries.helpers import DictionariesHelpersMixin
 from iikocloud.mixins.menu.helpers import MenuHelpersMixin
 from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
@@ -47,7 +47,7 @@ __all__ = [
 
 class IikoCloudApiClientManager(
     DeliveriesHelpersMixin,
-    DeliveriesRetrieveCoreMixin,
+    DeliveriesRetrieveHelpersMixin,
     CustomersHelpersMixin,
     DictionariesHelpersMixin,
     MenuHelpersMixin,
