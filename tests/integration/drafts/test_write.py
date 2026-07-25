@@ -17,6 +17,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+from functools import lru_cache
+from typing import Any
 from uuid import UUID
 
 import pytest
@@ -46,13 +48,20 @@ pytestmark = [
 ]
 
 
+@lru_cache
+def _read_config_data(path: str) -> dict[str, Any]:
+    """Прочитать и распарсить config.test.yml один раз на путь за процесс."""
+    with open(path, "rb") as file:
+        data: dict[str, Any] = yaml_load(file, Loader=CSafeLoader)
+    return data
+
+
 def _write_config_key(key: str) -> str | None:
     """Необязательный ключ из write-секции config.test.yml."""
     path = os.getenv("IIKOCLOUD_TEST_CONFIG")
     if not path:
         return None
-    with open(path, "rb") as file:
-        data = yaml_load(file, Loader=CSafeLoader)
+    data = _read_config_data(path)
     value = (data.get("write") or {}).get(key)
     return str(value) if value else None
 
