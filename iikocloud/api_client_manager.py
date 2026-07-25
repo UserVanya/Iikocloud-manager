@@ -14,6 +14,7 @@ from iikocloud_client import (
     DeliveriesRetrieveApi,
     DeliveryRestrictionsApi,
     DictionariesApi,
+    DiscountsAndPromotionsApi,
     DraftsApi,
     MenuApi,
     OrganizationsApi,
@@ -127,6 +128,7 @@ class IikoCloudApiClientManager(
         self._delivery_restrictions_api: DeliveryRestrictionsApi | None = None
         self._drafts_api: DraftsApi | None = None
         self._addresses_api: AddressesApi | None = None
+        self._discounts_and_promotions_api: DiscountsAndPromotionsApi | None = None
 
         logger.debug(
             "Создан экземпляр IikoCloudApiClientManager для key_id=%s",

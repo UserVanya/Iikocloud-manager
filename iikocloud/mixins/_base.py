@@ -20,6 +20,7 @@ from iikocloud_client import (
     DeliveriesRetrieveApi,
     DeliveryRestrictionsApi,
     DictionariesApi,
+    DiscountsAndPromotionsApi,
     DraftsApi,
     MenuApi,
     OrganizationsApi,
@@ -171,6 +172,14 @@ class ApiMethod(Enum):
     GET_STREETS_BY_CITY = "get_streets_by_city"
     GET_STREETS_BY_ID = "get_streets_by_id"
 
+    # Discounts & Promotions
+    CALCULATE_LOYALTY_CHECKIN = "calculate_loyalty_checkin"
+    GET_COUPON_INFO = "get_coupon_info"
+    GET_COUPON_SERIES = "get_coupon_series"
+    GET_LOYALTY_MANUAL_CONDITIONS = "get_loyalty_manual_conditions"
+    GET_LOYALTY_PROGRAMS = "get_loyalty_programs"
+    GET_NON_ACTIVATED_COUPONS_BY_SERIES = "get_non_activated_coupons_by_series"
+
 
 @dataclass
 class ApiCredentials:
@@ -274,6 +283,12 @@ class MethodRateLimits:
     get_regions: RateLimitConfig
     get_streets_by_city: RateLimitConfig
     get_streets_by_id: RateLimitConfig
+    calculate_loyalty_checkin: RateLimitConfig
+    get_coupon_info: RateLimitConfig
+    get_coupon_series: RateLimitConfig
+    get_loyalty_manual_conditions: RateLimitConfig
+    get_loyalty_programs: RateLimitConfig
+    get_non_activated_coupons_by_series: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -340,6 +355,7 @@ class _ManagerBase:
     _delivery_restrictions_api: DeliveryRestrictionsApi | None
     _drafts_api: DraftsApi | None
     _addresses_api: AddressesApi | None
+    _discounts_and_promotions_api: DiscountsAndPromotionsApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -436,6 +452,15 @@ class _ManagerBase:
         if self._addresses_api is None:
             self._addresses_api = AddressesApi(api_client=self._api_client)
         return self._addresses_api
+
+    async def get_discounts_and_promotions_api(self) -> DiscountsAndPromotionsApi:
+        """Получить клиент DiscountsAndPromotionsApi."""
+        await self._ensure_token_manager()
+        if self._discounts_and_promotions_api is None:
+            self._discounts_and_promotions_api = DiscountsAndPromotionsApi(
+                api_client=self._api_client
+            )
+        return self._discounts_and_promotions_api
 
     # ========== Инфраструктура ==========
 

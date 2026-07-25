@@ -305,6 +305,26 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=1, time_window_seconds=60.0
     )
 
+    # Discounts & Promotions
+    calculate_loyalty_checkin: RateLimitSettings = RateLimitSettings(
+        max_requests=1000, time_window_seconds=60.0
+    )
+    get_coupon_info: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_coupon_series: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_loyalty_manual_conditions: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_loyalty_programs: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_non_activated_coupons_by_series: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

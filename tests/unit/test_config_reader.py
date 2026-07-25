@@ -172,3 +172,21 @@ def test_addresses_methods_have_limits() -> None:
         assert config.max_requests / config.time_window_seconds == pytest.approx(
             1 / 60.0
         )
+
+
+def test_discounts_methods_have_limits() -> None:
+    """6 методов discounts есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    expected = {
+        "calculate_loyalty_checkin": 1000 / 60.0,
+        "get_coupon_info": 10 / 60.0,
+        "get_coupon_series": 1 / 60.0,
+        "get_loyalty_manual_conditions": 1 / 60.0,
+        "get_loyalty_programs": 1 / 60.0,
+        "get_non_activated_coupons_by_series": 10 / 60.0,
+    }
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name, rps in expected.items():
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(rps)

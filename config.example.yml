@@ -231,3 +231,21 @@ iikocloud:
     get_streets_by_id:
       max_requests: 1
       time_window_seconds: 60.0
+    calculate_loyalty_checkin:
+      max_requests: 1000
+      time_window_seconds: 60.0
+    get_coupon_info:
+      max_requests: 10
+      time_window_seconds: 60.0
+    get_coupon_series:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_loyalty_manual_conditions:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_loyalty_programs:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_non_activated_coupons_by_series:
+      max_requests: 10
+      time_window_seconds: 60.0
