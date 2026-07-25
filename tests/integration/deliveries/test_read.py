@@ -80,6 +80,9 @@ class TestDeliveryReadback:
                     break
             assert found is not None, "Заказ не появился в get_deliveries_by_id"
             assert found.id == order_id
+            # phone живёт уровнем ниже: OrderInfo.order (nullable payload)
+            assert found.order is not None
+            assert found.order.phone == phone
 
             await asyncio.sleep(_API_PAUSE_SEC)
 

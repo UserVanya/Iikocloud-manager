@@ -85,6 +85,9 @@ class TestRetrieveStructure:
                 )
             )
         except ApiException as exc:
+            body = getattr(exc, "body", None) or str(exc)
+            if "TOO_OLD_REVISION" not in body:
+                raise
             pytest.skip(f"Стенд отклонил start_revision=0 (окно 3ч): {exc}")
         assert response is not None
         assert response.orders_by_organizations is not None

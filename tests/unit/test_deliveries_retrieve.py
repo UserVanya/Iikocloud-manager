@@ -99,7 +99,7 @@ async def test_get_deliveries_by_id_rejects_both_id_lists() -> None:
     request = OrdersByIdRequest(
         organization_id=ORG_ID, order_ids=[ORG_ID], pos_order_ids=[ORG_ID]
     )
-    with pytest.raises(ValueError, match="order_ids"):
+    with pytest.raises(ValueError, match="XOR"):
         await manager.get_deliveries_by_id(request)
     mock_api.get_deliveries_by_id.assert_not_called()
 
@@ -109,7 +109,7 @@ async def test_get_deliveries_by_id_rejects_empty() -> None:
     manager, mock_api = await manager_with_stub_api(API_SLOT)
 
     request = OrdersByIdRequest(organization_id=ORG_ID)
-    with pytest.raises(ValueError, match="order_ids"):
+    with pytest.raises(ValueError, match="непустой"):
         await manager.get_deliveries_by_id(request)
     mock_api.get_deliveries_by_id.assert_not_called()
 
@@ -120,6 +120,33 @@ async def test_get_deliveries_by_id_rejects_over_200() -> None:
 
     request = OrdersByIdRequest(
         organization_id=ORG_ID, order_ids=[ORG_ID] * 201
+    )
+    with pytest.raises(ValueError, match="200"):
+        await manager.get_deliveries_by_id(request)
+    mock_api.get_deliveries_by_id.assert_not_called()
+
+
+async def test_get_deliveries_by_pos_order_ids() -> None:
+    """pos_order_ids: валидный запрос проксируется в SDK."""
+    manager, mock_api = await manager_with_stub_api(API_SLOT)
+    mock_response = MagicMock(spec=OrdersResponse)
+    mock_api.get_deliveries_by_id = AsyncMock(return_value=mock_response)
+
+    request = OrdersByIdRequest(organization_id=ORG_ID, pos_order_ids=[ORG_ID])
+    result = await manager.get_deliveries_by_id(request)
+
+    assert result is mock_response
+    mock_api.get_deliveries_by_id.assert_awaited_once_with(
+        orders_by_id_request=request
+    )
+
+
+async def test_get_deliveries_by_pos_order_ids_rejects_over_200() -> None:
+    """> 200 pos_order_ids за запрос -> ValueError."""
+    manager, mock_api = await manager_with_stub_api(API_SLOT)
+
+    request = OrdersByIdRequest(
+        organization_id=ORG_ID, pos_order_ids=[ORG_ID] * 201
     )
     with pytest.raises(ValueError, match="200"):
         await manager.get_deliveries_by_id(request)
