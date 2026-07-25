@@ -104,6 +104,28 @@ def test_delivery_restrictions_methods_have_limits() -> None:
         assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
 
 
+def test_drafts_methods_have_limits() -> None:
+    """8 методов drafts есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    write_names = [
+        "create_delivery_draft",
+        "save_delivery_draft",
+        "delete_delivery_draft",
+        "lock_delivery_draft",
+        "unlock_delivery_draft",
+    ]
+    expected = {name: 100 / 60.0 for name in write_names}
+    expected["commit_delivery_draft"] = 20 / 60.0
+    expected["get_delivery_draft_by_id"] = 20 / 60.0
+    expected["get_delivery_drafts_by_filter"] = 20 / 60.0
+
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name, rps in expected.items():
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
+
+
 def test_deliveries_retrieve_methods_have_limits() -> None:
     """6 методов deliveries_retrieve есть в ApiMethod и MethodRateLimits."""
     from iikocloud.mixins._base import ApiMethod, MethodRateLimits

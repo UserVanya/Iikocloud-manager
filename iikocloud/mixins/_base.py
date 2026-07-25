@@ -18,6 +18,7 @@ from iikocloud_client import (
     DeliveriesRetrieveApi,
     DeliveryRestrictionsApi,
     DictionariesApi,
+    DraftsApi,
     MenuApi,
     OrganizationsApi,
     TerminalGroupsApi,
@@ -147,6 +148,16 @@ class ApiMethod(Enum):
     GET_ALLOWED_DELIVERY_RESTRICTIONS = "get_allowed_delivery_restrictions"
     GET_DELIVERY_RESTRICTIONS = "get_delivery_restrictions"
 
+    # Drafts
+    CREATE_DELIVERY_DRAFT = "create_delivery_draft"
+    SAVE_DELIVERY_DRAFT = "save_delivery_draft"
+    COMMIT_DELIVERY_DRAFT = "commit_delivery_draft"
+    DELETE_DELIVERY_DRAFT = "delete_delivery_draft"
+    LOCK_DELIVERY_DRAFT = "lock_delivery_draft"
+    UNLOCK_DELIVERY_DRAFT = "unlock_delivery_draft"
+    GET_DELIVERY_DRAFT_BY_ID = "get_delivery_draft_by_id"
+    GET_DELIVERY_DRAFTS_BY_FILTER = "get_delivery_drafts_by_filter"
+
 
 @dataclass
 class ApiCredentials:
@@ -235,6 +246,14 @@ class MethodRateLimits:
     search_deliveries: RateLimitConfig
     get_allowed_delivery_restrictions: RateLimitConfig
     get_delivery_restrictions: RateLimitConfig
+    create_delivery_draft: RateLimitConfig
+    save_delivery_draft: RateLimitConfig
+    commit_delivery_draft: RateLimitConfig
+    delete_delivery_draft: RateLimitConfig
+    lock_delivery_draft: RateLimitConfig
+    unlock_delivery_draft: RateLimitConfig
+    get_delivery_draft_by_id: RateLimitConfig
+    get_delivery_drafts_by_filter: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -298,6 +317,7 @@ class _ManagerBase:
     _deliveries_create_and_update_api: DeliveriesCreateAndUpdateApi | None
     _deliveries_retrieve_api: DeliveriesRetrieveApi | None
     _delivery_restrictions_api: DeliveryRestrictionsApi | None
+    _drafts_api: DraftsApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -371,6 +391,13 @@ class _ManagerBase:
                 api_client=self._api_client
             )
         return self._delivery_restrictions_api
+
+    async def get_drafts_api(self) -> DraftsApi:
+        """Получить клиент DraftsApi."""
+        await self._ensure_token_manager()
+        if self._drafts_api is None:
+            self._drafts_api = DraftsApi(api_client=self._api_client)
+        return self._drafts_api
 
     # ========== Инфраструктура ==========
 
