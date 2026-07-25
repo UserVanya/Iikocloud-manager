@@ -108,6 +108,7 @@ class TestDraftLifecycle:
                         menu_id=draft_menu_id,
                         phone=phone,
                         items=[item],
+                        order_service_type="DeliveryByClient",
                     ),
                 )
             )
@@ -136,6 +137,7 @@ class TestDraftLifecycle:
                 phone=phone,
                 items=[item],
                 comment="integration test save",
+                order_service_type="DeliveryByClient",
             )
             save_response = await manager.save_delivery_draft(
                 SaveDraftRequest(
