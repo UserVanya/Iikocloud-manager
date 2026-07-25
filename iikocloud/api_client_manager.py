@@ -10,6 +10,7 @@ from iikocloud_client import (
     CustomersApi,
     DeliveriesCreateAndUpdateApi,
     DeliveriesRetrieveApi,
+    DeliveryRestrictionsApi,
     DictionariesApi,
     MenuApi,
     OrganizationsApi,
@@ -108,6 +109,7 @@ class IikoCloudApiClientManager(
             None
         )
         self._deliveries_retrieve_api: DeliveriesRetrieveApi | None = None
+        self._delivery_restrictions_api: DeliveryRestrictionsApi | None = None
 
         logger.debug(
             "Создан экземпляр IikoCloudApiClientManager для key_id=%s",

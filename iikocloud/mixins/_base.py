@@ -16,6 +16,7 @@ from iikocloud_client import (
     CustomersApi,
     DeliveriesCreateAndUpdateApi,
     DeliveriesRetrieveApi,
+    DeliveryRestrictionsApi,
     DictionariesApi,
     MenuApi,
     OrganizationsApi,
@@ -142,6 +143,10 @@ class ApiMethod(Enum):
     )
     SEARCH_DELIVERIES = "search_deliveries"
 
+    # Delivery Restrictions
+    GET_ALLOWED_DELIVERY_RESTRICTIONS = "get_allowed_delivery_restrictions"
+    GET_DELIVERY_RESTRICTIONS = "get_delivery_restrictions"
+
 
 @dataclass
 class ApiCredentials:
@@ -228,6 +233,8 @@ class MethodRateLimits:
     get_deliveries_by_revision: RateLimitConfig
     get_delivery_history_by_delivery_date_and_phone: RateLimitConfig
     search_deliveries: RateLimitConfig
+    get_allowed_delivery_restrictions: RateLimitConfig
+    get_delivery_restrictions: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -290,6 +297,7 @@ class _ManagerBase:
     _dictionaries_api: DictionariesApi | None
     _deliveries_create_and_update_api: DeliveriesCreateAndUpdateApi | None
     _deliveries_retrieve_api: DeliveriesRetrieveApi | None
+    _delivery_restrictions_api: DeliveryRestrictionsApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -354,6 +362,15 @@ class _ManagerBase:
                 api_client=self._api_client
             )
         return self._deliveries_retrieve_api
+
+    async def get_delivery_restrictions_api(self) -> DeliveryRestrictionsApi:
+        """Получить клиент DeliveryRestrictionsApi."""
+        await self._ensure_token_manager()
+        if self._delivery_restrictions_api is None:
+            self._delivery_restrictions_api = DeliveryRestrictionsApi(
+                api_client=self._api_client
+            )
+        return self._delivery_restrictions_api
 
     # ========== Инфраструктура ==========
 

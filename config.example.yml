@@ -180,3 +180,9 @@ iikocloud:
     search_deliveries:
       max_requests: 10
       time_window_seconds: 60.0
+    get_allowed_delivery_restrictions:
+      max_requests: 20
+      time_window_seconds: 60.0
+    get_delivery_restrictions:
+      max_requests: 1
+      time_window_seconds: 60.0
