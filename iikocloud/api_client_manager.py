@@ -8,6 +8,7 @@ from iikocloud_client import (
     AuthorizationApi,
     Configuration,
     CustomersApi,
+    DeliveriesCreateAndUpdateApi,
     DictionariesApi,
     MenuApi,
     OrganizationsApi,
@@ -98,6 +99,9 @@ class IikoCloudApiClientManager(
         self._terminal_groups_api: TerminalGroupsApi | None = None
         self._menu_api: MenuApi | None = None
         self._dictionaries_api: DictionariesApi | None = None
+        self._deliveries_create_and_update_api: DeliveriesCreateAndUpdateApi | None = (
+            None
+        )
 
         logger.debug(
             "Создан экземпляр IikoCloudApiClientManager для key_id=%s",

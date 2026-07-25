@@ -54,3 +54,37 @@ def test_new_extension_methods_have_limits() -> None:
         method = ApiMethod(name)
         config = limits.for_method(method)
         assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
+
+
+def test_deliveries_methods_have_limits() -> None:
+    """20 методов deliveries есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    expected = {"create_delivery_order": 20 / 60.0}
+    commands = [
+        "add_delivery_order_items",
+        "add_delivery_order_payments",
+        "cancel_delivery_order",
+        "cancel_delivery_confirmation",
+        "confirm_delivery",
+        "change_delivery_comment",
+        "change_delivery_complete_before",
+        "change_delivery_driver_info",
+        "change_delivery_external_data",
+        "change_delivery_operator",
+        "change_delivery_payments",
+        "change_delivery_point",
+        "change_delivery_service_type",
+        "close_delivery_order",
+        "print_delivery_bill",
+        "print_table_order_bill",
+        "update_delivery_order_problem",
+        "update_delivery_order_status",
+        "update_delivery_tracking_link",
+    ]
+    expected.update({name: 100 / 60.0 for name in commands})
+
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name, rps in expected.items():
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(rps)

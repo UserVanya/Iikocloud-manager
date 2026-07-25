@@ -14,6 +14,7 @@ from iikocloud_client import (
     AuthorizationApi,
     Configuration,
     CustomersApi,
+    DeliveriesCreateAndUpdateApi,
     DictionariesApi,
     MenuApi,
     OrganizationsApi,
@@ -104,6 +105,28 @@ class ApiMethod(Enum):
     GET_REMOVAL_TYPES = "get_removal_types"
     GET_TIPS_TYPES = "get_tips_types"
 
+    # Deliveries (create & update)
+    CREATE_DELIVERY_ORDER = "create_delivery_order"
+    ADD_DELIVERY_ORDER_ITEMS = "add_delivery_order_items"
+    ADD_DELIVERY_ORDER_PAYMENTS = "add_delivery_order_payments"
+    CANCEL_DELIVERY_ORDER = "cancel_delivery_order"
+    CANCEL_DELIVERY_CONFIRMATION = "cancel_delivery_confirmation"
+    CONFIRM_DELIVERY = "confirm_delivery"
+    CHANGE_DELIVERY_COMMENT = "change_delivery_comment"
+    CHANGE_DELIVERY_COMPLETE_BEFORE = "change_delivery_complete_before"
+    CHANGE_DELIVERY_DRIVER_INFO = "change_delivery_driver_info"
+    CHANGE_DELIVERY_EXTERNAL_DATA = "change_delivery_external_data"
+    CHANGE_DELIVERY_OPERATOR = "change_delivery_operator"
+    CHANGE_DELIVERY_PAYMENTS = "change_delivery_payments"
+    CHANGE_DELIVERY_POINT = "change_delivery_point"
+    CHANGE_DELIVERY_SERVICE_TYPE = "change_delivery_service_type"
+    CLOSE_DELIVERY_ORDER = "close_delivery_order"
+    PRINT_DELIVERY_BILL = "print_delivery_bill"
+    PRINT_TABLE_ORDER_BILL = "print_table_order_bill"
+    UPDATE_DELIVERY_ORDER_PROBLEM = "update_delivery_order_problem"
+    UPDATE_DELIVERY_ORDER_STATUS = "update_delivery_order_status"
+    UPDATE_DELIVERY_TRACKING_LINK = "update_delivery_tracking_link"
+
 
 @dataclass
 class ApiCredentials:
@@ -164,6 +187,26 @@ class MethodRateLimits:
     get_discounts: RateLimitConfig
     get_removal_types: RateLimitConfig
     get_tips_types: RateLimitConfig
+    create_delivery_order: RateLimitConfig
+    add_delivery_order_items: RateLimitConfig
+    add_delivery_order_payments: RateLimitConfig
+    cancel_delivery_order: RateLimitConfig
+    cancel_delivery_confirmation: RateLimitConfig
+    confirm_delivery: RateLimitConfig
+    change_delivery_comment: RateLimitConfig
+    change_delivery_complete_before: RateLimitConfig
+    change_delivery_driver_info: RateLimitConfig
+    change_delivery_external_data: RateLimitConfig
+    change_delivery_operator: RateLimitConfig
+    change_delivery_payments: RateLimitConfig
+    change_delivery_point: RateLimitConfig
+    change_delivery_service_type: RateLimitConfig
+    close_delivery_order: RateLimitConfig
+    print_delivery_bill: RateLimitConfig
+    print_table_order_bill: RateLimitConfig
+    update_delivery_order_problem: RateLimitConfig
+    update_delivery_order_status: RateLimitConfig
+    update_delivery_tracking_link: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -224,6 +267,7 @@ class _ManagerBase:
     _terminal_groups_api: TerminalGroupsApi | None
     _menu_api: MenuApi | None
     _dictionaries_api: DictionariesApi | None
+    _deliveries_create_and_update_api: DeliveriesCreateAndUpdateApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -268,6 +312,17 @@ class _ManagerBase:
         if self._dictionaries_api is None:
             self._dictionaries_api = DictionariesApi(api_client=self._api_client)
         return self._dictionaries_api
+
+    async def get_deliveries_create_and_update_api(
+        self,
+    ) -> DeliveriesCreateAndUpdateApi:
+        """Получить клиент DeliveriesCreateAndUpdateApi."""
+        await self._ensure_token_manager()
+        if self._deliveries_create_and_update_api is None:
+            self._deliveries_create_and_update_api = DeliveriesCreateAndUpdateApi(
+                api_client=self._api_client
+            )
+        return self._deliveries_create_and_update_api
 
     # ========== Инфраструктура ==========
 

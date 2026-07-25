@@ -102,3 +102,63 @@ iikocloud:
     get_tips_types:
       max_requests: 1
       time_window_seconds: 60.0
+    create_delivery_order:
+      max_requests: 20
+      time_window_seconds: 60.0
+    add_delivery_order_items:
+      max_requests: 100
+      time_window_seconds: 60.0
+    add_delivery_order_payments:
+      max_requests: 100
+      time_window_seconds: 60.0
+    cancel_delivery_order:
+      max_requests: 100
+      time_window_seconds: 60.0
+    cancel_delivery_confirmation:
+      max_requests: 100
+      time_window_seconds: 60.0
+    confirm_delivery:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_delivery_comment:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_delivery_complete_before:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_delivery_driver_info:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_delivery_external_data:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_delivery_operator:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_delivery_payments:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_delivery_point:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_delivery_service_type:
+      max_requests: 100
+      time_window_seconds: 60.0
+    close_delivery_order:
+      max_requests: 100
+      time_window_seconds: 60.0
+    print_delivery_bill:
+      max_requests: 100
+      time_window_seconds: 60.0
+    print_table_order_bill:
+      max_requests: 100
+      time_window_seconds: 60.0
+    update_delivery_order_problem:
+      max_requests: 100
+      time_window_seconds: 60.0
+    update_delivery_order_status:
+      max_requests: 100
+      time_window_seconds: 60.0
+    update_delivery_tracking_link:
+      max_requests: 100
+      time_window_seconds: 60.0

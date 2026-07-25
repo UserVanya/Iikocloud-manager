@@ -164,6 +164,68 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=1, time_window_seconds=60.0
     )
 
+    # Deliveries (create & update)
+    create_delivery_order: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    add_delivery_order_items: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    add_delivery_order_payments: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    cancel_delivery_order: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    cancel_delivery_confirmation: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    confirm_delivery: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_delivery_comment: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_delivery_complete_before: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_delivery_driver_info: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_delivery_external_data: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_delivery_operator: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_delivery_payments: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_delivery_point: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_delivery_service_type: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    close_delivery_order: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    print_delivery_bill: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    print_table_order_bill: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_delivery_order_problem: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_delivery_order_status: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_delivery_tracking_link: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 
