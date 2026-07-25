@@ -33,6 +33,7 @@ from iikocloud.mixins.delivery_restrictions.helpers import (
     DeliveryRestrictionsHelpersMixin,
 )
 from iikocloud.mixins.dictionaries.helpers import DictionariesHelpersMixin
+from iikocloud.mixins.drafts.helpers import DraftsHelpersMixin
 from iikocloud.mixins.menu.helpers import MenuHelpersMixin
 from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
 from iikocloud.mixins.terminal_groups.helpers import TerminalGroupsHelpersMixin
@@ -54,6 +55,7 @@ class IikoCloudApiClientManager(
     DeliveriesHelpersMixin,
     DeliveriesRetrieveHelpersMixin,
     DeliveryRestrictionsHelpersMixin,
+    DraftsHelpersMixin,
     CustomersHelpersMixin,
     DictionariesHelpersMixin,
     MenuHelpersMixin,
@@ -65,7 +67,8 @@ class IikoCloudApiClientManager(
 
     Содержит: ApiClient, TokenManager, глобальный лимитер, лимитеры по методам.
     Domain-методы — через mixins: organizations, customers, terminal_groups,
-    menu, dictionaries, deliveries, deliveries_retrieve, delivery_restrictions.
+    menu, dictionaries, deliveries, deliveries_retrieve, delivery_restrictions,
+    drafts.
 
     Конкурентность:
         Экземпляр безопасен для параллельных вызовов из нескольких задач
