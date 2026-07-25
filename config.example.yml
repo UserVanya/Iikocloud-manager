@@ -210,3 +210,15 @@ iikocloud:
     get_delivery_drafts_by_filter:
       max_requests: 20
       time_window_seconds: 60.0
+    get_cities:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_regions:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_streets_by_city:
+      max_requests: 1
+      time_window_seconds: 60.0
+    get_streets_by_id:
+      max_requests: 1
+      time_window_seconds: 60.0

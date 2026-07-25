@@ -4,6 +4,7 @@ import asyncio
 import logging
 
 from iikocloud_client import (
+    AddressesApi,
     ApiClient,
     AuthorizationApi,
     Configuration,
@@ -119,6 +120,7 @@ class IikoCloudApiClientManager(
         self._deliveries_retrieve_api: DeliveriesRetrieveApi | None = None
         self._delivery_restrictions_api: DeliveryRestrictionsApi | None = None
         self._drafts_api: DraftsApi | None = None
+        self._addresses_api: AddressesApi | None = None
 
         logger.debug(
             "Создан экземпляр IikoCloudApiClientManager для key_id=%s",

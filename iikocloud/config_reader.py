@@ -280,6 +280,20 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=20, time_window_seconds=60.0
     )
 
+    # Addresses
+    get_cities: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_regions: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_streets_by_city: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_streets_by_id: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

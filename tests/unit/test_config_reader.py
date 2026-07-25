@@ -144,3 +144,16 @@ def test_deliveries_retrieve_methods_have_limits() -> None:
         assert config.max_requests / config.time_window_seconds == pytest.approx(
             10 / 60.0
         )
+
+
+def test_addresses_methods_have_limits() -> None:
+    """4 метода addresses есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    names = ["get_cities", "get_regions", "get_streets_by_city", "get_streets_by_id"]
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name in names:
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(
+            1 / 60.0
+        )

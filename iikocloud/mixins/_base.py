@@ -10,6 +10,7 @@ from typing import TypeVar, cast
 from uuid import UUID
 
 from iikocloud_client import (
+    AddressesApi,
     ApiClient,
     AuthorizationApi,
     Configuration,
@@ -158,6 +159,12 @@ class ApiMethod(Enum):
     GET_DELIVERY_DRAFT_BY_ID = "get_delivery_draft_by_id"
     GET_DELIVERY_DRAFTS_BY_FILTER = "get_delivery_drafts_by_filter"
 
+    # Addresses
+    GET_CITIES = "get_cities"
+    GET_REGIONS = "get_regions"
+    GET_STREETS_BY_CITY = "get_streets_by_city"
+    GET_STREETS_BY_ID = "get_streets_by_id"
+
 
 @dataclass
 class ApiCredentials:
@@ -254,6 +261,10 @@ class MethodRateLimits:
     unlock_delivery_draft: RateLimitConfig
     get_delivery_draft_by_id: RateLimitConfig
     get_delivery_drafts_by_filter: RateLimitConfig
+    get_cities: RateLimitConfig
+    get_regions: RateLimitConfig
+    get_streets_by_city: RateLimitConfig
+    get_streets_by_id: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -318,6 +329,7 @@ class _ManagerBase:
     _deliveries_retrieve_api: DeliveriesRetrieveApi | None
     _delivery_restrictions_api: DeliveryRestrictionsApi | None
     _drafts_api: DraftsApi | None
+    _addresses_api: AddressesApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -398,6 +410,13 @@ class _ManagerBase:
         if self._drafts_api is None:
             self._drafts_api = DraftsApi(api_client=self._api_client)
         return self._drafts_api
+
+    async def get_addresses_api(self) -> AddressesApi:
+        """Получить клиент AddressesApi."""
+        await self._ensure_token_manager()
+        if self._addresses_api is None:
+            self._addresses_api = AddressesApi(api_client=self._api_client)
+        return self._addresses_api
 
     # ========== Инфраструктура ==========
 
