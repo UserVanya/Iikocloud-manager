@@ -24,7 +24,7 @@ from iikocloud.mixins._base import (
     default_method_limits,
 )
 from iikocloud.mixins.customers.helpers import CustomersHelpersMixin
-from iikocloud.mixins.deliveries.core import DeliveriesCoreMixin
+from iikocloud.mixins.deliveries.helpers import DeliveriesHelpersMixin
 from iikocloud.mixins.dictionaries.helpers import DictionariesHelpersMixin
 from iikocloud.mixins.menu.helpers import MenuHelpersMixin
 from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
@@ -44,8 +44,8 @@ __all__ = [
 
 
 class IikoCloudApiClientManager(
+    DeliveriesHelpersMixin,
     CustomersHelpersMixin,
-    DeliveriesCoreMixin,
     DictionariesHelpersMixin,
     MenuHelpersMixin,
     OrganizationsHelpersMixin,

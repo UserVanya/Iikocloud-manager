@@ -22,9 +22,12 @@ from iikocloud_client import (
     CorrelationIdResponse,
     CreateOrderRequest,
     DeliveryOrder,
+    DeliveryOrderCreateCompoundItem,
+    DeliveryOrderCreateCompoundItemComponent,
     DeliveryOrderCreatePoint,
     DeliveryOrderCreateProductItem,
     DeliveryStatusForUpdate,
+    Modifier,
     OrderResponse,
     PrintBillRequest,
     PrintDeliveryBillRequest,
@@ -219,3 +222,80 @@ async def test_update_delivery_tracking_link_returns_none() -> None:
     mock_api.update_delivery_tracking_link.assert_awaited_once_with(
         update_tracking_link_request=request
     )
+
+
+def test_build_product_item_fills_discriminator() -> None:
+    """build_product_item собирает Product-позицию с type='Product'."""
+    from iikocloud.mixins.deliveries.helpers import DeliveriesHelpersMixin
+
+    item = DeliveriesHelpersMixin.build_product_item(
+        product_id=str(ORG_ID), price=150.0, amount=2.0, comment="no onion"
+    )
+
+    assert isinstance(item, DeliveryOrderCreateProductItem)
+    assert item.type == "Product"
+    assert item.product_id == ORG_ID
+    assert item.price == 150.0
+    assert item.amount == 2.0
+    assert item.comment == "no onion"
+
+
+def test_build_product_item_with_modifier() -> None:
+    """build_product_item прокидывает modifiers."""
+    from iikocloud.mixins.deliveries.helpers import DeliveriesHelpersMixin
+
+    modifier = Modifier(product_id=ORG_ID, amount=1.0)
+    item = DeliveriesHelpersMixin.build_product_item(
+        product_id=ORG_ID, price=100.0, modifiers=[modifier]
+    )
+
+    assert item.modifiers == [modifier]
+
+
+def test_build_compound_item_components() -> None:
+    """build_compound_item собирает Compound-позицию с компонентами."""
+    from iikocloud.mixins.deliveries.helpers import DeliveriesHelpersMixin
+
+    item = DeliveriesHelpersMixin.build_compound_item(
+        primary_product_id=ORG_ID,
+        secondary_product_id=str(ORG_ID),
+        primary_price=200.0,
+    )
+
+    assert isinstance(item, DeliveryOrderCreateCompoundItem)
+    assert item.type == "Compound"
+    assert isinstance(
+        item.primary_component, DeliveryOrderCreateCompoundItemComponent
+    )
+    assert item.primary_component.product_id == ORG_ID
+    assert item.primary_component.price == 200.0
+    assert item.secondary_component is not None
+    assert item.secondary_component.product_id == ORG_ID
+
+
+def test_build_compound_item_without_secondary() -> None:
+    """build_compound_item без второго компонента -> secondary=None."""
+    from iikocloud.mixins.deliveries.helpers import DeliveriesHelpersMixin
+
+    item = DeliveriesHelpersMixin.build_compound_item(primary_product_id=ORG_ID)
+
+    assert item.secondary_component is None
+
+
+async def test_cancel_order_builds_request() -> None:
+    """cancel_order собирает CancelOrderRequest и вызывает core."""
+    manager, mock_api = await manager_with_stub_api(API_SLOT)
+    mock_response = MagicMock(spec=CorrelationIdResponse)
+    mock_api.cancel_delivery_order = AsyncMock(return_value=mock_response)
+
+    result = await manager.cancel_order(
+        organization_id=str(ORG_ID), order_id=ORG_ID, cancel_comment="test"
+    )
+
+    assert result is mock_response
+    call_kwargs = mock_api.cancel_delivery_order.await_args.kwargs
+    request = call_kwargs["cancel_order_request"]
+    assert isinstance(request, CancelOrderRequest)
+    assert request.organization_id == ORG_ID
+    assert request.order_id == ORG_ID
+    assert request.cancel_comment == "test"
