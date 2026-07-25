@@ -66,8 +66,11 @@
 
 0. **Первым этапом** (одна спека + один план): доборы `customers+` и `menu+` —
    расширение уже существующих доменов (решение пользователя 2026-07-23)
-1. Deliveries-блок: `deliveries_create_and_update`, `deliveries_retrieve`,
-   `delivery_restrictions`, `drafts`, `orders`, `addresses`
+1. Deliveries-блок: `deliveries_create_and_update` ✅, `deliveries_retrieve` ✅,
+   `delivery_restrictions`, `drafts`, `addresses`
+   (`orders` перенесён: берётся ПОСЛЕ `banquets_reserves` — для полного
+   контура столовых заказов нужны столики из BanquetsReservesApi;
+   решение пользователя 2026-07-25)
 2. Лояльность: `customer_categories`, `discounts_and_promotions`,
    `marketing_sources`
 3. Прочее: `employees`, `messages`, `notifications`, `operations`, `report`,
