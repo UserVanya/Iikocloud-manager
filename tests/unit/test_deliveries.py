@@ -211,7 +211,7 @@ async def test_create_delivery_order_returns_order_response() -> None:
 async def test_update_delivery_tracking_link_returns_none() -> None:
     """update_delivery_tracking_link: ответ без тела -> None."""
     manager, mock_api = await manager_with_stub_api(API_SLOT)
-    mock_api.update_delivery_tracking_link = AsyncMock(return_value=None)
+    mock_api.update_delivery_tracking_link = AsyncMock(return_value=object())
 
     request = UpdateTrackingLinkRequest(
         organization_id=ORG_ID, order_id=ORG_ID, tracking_link="https://x"
