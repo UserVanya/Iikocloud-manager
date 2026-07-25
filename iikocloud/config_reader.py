@@ -226,6 +226,26 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=100, time_window_seconds=60.0
     )
 
+    # Deliveries (retrieve)
+    get_deliveries_by_delivery_date_and_phone: RateLimitSettings = (
+        RateLimitSettings(max_requests=10, time_window_seconds=60.0)
+    )
+    get_deliveries_by_delivery_date_and_status: RateLimitSettings = (
+        RateLimitSettings(max_requests=10, time_window_seconds=60.0)
+    )
+    get_deliveries_by_id: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_deliveries_by_revision: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_delivery_history_by_delivery_date_and_phone: RateLimitSettings = (
+        RateLimitSettings(max_requests=10, time_window_seconds=60.0)
+    )
+    search_deliveries: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

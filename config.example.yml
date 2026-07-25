@@ -162,3 +162,21 @@ iikocloud:
     update_delivery_tracking_link:
       max_requests: 100
       time_window_seconds: 60.0
+    get_deliveries_by_delivery_date_and_phone:
+      max_requests: 10
+      time_window_seconds: 60.0
+    get_deliveries_by_delivery_date_and_status:
+      max_requests: 10
+      time_window_seconds: 60.0
+    get_deliveries_by_id:
+      max_requests: 10
+      time_window_seconds: 60.0
+    get_deliveries_by_revision:
+      max_requests: 10
+      time_window_seconds: 60.0
+    get_delivery_history_by_delivery_date_and_phone:
+      max_requests: 10
+      time_window_seconds: 60.0
+    search_deliveries:
+      max_requests: 10
+      time_window_seconds: 60.0

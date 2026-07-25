@@ -15,6 +15,7 @@ from iikocloud_client import (
     Configuration,
     CustomersApi,
     DeliveriesCreateAndUpdateApi,
+    DeliveriesRetrieveApi,
     DictionariesApi,
     MenuApi,
     OrganizationsApi,
@@ -127,6 +128,20 @@ class ApiMethod(Enum):
     UPDATE_DELIVERY_ORDER_STATUS = "update_delivery_order_status"
     UPDATE_DELIVERY_TRACKING_LINK = "update_delivery_tracking_link"
 
+    # Deliveries (retrieve)
+    GET_DELIVERIES_BY_DELIVERY_DATE_AND_PHONE = (
+        "get_deliveries_by_delivery_date_and_phone"
+    )
+    GET_DELIVERIES_BY_DELIVERY_DATE_AND_STATUS = (
+        "get_deliveries_by_delivery_date_and_status"
+    )
+    GET_DELIVERIES_BY_ID = "get_deliveries_by_id"
+    GET_DELIVERIES_BY_REVISION = "get_deliveries_by_revision"
+    GET_DELIVERY_HISTORY_BY_DELIVERY_DATE_AND_PHONE = (
+        "get_delivery_history_by_delivery_date_and_phone"
+    )
+    SEARCH_DELIVERIES = "search_deliveries"
+
 
 @dataclass
 class ApiCredentials:
@@ -207,6 +222,12 @@ class MethodRateLimits:
     update_delivery_order_problem: RateLimitConfig
     update_delivery_order_status: RateLimitConfig
     update_delivery_tracking_link: RateLimitConfig
+    get_deliveries_by_delivery_date_and_phone: RateLimitConfig
+    get_deliveries_by_delivery_date_and_status: RateLimitConfig
+    get_deliveries_by_id: RateLimitConfig
+    get_deliveries_by_revision: RateLimitConfig
+    get_delivery_history_by_delivery_date_and_phone: RateLimitConfig
+    search_deliveries: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -268,6 +289,7 @@ class _ManagerBase:
     _menu_api: MenuApi | None
     _dictionaries_api: DictionariesApi | None
     _deliveries_create_and_update_api: DeliveriesCreateAndUpdateApi | None
+    _deliveries_retrieve_api: DeliveriesRetrieveApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -323,6 +345,15 @@ class _ManagerBase:
                 api_client=self._api_client
             )
         return self._deliveries_create_and_update_api
+
+    async def get_deliveries_retrieve_api(self) -> DeliveriesRetrieveApi:
+        """Получить клиент DeliveriesRetrieveApi."""
+        await self._ensure_token_manager()
+        if self._deliveries_retrieve_api is None:
+            self._deliveries_retrieve_api = DeliveriesRetrieveApi(
+                api_client=self._api_client
+            )
+        return self._deliveries_retrieve_api
 
     # ========== Инфраструктура ==========
 
