@@ -294,3 +294,6 @@ iikocloud:
     send_loyalty_email:
       max_requests: 20
       time_window_seconds: 60.0
+    send_notification:
+      max_requests: 100
+      time_window_seconds: 60.0

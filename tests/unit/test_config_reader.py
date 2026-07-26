@@ -219,6 +219,17 @@ def test_messages_methods_have_limits() -> None:
         assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
 
 
+def test_send_notification_has_limits() -> None:
+    """send_notification есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    config = limits.for_method(ApiMethod("send_notification"))
+    assert config.max_requests / config.time_window_seconds == pytest.approx(
+        100 / 60.0
+    )
+
+
 def test_employees_methods_have_limits() -> None:
     """10 методов employees есть в ApiMethod и MethodRateLimits."""
     from iikocloud.mixins._base import ApiMethod, MethodRateLimits

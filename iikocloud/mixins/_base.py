@@ -26,6 +26,7 @@ from iikocloud_client import (
     MarketingSourcesApi,
     MenuApi,
     MessagesApi,
+    NotificationsApi,
     OrganizationsApi,
     TerminalGroupsApi,
 )
@@ -206,6 +207,9 @@ class ApiMethod(Enum):
     SEND_LOYALTY_SMS = "send_loyalty_sms"
     SEND_LOYALTY_EMAIL = "send_loyalty_email"
 
+    # Notifications
+    SEND_NOTIFICATION = "send_notification"
+
 
 @dataclass
 class ApiCredentials:
@@ -330,6 +334,7 @@ class MethodRateLimits:
     check_sms_status: RateLimitConfig
     send_loyalty_sms: RateLimitConfig
     send_loyalty_email: RateLimitConfig
+    send_notification: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -400,6 +405,7 @@ class _ManagerBase:
     _marketing_sources_api: MarketingSourcesApi | None
     _employees_api: EmployeesApi | None
     _messages_api: MessagesApi | None
+    _notifications_api: NotificationsApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -528,6 +534,13 @@ class _ManagerBase:
         if self._messages_api is None:
             self._messages_api = MessagesApi(api_client=self._api_client)
         return self._messages_api
+
+    async def get_notifications_api(self) -> NotificationsApi:
+        """Получить клиент NotificationsApi."""
+        await self._ensure_token_manager()
+        if self._notifications_api is None:
+            self._notifications_api = NotificationsApi(api_client=self._api_client)
+        return self._notifications_api
 
     # ========== Инфраструктура ==========
 
