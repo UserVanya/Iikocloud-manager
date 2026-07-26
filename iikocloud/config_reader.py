@@ -330,6 +330,38 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=1, time_window_seconds=60.0
     )
 
+    # Employees
+    get_couriers: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_couriers_by_role: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_employee_info: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+    get_active_courier_locations: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_active_courier_locations_by_terminal: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_courier_location_history: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_personal_session_info: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_terminal_groups_of_employee: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    open_personal_session: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    close_personal_session: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

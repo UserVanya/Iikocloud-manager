@@ -22,6 +22,7 @@ from iikocloud_client import (
     DictionariesApi,
     DiscountsAndPromotionsApi,
     DraftsApi,
+    EmployeesApi,
     MarketingSourcesApi,
     MenuApi,
     OrganizationsApi,
@@ -184,6 +185,20 @@ class ApiMethod(Enum):
     # Marketing Sources
     GET_MARKETING_SOURCES = "get_marketing_sources"
 
+    # Employees
+    GET_COURIERS = "get_couriers"
+    GET_COURIERS_BY_ROLE = "get_couriers_by_role"
+    GET_EMPLOYEE_INFO = "get_employee_info"
+    GET_ACTIVE_COURIER_LOCATIONS = "get_active_courier_locations"
+    GET_ACTIVE_COURIER_LOCATIONS_BY_TERMINAL = (
+        "get_active_courier_locations_by_terminal"
+    )
+    GET_COURIER_LOCATION_HISTORY = "get_courier_location_history"
+    GET_PERSONAL_SESSION_INFO = "get_personal_session_info"
+    GET_TERMINAL_GROUPS_OF_EMPLOYEE = "get_terminal_groups_of_employee"
+    OPEN_PERSONAL_SESSION = "open_personal_session"
+    CLOSE_PERSONAL_SESSION = "close_personal_session"
+
 
 @dataclass
 class ApiCredentials:
@@ -294,6 +309,16 @@ class MethodRateLimits:
     get_loyalty_programs: RateLimitConfig
     get_non_activated_coupons_by_series: RateLimitConfig
     get_marketing_sources: RateLimitConfig
+    get_couriers: RateLimitConfig
+    get_couriers_by_role: RateLimitConfig
+    get_employee_info: RateLimitConfig
+    get_active_courier_locations: RateLimitConfig
+    get_active_courier_locations_by_terminal: RateLimitConfig
+    get_courier_location_history: RateLimitConfig
+    get_personal_session_info: RateLimitConfig
+    get_terminal_groups_of_employee: RateLimitConfig
+    open_personal_session: RateLimitConfig
+    close_personal_session: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -362,6 +387,7 @@ class _ManagerBase:
     _addresses_api: AddressesApi | None
     _discounts_and_promotions_api: DiscountsAndPromotionsApi | None
     _marketing_sources_api: MarketingSourcesApi | None
+    _employees_api: EmployeesApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -476,6 +502,13 @@ class _ManagerBase:
                 api_client=self._api_client
             )
         return self._marketing_sources_api
+
+    async def get_employees_api(self) -> EmployeesApi:
+        """Получить клиент EmployeesApi."""
+        await self._ensure_token_manager()
+        if self._employees_api is None:
+            self._employees_api = EmployeesApi(api_client=self._api_client)
+        return self._employees_api
 
     # ========== Инфраструктура ==========
 

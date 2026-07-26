@@ -201,3 +201,25 @@ def test_marketing_sources_method_has_limits() -> None:
     assert config.max_requests / config.time_window_seconds == pytest.approx(
         1 / 60.0
     )
+
+
+def test_employees_methods_have_limits() -> None:
+    """10 методов employees есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    expected = {
+        "get_couriers": 1 / 60.0,
+        "get_couriers_by_role": 1 / 60.0,
+        "get_employee_info": 1 / 60.0,
+        "get_active_courier_locations": 10 / 60.0,
+        "get_active_courier_locations_by_terminal": 10 / 60.0,
+        "get_courier_location_history": 10 / 60.0,
+        "get_personal_session_info": 10 / 60.0,
+        "get_terminal_groups_of_employee": 10 / 60.0,
+        "open_personal_session": 100 / 60.0,
+        "close_personal_session": 100 / 60.0,
+    }
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name, rps in expected.items():
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
