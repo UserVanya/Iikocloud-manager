@@ -48,6 +48,7 @@ from iikocloud.mixins.employees.helpers import EmployeesHelpersMixin
 from iikocloud.mixins.marketing_sources.helpers import MarketingSourcesHelpersMixin
 from iikocloud.mixins.menu.helpers import MenuHelpersMixin
 from iikocloud.mixins.messages.helpers import MessagesHelpersMixin
+from iikocloud.mixins.notifications.helpers import NotificationsHelpersMixin
 from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
 from iikocloud.mixins.terminal_groups.helpers import TerminalGroupsHelpersMixin
 from iikocloud.rate_limiter import GlobalRateLimiter, TokenBucketRateLimiter
@@ -80,6 +81,7 @@ class IikoCloudApiClientManager(
     MarketingSourcesHelpersMixin,
     EmployeesHelpersMixin,
     MessagesHelpersMixin,
+    NotificationsHelpersMixin,
     _ManagerBase,
 ):
     """Multitone-фасад для работы с iikocloud API.
@@ -88,7 +90,7 @@ class IikoCloudApiClientManager(
     Domain-методы — через mixins: organizations, customers, customer_categories,
     terminal_groups, menu, dictionaries, deliveries, deliveries_retrieve,
     delivery_restrictions, drafts, addresses, discounts, marketing_sources,
-    employees, messages.
+    employees, messages, notifications.
 
     Конкурентность:
         Экземпляр безопасен для параллельных вызовов из нескольких задач
