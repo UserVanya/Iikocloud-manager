@@ -38,6 +38,7 @@ from iikocloud.mixins._base import (
     default_method_limits,
 )
 from iikocloud.mixins.addresses.helpers import AddressesHelpersMixin
+from iikocloud.mixins.banquets.helpers import BanquetsHelpersMixin
 from iikocloud.mixins.customer_categories.helpers import CustomerCategoriesHelpersMixin
 from iikocloud.mixins.customers.helpers import CustomersHelpersMixin
 from iikocloud.mixins.deliveries.helpers import DeliveriesHelpersMixin
@@ -92,6 +93,7 @@ class IikoCloudApiClientManager(
     OperationsHelpersMixin,
     ReportHelpersMixin,
     WebhooksHelpersMixin,
+    BanquetsHelpersMixin,
     _ManagerBase,
 ):
     """Multitone-фасад для работы с iikocloud API.
@@ -100,7 +102,7 @@ class IikoCloudApiClientManager(
     Domain-методы — через mixins: organizations, customers, customer_categories,
     terminal_groups, menu, dictionaries, deliveries, deliveries_retrieve,
     delivery_restrictions, drafts, addresses, discounts, marketing_sources,
-    employees, messages, notifications, operations, report, webhooks.
+    employees, messages, notifications, operations, report, webhooks, banquets.
 
     Конкурентность:
         Экземпляр безопасен для параллельных вызовов из нескольких задач
