@@ -381,6 +381,11 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=100, time_window_seconds=60.0
     )
 
+    # Operations (polling-метод)
+    get_command_status: RateLimitSettings = RateLimitSettings(
+        max_requests=60, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

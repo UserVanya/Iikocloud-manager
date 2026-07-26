@@ -297,3 +297,6 @@ iikocloud:
     send_notification:
       max_requests: 100
       time_window_seconds: 60.0
+    get_command_status:
+      max_requests: 60
+      time_window_seconds: 60.0

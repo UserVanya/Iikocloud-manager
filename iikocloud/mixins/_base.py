@@ -27,6 +27,7 @@ from iikocloud_client import (
     MenuApi,
     MessagesApi,
     NotificationsApi,
+    OperationsApi,
     OrganizationsApi,
     TerminalGroupsApi,
 )
@@ -210,6 +211,9 @@ class ApiMethod(Enum):
     # Notifications
     SEND_NOTIFICATION = "send_notification"
 
+    # Operations
+    GET_COMMAND_STATUS = "get_command_status"
+
 
 @dataclass
 class ApiCredentials:
@@ -335,6 +339,7 @@ class MethodRateLimits:
     send_loyalty_sms: RateLimitConfig
     send_loyalty_email: RateLimitConfig
     send_notification: RateLimitConfig
+    get_command_status: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -406,6 +411,7 @@ class _ManagerBase:
     _employees_api: EmployeesApi | None
     _messages_api: MessagesApi | None
     _notifications_api: NotificationsApi | None
+    _operations_api: OperationsApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -541,6 +547,13 @@ class _ManagerBase:
         if self._notifications_api is None:
             self._notifications_api = NotificationsApi(api_client=self._api_client)
         return self._notifications_api
+
+    async def get_operations_api(self) -> OperationsApi:
+        """Получить клиент OperationsApi."""
+        await self._ensure_token_manager()
+        if self._operations_api is None:
+            self._operations_api = OperationsApi(api_client=self._api_client)
+        return self._operations_api
 
     # ========== Инфраструктура ==========
 
