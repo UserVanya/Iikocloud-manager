@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+from functools import lru_cache
 from uuid import UUID
 
 import pytest
@@ -39,14 +40,13 @@ pytestmark = [
 ]
 
 
+@lru_cache
+def _load(path: str):
+    with open(path, "rb") as file:
+        return yaml_load(file, Loader=CSafeLoader)
+
+
 def _write_config_key(key: str) -> str | None:
-    from functools import lru_cache
-
-    @lru_cache
-    def _load(path: str):
-        with open(path, "rb") as file:
-            return yaml_load(file, Loader=CSafeLoader)
-
     path = os.getenv("IIKOCLOUD_TEST_CONFIG")
     if not path:
         return None

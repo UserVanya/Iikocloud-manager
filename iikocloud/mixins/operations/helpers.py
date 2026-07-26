@@ -32,6 +32,8 @@ class OperationsHelpersMixin(OperationsCoreMixin):
         Raises:
             TimeoutError: статус не стал терминальным за timeout
         """
+        if timeout <= 0 or interval <= 0:
+            raise ValueError("timeout и interval должны быть положительными")
         request = GetCommandStatusRequest(
             organization_id=as_uuid(organization_id),
             correlation_id=as_uuid(correlation_id),

@@ -45,6 +45,8 @@ class WebhooksCoreMixin(_ManagerBase):
         """Обновить webhook-настройки организации.
 
         Перезаписывает webhook-конфиг api-логина (web_hooks_uri, auth_token).
+        Сервер жёстко лимитирует этот endpoint (эмпирически ~1 update/час
+        на организацию; массовые вызовы получают 429).
 
         Args:
             request: Параметры запроса (organization_id, web_hooks_uri, ...)
