@@ -257,6 +257,19 @@ def test_get_command_status_has_limits() -> None:
     )
 
 
+def test_webhooks_methods_have_limits() -> None:
+    """2 метода webhooks есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    names = ["get_webhook_settings", "update_webhook_settings"]
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name in names:
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(
+            1 / 60.0
+        )
+
+
 def test_employees_methods_have_limits() -> None:
     """10 методов employees есть в ApiMethod и MethodRateLimits."""
     from iikocloud.mixins._base import ApiMethod, MethodRateLimits

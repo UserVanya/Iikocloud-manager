@@ -25,6 +25,7 @@ from iikocloud_client import (
     OrganizationsApi,
     ReportApi,
     TerminalGroupsApi,
+    WebhooksApi,
 )
 
 from iikocloud.config_reader import IikoCloudConfig
@@ -156,6 +157,7 @@ class IikoCloudApiClientManager(
         self._notifications_api: NotificationsApi | None = None
         self._operations_api: OperationsApi | None = None
         self._report_api: ReportApi | None = None
+        self._webhooks_api: WebhooksApi | None = None
 
         logger.debug(
             "Создан экземпляр IikoCloudApiClientManager для key_id=%s",

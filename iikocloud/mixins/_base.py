@@ -31,6 +31,7 @@ from iikocloud_client import (
     OrganizationsApi,
     ReportApi,
     TerminalGroupsApi,
+    WebhooksApi,
 )
 from iikocloud_client.exceptions import UnauthorizedException
 
@@ -219,6 +220,10 @@ class ApiMethod(Enum):
     GET_CUSTOMER_TRANSACTIONS_BY_DATE = "get_customer_transactions_by_date"
     GET_CUSTOMER_TRANSACTIONS_BY_REVISION = "get_customer_transactions_by_revision"
 
+    # Webhooks
+    GET_WEBHOOK_SETTINGS = "get_webhook_settings"
+    UPDATE_WEBHOOK_SETTINGS = "update_webhook_settings"
+
 
 @dataclass
 class ApiCredentials:
@@ -347,6 +352,8 @@ class MethodRateLimits:
     get_command_status: RateLimitConfig
     get_customer_transactions_by_date: RateLimitConfig
     get_customer_transactions_by_revision: RateLimitConfig
+    get_webhook_settings: RateLimitConfig
+    update_webhook_settings: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -420,6 +427,7 @@ class _ManagerBase:
     _notifications_api: NotificationsApi | None
     _operations_api: OperationsApi | None
     _report_api: ReportApi | None
+    _webhooks_api: WebhooksApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -569,6 +577,13 @@ class _ManagerBase:
         if self._report_api is None:
             self._report_api = ReportApi(api_client=self._api_client)
         return self._report_api
+
+    async def get_webhooks_api(self) -> WebhooksApi:
+        """Получить клиент WebhooksApi."""
+        await self._ensure_token_manager()
+        if self._webhooks_api is None:
+            self._webhooks_api = WebhooksApi(api_client=self._api_client)
+        return self._webhooks_api
 
     # ========== Инфраструктура ==========
 
