@@ -29,6 +29,7 @@ from iikocloud_client import (
     NotificationsApi,
     OperationsApi,
     OrganizationsApi,
+    ReportApi,
     TerminalGroupsApi,
 )
 from iikocloud_client.exceptions import UnauthorizedException
@@ -214,6 +215,10 @@ class ApiMethod(Enum):
     # Operations
     GET_COMMAND_STATUS = "get_command_status"
 
+    # Report
+    GET_CUSTOMER_TRANSACTIONS_BY_DATE = "get_customer_transactions_by_date"
+    GET_CUSTOMER_TRANSACTIONS_BY_REVISION = "get_customer_transactions_by_revision"
+
 
 @dataclass
 class ApiCredentials:
@@ -340,6 +345,8 @@ class MethodRateLimits:
     send_loyalty_email: RateLimitConfig
     send_notification: RateLimitConfig
     get_command_status: RateLimitConfig
+    get_customer_transactions_by_date: RateLimitConfig
+    get_customer_transactions_by_revision: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -412,6 +419,7 @@ class _ManagerBase:
     _messages_api: MessagesApi | None
     _notifications_api: NotificationsApi | None
     _operations_api: OperationsApi | None
+    _report_api: ReportApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -554,6 +562,13 @@ class _ManagerBase:
         if self._operations_api is None:
             self._operations_api = OperationsApi(api_client=self._api_client)
         return self._operations_api
+
+    async def get_report_api(self) -> ReportApi:
+        """Получить клиент ReportApi."""
+        await self._ensure_token_manager()
+        if self._report_api is None:
+            self._report_api = ReportApi(api_client=self._api_client)
+        return self._report_api
 
     # ========== Инфраструктура ==========
 

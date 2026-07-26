@@ -300,3 +300,9 @@ iikocloud:
     get_command_status:
       max_requests: 60
       time_window_seconds: 60.0
+    get_customer_transactions_by_date:
+      max_requests: 10
+      time_window_seconds: 60.0
+    get_customer_transactions_by_revision:
+      max_requests: 10
+      time_window_seconds: 60.0

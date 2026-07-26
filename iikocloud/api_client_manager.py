@@ -23,6 +23,7 @@ from iikocloud_client import (
     NotificationsApi,
     OperationsApi,
     OrganizationsApi,
+    ReportApi,
     TerminalGroupsApi,
 )
 
@@ -152,6 +153,7 @@ class IikoCloudApiClientManager(
         self._messages_api: MessagesApi | None = None
         self._notifications_api: NotificationsApi | None = None
         self._operations_api: OperationsApi | None = None
+        self._report_api: ReportApi | None = None
 
         logger.debug(
             "Создан экземпляр IikoCloudApiClientManager для key_id=%s",

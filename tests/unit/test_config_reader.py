@@ -192,6 +192,22 @@ def test_discounts_methods_have_limits() -> None:
         assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
 
 
+def test_report_methods_have_limits() -> None:
+    """2 метода report есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    names = [
+        "get_customer_transactions_by_date",
+        "get_customer_transactions_by_revision",
+    ]
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name in names:
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(
+            10 / 60.0
+        )
+
+
 def test_marketing_sources_method_has_limits() -> None:
     """get_marketing_sources есть в ApiMethod и MethodRateLimits."""
     from iikocloud.mixins._base import ApiMethod, MethodRateLimits
