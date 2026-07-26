@@ -7,6 +7,7 @@ from iikocloud_client import (
     AddressesApi,
     ApiClient,
     AuthorizationApi,
+    BanquetsReservesApi,
     Configuration,
     CustomerCategoriesApi,
     CustomersApi,
@@ -160,6 +161,7 @@ class IikoCloudApiClientManager(
         self._operations_api: OperationsApi | None = None
         self._report_api: ReportApi | None = None
         self._webhooks_api: WebhooksApi | None = None
+        self._banquets_reserves_api: BanquetsReservesApi | None = None
 
         logger.debug(
             "Создан экземпляр IikoCloudApiClientManager для key_id=%s",

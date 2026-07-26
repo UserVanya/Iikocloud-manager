@@ -312,3 +312,39 @@ iikocloud:
     update_webhook_settings:
       max_requests: 1
       time_window_seconds: 60.0
+    get_reserve_available_organizations:
+      max_requests: 20
+      time_window_seconds: 60.0
+    get_reserve_terminal_groups:
+      max_requests: 20
+      time_window_seconds: 60.0
+    get_reserve_restaurant_sections:
+      max_requests: 20
+      time_window_seconds: 60.0
+    get_reserve_statuses_by_id:
+      max_requests: 20
+      time_window_seconds: 60.0
+    get_restaurant_sections_workload:
+      max_requests: 20
+      time_window_seconds: 60.0
+    create_reserve:
+      max_requests: 20
+      time_window_seconds: 60.0
+    add_banquet_order_items:
+      max_requests: 100
+      time_window_seconds: 60.0
+    add_banquet_order_payments:
+      max_requests: 100
+      time_window_seconds: 60.0
+    cancel_reserve:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_banquet_order_items:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_reserve_estimated_start_time:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_reserve_tables:
+      max_requests: 100
+      time_window_seconds: 60.0

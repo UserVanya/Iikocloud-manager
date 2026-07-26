@@ -402,6 +402,44 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=1, time_window_seconds=60.0
     )
 
+    # Banquets & Reserves
+    get_reserve_available_organizations: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    get_reserve_terminal_groups: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    get_reserve_restaurant_sections: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    get_reserve_statuses_by_id: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    get_restaurant_sections_workload: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    create_reserve: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    add_banquet_order_items: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    add_banquet_order_payments: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    cancel_reserve: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_banquet_order_items: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_reserve_estimated_start_time: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_reserve_tables: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

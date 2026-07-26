@@ -13,6 +13,7 @@ from iikocloud_client import (
     AddressesApi,
     ApiClient,
     AuthorizationApi,
+    BanquetsReservesApi,
     Configuration,
     CustomerCategoriesApi,
     CustomersApi,
@@ -224,6 +225,20 @@ class ApiMethod(Enum):
     GET_WEBHOOK_SETTINGS = "get_webhook_settings"
     UPDATE_WEBHOOK_SETTINGS = "update_webhook_settings"
 
+    # Banquets & Reserves
+    GET_RESERVE_AVAILABLE_ORGANIZATIONS = "get_reserve_available_organizations"
+    GET_RESERVE_TERMINAL_GROUPS = "get_reserve_terminal_groups"
+    GET_RESERVE_RESTAURANT_SECTIONS = "get_reserve_restaurant_sections"
+    GET_RESERVE_STATUSES_BY_ID = "get_reserve_statuses_by_id"
+    GET_RESTAURANT_SECTIONS_WORKLOAD = "get_restaurant_sections_workload"
+    CREATE_RESERVE = "create_reserve"
+    ADD_BANQUET_ORDER_ITEMS = "add_banquet_order_items"
+    ADD_BANQUET_ORDER_PAYMENTS = "add_banquet_order_payments"
+    CANCEL_RESERVE = "cancel_reserve"
+    CHANGE_BANQUET_ORDER_ITEMS = "change_banquet_order_items"
+    CHANGE_RESERVE_ESTIMATED_START_TIME = "change_reserve_estimated_start_time"
+    CHANGE_RESERVE_TABLES = "change_reserve_tables"
+
 
 @dataclass
 class ApiCredentials:
@@ -354,6 +369,18 @@ class MethodRateLimits:
     get_customer_transactions_by_revision: RateLimitConfig
     get_webhook_settings: RateLimitConfig
     update_webhook_settings: RateLimitConfig
+    get_reserve_available_organizations: RateLimitConfig
+    get_reserve_terminal_groups: RateLimitConfig
+    get_reserve_restaurant_sections: RateLimitConfig
+    get_reserve_statuses_by_id: RateLimitConfig
+    get_restaurant_sections_workload: RateLimitConfig
+    create_reserve: RateLimitConfig
+    add_banquet_order_items: RateLimitConfig
+    add_banquet_order_payments: RateLimitConfig
+    cancel_reserve: RateLimitConfig
+    change_banquet_order_items: RateLimitConfig
+    change_reserve_estimated_start_time: RateLimitConfig
+    change_reserve_tables: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -428,6 +455,7 @@ class _ManagerBase:
     _operations_api: OperationsApi | None
     _report_api: ReportApi | None
     _webhooks_api: WebhooksApi | None
+    _banquets_reserves_api: BanquetsReservesApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -584,6 +612,15 @@ class _ManagerBase:
         if self._webhooks_api is None:
             self._webhooks_api = WebhooksApi(api_client=self._api_client)
         return self._webhooks_api
+
+    async def get_banquets_reserves_api(self) -> BanquetsReservesApi:
+        """Получить клиент BanquetsReservesApi."""
+        await self._ensure_token_manager()
+        if self._banquets_reserves_api is None:
+            self._banquets_reserves_api = BanquetsReservesApi(
+                api_client=self._api_client
+            )
+        return self._banquets_reserves_api
 
     # ========== Инфраструктура ==========
 
