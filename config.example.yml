@@ -282,3 +282,15 @@ iikocloud:
     close_personal_session:
       max_requests: 100
       time_window_seconds: 60.0
+    check_sms_sending_possibility:
+      max_requests: 10
+      time_window_seconds: 60.0
+    check_sms_status:
+      max_requests: 10
+      time_window_seconds: 60.0
+    send_loyalty_sms:
+      max_requests: 20
+      time_window_seconds: 60.0
+    send_loyalty_email:
+      max_requests: 20
+      time_window_seconds: 60.0

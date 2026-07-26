@@ -362,6 +362,20 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=100, time_window_seconds=60.0
     )
 
+    # Messages
+    check_sms_sending_possibility: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    check_sms_status: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    send_loyalty_sms: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    send_loyalty_email: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

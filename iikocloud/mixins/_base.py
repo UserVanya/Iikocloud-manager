@@ -25,6 +25,7 @@ from iikocloud_client import (
     EmployeesApi,
     MarketingSourcesApi,
     MenuApi,
+    MessagesApi,
     OrganizationsApi,
     TerminalGroupsApi,
 )
@@ -199,6 +200,12 @@ class ApiMethod(Enum):
     OPEN_PERSONAL_SESSION = "open_personal_session"
     CLOSE_PERSONAL_SESSION = "close_personal_session"
 
+    # Messages
+    CHECK_SMS_SENDING_POSSIBILITY = "check_sms_sending_possibility"
+    CHECK_SMS_STATUS = "check_sms_status"
+    SEND_LOYALTY_SMS = "send_loyalty_sms"
+    SEND_LOYALTY_EMAIL = "send_loyalty_email"
+
 
 @dataclass
 class ApiCredentials:
@@ -319,6 +326,10 @@ class MethodRateLimits:
     get_terminal_groups_of_employee: RateLimitConfig
     open_personal_session: RateLimitConfig
     close_personal_session: RateLimitConfig
+    check_sms_sending_possibility: RateLimitConfig
+    check_sms_status: RateLimitConfig
+    send_loyalty_sms: RateLimitConfig
+    send_loyalty_email: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -388,6 +399,7 @@ class _ManagerBase:
     _discounts_and_promotions_api: DiscountsAndPromotionsApi | None
     _marketing_sources_api: MarketingSourcesApi | None
     _employees_api: EmployeesApi | None
+    _messages_api: MessagesApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -509,6 +521,13 @@ class _ManagerBase:
         if self._employees_api is None:
             self._employees_api = EmployeesApi(api_client=self._api_client)
         return self._employees_api
+
+    async def get_messages_api(self) -> MessagesApi:
+        """Получить клиент MessagesApi."""
+        await self._ensure_token_manager()
+        if self._messages_api is None:
+            self._messages_api = MessagesApi(api_client=self._api_client)
+        return self._messages_api
 
     # ========== Инфраструктура ==========
 

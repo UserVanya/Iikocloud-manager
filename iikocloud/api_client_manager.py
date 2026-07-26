@@ -19,6 +19,7 @@ from iikocloud_client import (
     EmployeesApi,
     MarketingSourcesApi,
     MenuApi,
+    MessagesApi,
     OrganizationsApi,
     TerminalGroupsApi,
 )
@@ -140,6 +141,7 @@ class IikoCloudApiClientManager(
         self._discounts_and_promotions_api: DiscountsAndPromotionsApi | None = None
         self._marketing_sources_api: MarketingSourcesApi | None = None
         self._employees_api: EmployeesApi | None = None
+        self._messages_api: MessagesApi | None = None
 
         logger.debug(
             "Создан экземпляр IikoCloudApiClientManager для key_id=%s",

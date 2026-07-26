@@ -203,6 +203,22 @@ def test_marketing_sources_method_has_limits() -> None:
     )
 
 
+def test_messages_methods_have_limits() -> None:
+    """4 метода messages есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    expected = {
+        "check_sms_sending_possibility": 10 / 60.0,
+        "check_sms_status": 10 / 60.0,
+        "send_loyalty_sms": 20 / 60.0,
+        "send_loyalty_email": 20 / 60.0,
+    }
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name, rps in expected.items():
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
+
+
 def test_employees_methods_have_limits() -> None:
     """10 методов employees есть в ApiMethod и MethodRateLimits."""
     from iikocloud.mixins._base import ApiMethod, MethodRateLimits
