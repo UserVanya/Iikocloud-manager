@@ -249,3 +249,6 @@ iikocloud:
     get_non_activated_coupons_by_series:
       max_requests: 10
       time_window_seconds: 60.0
+    get_marketing_sources:
+      max_requests: 1
+      time_window_seconds: 60.0

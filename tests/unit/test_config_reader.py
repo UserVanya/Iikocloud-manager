@@ -190,3 +190,14 @@ def test_discounts_methods_have_limits() -> None:
     for name, rps in expected.items():
         config = limits.for_method(ApiMethod(name))
         assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
+
+
+def test_marketing_sources_method_has_limits() -> None:
+    """get_marketing_sources есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    config = limits.for_method(ApiMethod("get_marketing_sources"))
+    assert config.max_requests / config.time_window_seconds == pytest.approx(
+        1 / 60.0
+    )

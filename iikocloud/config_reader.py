@@ -325,6 +325,11 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=10, time_window_seconds=60.0
     )
 
+    # Marketing Sources
+    get_marketing_sources: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

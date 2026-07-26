@@ -22,6 +22,7 @@ from iikocloud_client import (
     DictionariesApi,
     DiscountsAndPromotionsApi,
     DraftsApi,
+    MarketingSourcesApi,
     MenuApi,
     OrganizationsApi,
     TerminalGroupsApi,
@@ -180,6 +181,9 @@ class ApiMethod(Enum):
     GET_LOYALTY_PROGRAMS = "get_loyalty_programs"
     GET_NON_ACTIVATED_COUPONS_BY_SERIES = "get_non_activated_coupons_by_series"
 
+    # Marketing Sources
+    GET_MARKETING_SOURCES = "get_marketing_sources"
+
 
 @dataclass
 class ApiCredentials:
@@ -289,6 +293,7 @@ class MethodRateLimits:
     get_loyalty_manual_conditions: RateLimitConfig
     get_loyalty_programs: RateLimitConfig
     get_non_activated_coupons_by_series: RateLimitConfig
+    get_marketing_sources: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -356,6 +361,7 @@ class _ManagerBase:
     _drafts_api: DraftsApi | None
     _addresses_api: AddressesApi | None
     _discounts_and_promotions_api: DiscountsAndPromotionsApi | None
+    _marketing_sources_api: MarketingSourcesApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -461,6 +467,15 @@ class _ManagerBase:
                 api_client=self._api_client
             )
         return self._discounts_and_promotions_api
+
+    async def get_marketing_sources_api(self) -> MarketingSourcesApi:
+        """Получить клиент MarketingSourcesApi."""
+        await self._ensure_token_manager()
+        if self._marketing_sources_api is None:
+            self._marketing_sources_api = MarketingSourcesApi(
+                api_client=self._api_client
+            )
+        return self._marketing_sources_api
 
     # ========== Инфраструктура ==========
 
