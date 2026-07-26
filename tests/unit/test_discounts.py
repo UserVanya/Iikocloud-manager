@@ -11,6 +11,7 @@ from iikocloud_client import (
     CouponInfoResponse,
     DeliveryOrderCreatePayload,
     DeliveryOrderCreateProductItem,
+    DeliveryOrderCreateServiceType,
     GetByOrganizationIdRequest,
     GetManualConditionsResponse,
     GetProgramsRequest,
@@ -131,4 +132,4 @@ async def test_calculate_order_loyalty_builds_payload() -> None:
     assert order.items == [item]
     assert order.loyalty_info is not None
     assert order.loyalty_info.coupon == "COUPON1"
-    assert order.order_service_type is not None
+    assert order.order_service_type == DeliveryOrderCreateServiceType.DELIVERYBYCLIENT
