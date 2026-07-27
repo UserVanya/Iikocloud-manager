@@ -345,3 +345,122 @@ def test_orders_methods_have_limits() -> None:
     for name, rps in expected.items():
         config = limits.for_method(ApiMethod(name))
         assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
+
+
+def test_invoice_processing_methods_have_limits() -> None:
+    """93 метода invoice processing есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    read_names = [
+        # get/list документных классов + references — 10/60s
+        "get_inventory_disassemble_document",
+        "list_inventory_disassemble_documents",
+        "get_inventory_incoming_invoice",
+        "list_inventory_incoming_invoices",
+        "get_inventory_incoming_returned_invoice",
+        "list_inventory_incoming_returned_invoices",
+        "get_inventory_internal_transfer",
+        "list_inventory_internal_transfers",
+        "get_inventory_outgoing_invoice",
+        "list_inventory_outgoing_invoices",
+        "get_inventory_production_document",
+        "list_inventory_production_documents",
+        "get_inventory_returned_invoice",
+        "list_inventory_returned_invoices",
+        "get_inventory_sales_document",
+        "list_inventory_sales_documents",
+        "get_inventory_transformation_document",
+        "list_inventory_transformation_documents",
+        "get_inventory_writeoff_document",
+        "list_inventory_writeoff_documents",
+        "get_finance_incoming_service",
+        "list_finance_incoming_services",
+        "get_finance_outgoing_service",
+        "list_finance_outgoing_services",
+        "list_finance_account_transactions",
+        "list_finance_document_transactions",
+        "get_inventory_counteragents",
+    ]
+    mutation_names = [
+        # create/update/post/unpost/cancel/add_payment/set_payment_date/
+        # calculate_cost_prices/update_barcodes — 100/60s
+        "cancel_inventory_disassemble_document",
+        "create_inventory_disassemble_document",
+        "post_inventory_disassemble_document",
+        "unpost_inventory_disassemble_document",
+        "update_inventory_disassemble_document",
+        "add_inventory_incoming_invoice_payment",
+        "cancel_inventory_incoming_invoice",
+        "create_inventory_incoming_invoice",
+        "post_inventory_incoming_invoice",
+        "set_inventory_incoming_invoice_payment_date",
+        "unpost_inventory_incoming_invoice",
+        "update_inventory_incoming_invoice",
+        "cancel_inventory_incoming_returned_invoice",
+        "create_inventory_incoming_returned_invoice",
+        "post_inventory_incoming_returned_invoice",
+        "unpost_inventory_incoming_returned_invoice",
+        "update_inventory_incoming_returned_invoice",
+        "cancel_inventory_internal_transfer",
+        "create_inventory_internal_transfer",
+        "post_inventory_internal_transfer",
+        "unpost_inventory_internal_transfer",
+        "update_inventory_internal_transfer",
+        "add_inventory_outgoing_invoice_payment",
+        "calculate_inventory_cost_prices",
+        "cancel_inventory_outgoing_invoice",
+        "create_inventory_outgoing_invoice",
+        "post_inventory_outgoing_invoice",
+        "set_inventory_outgoing_invoice_payment_date",
+        "unpost_inventory_outgoing_invoice",
+        "update_inventory_outgoing_invoice",
+        "cancel_inventory_production_document",
+        "create_inventory_production_document",
+        "post_inventory_production_document",
+        "unpost_inventory_production_document",
+        "update_inventory_production_document",
+        "cancel_inventory_returned_invoice",
+        "create_inventory_returned_invoice",
+        "post_inventory_returned_invoice",
+        "unpost_inventory_returned_invoice",
+        "update_inventory_returned_invoice",
+        "cancel_inventory_sales_document",
+        "create_inventory_sales_document",
+        "post_inventory_sales_document",
+        "unpost_inventory_sales_document",
+        "update_inventory_sales_document",
+        "cancel_inventory_transformation_document",
+        "create_inventory_transformation_document",
+        "post_inventory_transformation_document",
+        "unpost_inventory_transformation_document",
+        "update_inventory_transformation_document",
+        "cancel_inventory_writeoff_document",
+        "create_inventory_writeoff_document",
+        "post_inventory_writeoff_document",
+        "unpost_inventory_writeoff_document",
+        "update_inventory_writeoff_document",
+        "cancel_finance_incoming_service",
+        "create_finance_incoming_service",
+        "post_finance_incoming_service",
+        "unpost_finance_incoming_service",
+        "update_finance_incoming_service",
+        "cancel_finance_outgoing_service",
+        "create_finance_outgoing_service",
+        "post_finance_outgoing_service",
+        "unpost_finance_outgoing_service",
+        "update_finance_outgoing_service",
+        "update_inventory_product_barcodes",
+    ]
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name in read_names:
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(
+            10 / 60.0
+        )
+    for name in mutation_names:
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(
+            100 / 60.0
+        )
+    # страховка от пропуска: ровно 93 метода
+    assert len(read_names) + len(mutation_names) == 93

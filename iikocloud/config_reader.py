@@ -478,6 +478,303 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=100, time_window_seconds=60.0
     )
 
+    # Invoice Processing
+    # — disassemble_document
+    cancel_inventory_disassemble_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_disassemble_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_disassemble_document: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_disassemble_documents: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_disassemble_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_disassemble_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_disassemble_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — incoming_invoices
+    add_inventory_incoming_invoice_payment: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    cancel_inventory_incoming_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_incoming_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_incoming_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_incoming_invoices: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_incoming_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    set_inventory_incoming_invoice_payment_date: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_incoming_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_incoming_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — incoming_returned_invoice
+    cancel_inventory_incoming_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_incoming_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_incoming_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_incoming_returned_invoices: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_incoming_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_incoming_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_incoming_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — internal_transfer
+    cancel_inventory_internal_transfer: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_internal_transfer: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_internal_transfer: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_internal_transfers: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_internal_transfer: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_internal_transfer: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_internal_transfer: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — outgoing_invoices
+    add_inventory_outgoing_invoice_payment: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    calculate_inventory_cost_prices: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    cancel_inventory_outgoing_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_outgoing_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_outgoing_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_outgoing_invoices: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_outgoing_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    set_inventory_outgoing_invoice_payment_date: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_outgoing_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_outgoing_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — production_document
+    cancel_inventory_production_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_production_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_production_document: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_production_documents: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_production_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_production_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_production_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — returned_invoice
+    cancel_inventory_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_returned_invoices: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_returned_invoice: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — sales_document
+    cancel_inventory_sales_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_sales_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_sales_document: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_sales_documents: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_sales_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_sales_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_sales_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — transformation_document
+    cancel_inventory_transformation_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_transformation_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_transformation_document: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_transformation_documents: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_transformation_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_transformation_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_transformation_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — writeoff_document
+    cancel_inventory_writeoff_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_inventory_writeoff_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_inventory_writeoff_document: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_inventory_writeoff_documents: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_inventory_writeoff_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_inventory_writeoff_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_inventory_writeoff_document: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — incoming_service
+    cancel_finance_incoming_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_finance_incoming_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_finance_incoming_service: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_finance_incoming_services: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_finance_incoming_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_finance_incoming_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_finance_incoming_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — outgoing_service
+    cancel_finance_outgoing_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    create_finance_outgoing_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_finance_outgoing_service: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_finance_outgoing_services: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    post_finance_outgoing_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    unpost_finance_outgoing_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_finance_outgoing_service: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    # — account_transactions
+    list_finance_account_transactions: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    # — document_transactions
+    list_finance_document_transactions: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    # — counteragents
+    get_inventory_counteragents: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    # — invoice_nomenclature
+    update_inventory_product_barcodes: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

@@ -31,6 +31,23 @@ from iikocloud_client import (
     OperationsApi,
     OrdersApi,
     OrganizationsApi,
+    # Invoice Processing
+    PublicApiInvoiceProcessingAccountTransactionsApi,
+    PublicApiInvoiceProcessingCounteragentsApi,
+    PublicApiInvoiceProcessingDisassembleDocumentApi,
+    PublicApiInvoiceProcessingDocumentTransactionsApi,
+    PublicApiInvoiceProcessingIncomingInvoicesApi,
+    PublicApiInvoiceProcessingIncomingReturnedInvoiceApi,
+    PublicApiInvoiceProcessingIncomingServiceApi,
+    PublicApiInvoiceProcessingInternalTransferApi,
+    PublicApiInvoiceProcessingNomenclatureApi,
+    PublicApiInvoiceProcessingOutgoingInvoicesApi,
+    PublicApiInvoiceProcessingOutgoingServiceApi,
+    PublicApiInvoiceProcessingProductionDocumentApi,
+    PublicApiInvoiceProcessingReturnedInvoiceApi,
+    PublicApiInvoiceProcessingSalesDocumentApi,
+    PublicApiInvoiceProcessingTransformationDocumentApi,
+    PublicApiInvoiceProcessingWriteoffDocumentApi,
     ReportApi,
     TerminalGroupsApi,
     WebhooksApi,
@@ -254,6 +271,129 @@ class ApiMethod(Enum):
     INITIALIZE_TABLE_ORDERS_BY_POS_ORDERS = "initialize_table_orders_by_pos_orders"
     INITIALIZE_TABLE_ORDERS_BY_TABLES = "initialize_table_orders_by_tables"
 
+    # Invoice Processing
+    # — disassemble_document
+    CANCEL_INVENTORY_DISASSEMBLE_DOCUMENT = "cancel_inventory_disassemble_document"
+    CREATE_INVENTORY_DISASSEMBLE_DOCUMENT = "create_inventory_disassemble_document"
+    GET_INVENTORY_DISASSEMBLE_DOCUMENT = "get_inventory_disassemble_document"
+    LIST_INVENTORY_DISASSEMBLE_DOCUMENTS = "list_inventory_disassemble_documents"
+    POST_INVENTORY_DISASSEMBLE_DOCUMENT = "post_inventory_disassemble_document"
+    UNPOST_INVENTORY_DISASSEMBLE_DOCUMENT = "unpost_inventory_disassemble_document"
+    UPDATE_INVENTORY_DISASSEMBLE_DOCUMENT = "update_inventory_disassemble_document"
+    # — incoming_invoices
+    ADD_INVENTORY_INCOMING_INVOICE_PAYMENT = "add_inventory_incoming_invoice_payment"
+    CANCEL_INVENTORY_INCOMING_INVOICE = "cancel_inventory_incoming_invoice"
+    CREATE_INVENTORY_INCOMING_INVOICE = "create_inventory_incoming_invoice"
+    GET_INVENTORY_INCOMING_INVOICE = "get_inventory_incoming_invoice"
+    LIST_INVENTORY_INCOMING_INVOICES = "list_inventory_incoming_invoices"
+    POST_INVENTORY_INCOMING_INVOICE = "post_inventory_incoming_invoice"
+    SET_INVENTORY_INCOMING_INVOICE_PAYMENT_DATE = (
+        "set_inventory_incoming_invoice_payment_date"
+    )
+    UNPOST_INVENTORY_INCOMING_INVOICE = "unpost_inventory_incoming_invoice"
+    UPDATE_INVENTORY_INCOMING_INVOICE = "update_inventory_incoming_invoice"
+    # — incoming_returned_invoice
+    CANCEL_INVENTORY_INCOMING_RETURNED_INVOICE = (
+        "cancel_inventory_incoming_returned_invoice"
+    )
+    CREATE_INVENTORY_INCOMING_RETURNED_INVOICE = (
+        "create_inventory_incoming_returned_invoice"
+    )
+    GET_INVENTORY_INCOMING_RETURNED_INVOICE = "get_inventory_incoming_returned_invoice"
+    LIST_INVENTORY_INCOMING_RETURNED_INVOICES = "list_inventory_incoming_returned_invoices"
+    POST_INVENTORY_INCOMING_RETURNED_INVOICE = "post_inventory_incoming_returned_invoice"
+    UNPOST_INVENTORY_INCOMING_RETURNED_INVOICE = (
+        "unpost_inventory_incoming_returned_invoice"
+    )
+    UPDATE_INVENTORY_INCOMING_RETURNED_INVOICE = (
+        "update_inventory_incoming_returned_invoice"
+    )
+    # — internal_transfer
+    CANCEL_INVENTORY_INTERNAL_TRANSFER = "cancel_inventory_internal_transfer"
+    CREATE_INVENTORY_INTERNAL_TRANSFER = "create_inventory_internal_transfer"
+    GET_INVENTORY_INTERNAL_TRANSFER = "get_inventory_internal_transfer"
+    LIST_INVENTORY_INTERNAL_TRANSFERS = "list_inventory_internal_transfers"
+    POST_INVENTORY_INTERNAL_TRANSFER = "post_inventory_internal_transfer"
+    UNPOST_INVENTORY_INTERNAL_TRANSFER = "unpost_inventory_internal_transfer"
+    UPDATE_INVENTORY_INTERNAL_TRANSFER = "update_inventory_internal_transfer"
+    # — outgoing_invoices
+    ADD_INVENTORY_OUTGOING_INVOICE_PAYMENT = "add_inventory_outgoing_invoice_payment"
+    CALCULATE_INVENTORY_COST_PRICES = "calculate_inventory_cost_prices"
+    CANCEL_INVENTORY_OUTGOING_INVOICE = "cancel_inventory_outgoing_invoice"
+    CREATE_INVENTORY_OUTGOING_INVOICE = "create_inventory_outgoing_invoice"
+    GET_INVENTORY_OUTGOING_INVOICE = "get_inventory_outgoing_invoice"
+    LIST_INVENTORY_OUTGOING_INVOICES = "list_inventory_outgoing_invoices"
+    POST_INVENTORY_OUTGOING_INVOICE = "post_inventory_outgoing_invoice"
+    SET_INVENTORY_OUTGOING_INVOICE_PAYMENT_DATE = (
+        "set_inventory_outgoing_invoice_payment_date"
+    )
+    UNPOST_INVENTORY_OUTGOING_INVOICE = "unpost_inventory_outgoing_invoice"
+    UPDATE_INVENTORY_OUTGOING_INVOICE = "update_inventory_outgoing_invoice"
+    # — production_document
+    CANCEL_INVENTORY_PRODUCTION_DOCUMENT = "cancel_inventory_production_document"
+    CREATE_INVENTORY_PRODUCTION_DOCUMENT = "create_inventory_production_document"
+    GET_INVENTORY_PRODUCTION_DOCUMENT = "get_inventory_production_document"
+    LIST_INVENTORY_PRODUCTION_DOCUMENTS = "list_inventory_production_documents"
+    POST_INVENTORY_PRODUCTION_DOCUMENT = "post_inventory_production_document"
+    UNPOST_INVENTORY_PRODUCTION_DOCUMENT = "unpost_inventory_production_document"
+    UPDATE_INVENTORY_PRODUCTION_DOCUMENT = "update_inventory_production_document"
+    # — returned_invoice
+    CANCEL_INVENTORY_RETURNED_INVOICE = "cancel_inventory_returned_invoice"
+    CREATE_INVENTORY_RETURNED_INVOICE = "create_inventory_returned_invoice"
+    GET_INVENTORY_RETURNED_INVOICE = "get_inventory_returned_invoice"
+    LIST_INVENTORY_RETURNED_INVOICES = "list_inventory_returned_invoices"
+    POST_INVENTORY_RETURNED_INVOICE = "post_inventory_returned_invoice"
+    UNPOST_INVENTORY_RETURNED_INVOICE = "unpost_inventory_returned_invoice"
+    UPDATE_INVENTORY_RETURNED_INVOICE = "update_inventory_returned_invoice"
+    # — sales_document
+    CANCEL_INVENTORY_SALES_DOCUMENT = "cancel_inventory_sales_document"
+    CREATE_INVENTORY_SALES_DOCUMENT = "create_inventory_sales_document"
+    GET_INVENTORY_SALES_DOCUMENT = "get_inventory_sales_document"
+    LIST_INVENTORY_SALES_DOCUMENTS = "list_inventory_sales_documents"
+    POST_INVENTORY_SALES_DOCUMENT = "post_inventory_sales_document"
+    UNPOST_INVENTORY_SALES_DOCUMENT = "unpost_inventory_sales_document"
+    UPDATE_INVENTORY_SALES_DOCUMENT = "update_inventory_sales_document"
+    # — transformation_document
+    CANCEL_INVENTORY_TRANSFORMATION_DOCUMENT = "cancel_inventory_transformation_document"
+    CREATE_INVENTORY_TRANSFORMATION_DOCUMENT = "create_inventory_transformation_document"
+    GET_INVENTORY_TRANSFORMATION_DOCUMENT = "get_inventory_transformation_document"
+    LIST_INVENTORY_TRANSFORMATION_DOCUMENTS = "list_inventory_transformation_documents"
+    POST_INVENTORY_TRANSFORMATION_DOCUMENT = "post_inventory_transformation_document"
+    UNPOST_INVENTORY_TRANSFORMATION_DOCUMENT = "unpost_inventory_transformation_document"
+    UPDATE_INVENTORY_TRANSFORMATION_DOCUMENT = "update_inventory_transformation_document"
+    # — writeoff_document
+    CANCEL_INVENTORY_WRITEOFF_DOCUMENT = "cancel_inventory_writeoff_document"
+    CREATE_INVENTORY_WRITEOFF_DOCUMENT = "create_inventory_writeoff_document"
+    GET_INVENTORY_WRITEOFF_DOCUMENT = "get_inventory_writeoff_document"
+    LIST_INVENTORY_WRITEOFF_DOCUMENTS = "list_inventory_writeoff_documents"
+    POST_INVENTORY_WRITEOFF_DOCUMENT = "post_inventory_writeoff_document"
+    UNPOST_INVENTORY_WRITEOFF_DOCUMENT = "unpost_inventory_writeoff_document"
+    UPDATE_INVENTORY_WRITEOFF_DOCUMENT = "update_inventory_writeoff_document"
+    # — incoming_service
+    CANCEL_FINANCE_INCOMING_SERVICE = "cancel_finance_incoming_service"
+    CREATE_FINANCE_INCOMING_SERVICE = "create_finance_incoming_service"
+    GET_FINANCE_INCOMING_SERVICE = "get_finance_incoming_service"
+    LIST_FINANCE_INCOMING_SERVICES = "list_finance_incoming_services"
+    POST_FINANCE_INCOMING_SERVICE = "post_finance_incoming_service"
+    UNPOST_FINANCE_INCOMING_SERVICE = "unpost_finance_incoming_service"
+    UPDATE_FINANCE_INCOMING_SERVICE = "update_finance_incoming_service"
+    # — outgoing_service
+    CANCEL_FINANCE_OUTGOING_SERVICE = "cancel_finance_outgoing_service"
+    CREATE_FINANCE_OUTGOING_SERVICE = "create_finance_outgoing_service"
+    GET_FINANCE_OUTGOING_SERVICE = "get_finance_outgoing_service"
+    LIST_FINANCE_OUTGOING_SERVICES = "list_finance_outgoing_services"
+    POST_FINANCE_OUTGOING_SERVICE = "post_finance_outgoing_service"
+    UNPOST_FINANCE_OUTGOING_SERVICE = "unpost_finance_outgoing_service"
+    UPDATE_FINANCE_OUTGOING_SERVICE = "update_finance_outgoing_service"
+    # — account_transactions
+    LIST_FINANCE_ACCOUNT_TRANSACTIONS = "list_finance_account_transactions"
+    # — document_transactions
+    LIST_FINANCE_DOCUMENT_TRANSACTIONS = "list_finance_document_transactions"
+    # — counteragents
+    GET_INVENTORY_COUNTERAGENTS = "get_inventory_counteragents"
+    # — invoice_nomenclature
+    UPDATE_INVENTORY_PRODUCT_BARCODES = "update_inventory_product_barcodes"
+
 
 @dataclass
 class ApiCredentials:
@@ -409,6 +549,117 @@ class MethodRateLimits:
     initialize_table_orders_by_pos_orders: RateLimitConfig
     initialize_table_orders_by_tables: RateLimitConfig
 
+    # Invoice Processing
+    # — disassemble_document
+    cancel_inventory_disassemble_document: RateLimitConfig
+    create_inventory_disassemble_document: RateLimitConfig
+    get_inventory_disassemble_document: RateLimitConfig
+    list_inventory_disassemble_documents: RateLimitConfig
+    post_inventory_disassemble_document: RateLimitConfig
+    unpost_inventory_disassemble_document: RateLimitConfig
+    update_inventory_disassemble_document: RateLimitConfig
+    # — incoming_invoices
+    add_inventory_incoming_invoice_payment: RateLimitConfig
+    cancel_inventory_incoming_invoice: RateLimitConfig
+    create_inventory_incoming_invoice: RateLimitConfig
+    get_inventory_incoming_invoice: RateLimitConfig
+    list_inventory_incoming_invoices: RateLimitConfig
+    post_inventory_incoming_invoice: RateLimitConfig
+    set_inventory_incoming_invoice_payment_date: RateLimitConfig
+    unpost_inventory_incoming_invoice: RateLimitConfig
+    update_inventory_incoming_invoice: RateLimitConfig
+    # — incoming_returned_invoice
+    cancel_inventory_incoming_returned_invoice: RateLimitConfig
+    create_inventory_incoming_returned_invoice: RateLimitConfig
+    get_inventory_incoming_returned_invoice: RateLimitConfig
+    list_inventory_incoming_returned_invoices: RateLimitConfig
+    post_inventory_incoming_returned_invoice: RateLimitConfig
+    unpost_inventory_incoming_returned_invoice: RateLimitConfig
+    update_inventory_incoming_returned_invoice: RateLimitConfig
+    # — internal_transfer
+    cancel_inventory_internal_transfer: RateLimitConfig
+    create_inventory_internal_transfer: RateLimitConfig
+    get_inventory_internal_transfer: RateLimitConfig
+    list_inventory_internal_transfers: RateLimitConfig
+    post_inventory_internal_transfer: RateLimitConfig
+    unpost_inventory_internal_transfer: RateLimitConfig
+    update_inventory_internal_transfer: RateLimitConfig
+    # — outgoing_invoices
+    add_inventory_outgoing_invoice_payment: RateLimitConfig
+    calculate_inventory_cost_prices: RateLimitConfig
+    cancel_inventory_outgoing_invoice: RateLimitConfig
+    create_inventory_outgoing_invoice: RateLimitConfig
+    get_inventory_outgoing_invoice: RateLimitConfig
+    list_inventory_outgoing_invoices: RateLimitConfig
+    post_inventory_outgoing_invoice: RateLimitConfig
+    set_inventory_outgoing_invoice_payment_date: RateLimitConfig
+    unpost_inventory_outgoing_invoice: RateLimitConfig
+    update_inventory_outgoing_invoice: RateLimitConfig
+    # — production_document
+    cancel_inventory_production_document: RateLimitConfig
+    create_inventory_production_document: RateLimitConfig
+    get_inventory_production_document: RateLimitConfig
+    list_inventory_production_documents: RateLimitConfig
+    post_inventory_production_document: RateLimitConfig
+    unpost_inventory_production_document: RateLimitConfig
+    update_inventory_production_document: RateLimitConfig
+    # — returned_invoice
+    cancel_inventory_returned_invoice: RateLimitConfig
+    create_inventory_returned_invoice: RateLimitConfig
+    get_inventory_returned_invoice: RateLimitConfig
+    list_inventory_returned_invoices: RateLimitConfig
+    post_inventory_returned_invoice: RateLimitConfig
+    unpost_inventory_returned_invoice: RateLimitConfig
+    update_inventory_returned_invoice: RateLimitConfig
+    # — sales_document
+    cancel_inventory_sales_document: RateLimitConfig
+    create_inventory_sales_document: RateLimitConfig
+    get_inventory_sales_document: RateLimitConfig
+    list_inventory_sales_documents: RateLimitConfig
+    post_inventory_sales_document: RateLimitConfig
+    unpost_inventory_sales_document: RateLimitConfig
+    update_inventory_sales_document: RateLimitConfig
+    # — transformation_document
+    cancel_inventory_transformation_document: RateLimitConfig
+    create_inventory_transformation_document: RateLimitConfig
+    get_inventory_transformation_document: RateLimitConfig
+    list_inventory_transformation_documents: RateLimitConfig
+    post_inventory_transformation_document: RateLimitConfig
+    unpost_inventory_transformation_document: RateLimitConfig
+    update_inventory_transformation_document: RateLimitConfig
+    # — writeoff_document
+    cancel_inventory_writeoff_document: RateLimitConfig
+    create_inventory_writeoff_document: RateLimitConfig
+    get_inventory_writeoff_document: RateLimitConfig
+    list_inventory_writeoff_documents: RateLimitConfig
+    post_inventory_writeoff_document: RateLimitConfig
+    unpost_inventory_writeoff_document: RateLimitConfig
+    update_inventory_writeoff_document: RateLimitConfig
+    # — incoming_service
+    cancel_finance_incoming_service: RateLimitConfig
+    create_finance_incoming_service: RateLimitConfig
+    get_finance_incoming_service: RateLimitConfig
+    list_finance_incoming_services: RateLimitConfig
+    post_finance_incoming_service: RateLimitConfig
+    unpost_finance_incoming_service: RateLimitConfig
+    update_finance_incoming_service: RateLimitConfig
+    # — outgoing_service
+    cancel_finance_outgoing_service: RateLimitConfig
+    create_finance_outgoing_service: RateLimitConfig
+    get_finance_outgoing_service: RateLimitConfig
+    list_finance_outgoing_services: RateLimitConfig
+    post_finance_outgoing_service: RateLimitConfig
+    unpost_finance_outgoing_service: RateLimitConfig
+    update_finance_outgoing_service: RateLimitConfig
+    # — account_transactions
+    list_finance_account_transactions: RateLimitConfig
+    # — document_transactions
+    list_finance_document_transactions: RateLimitConfig
+    # — counteragents
+    get_inventory_counteragents: RateLimitConfig
+    # — invoice_nomenclature
+    update_inventory_product_barcodes: RateLimitConfig
+
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
         """Создать из Pydantic settings (имена полей совпадают 1:1)."""
@@ -484,6 +735,26 @@ class _ManagerBase:
     _webhooks_api: WebhooksApi | None
     _banquets_reserves_api: BanquetsReservesApi | None
     _orders_api: OrdersApi | None
+
+    # Invoice Processing
+    _disassemble_document_api: PublicApiInvoiceProcessingDisassembleDocumentApi | None
+    _incoming_invoices_api: PublicApiInvoiceProcessingIncomingInvoicesApi | None
+    _incoming_returned_invoice_api: (
+        PublicApiInvoiceProcessingIncomingReturnedInvoiceApi | None
+    )
+    _internal_transfer_api: PublicApiInvoiceProcessingInternalTransferApi | None
+    _outgoing_invoices_api: PublicApiInvoiceProcessingOutgoingInvoicesApi | None
+    _production_document_api: PublicApiInvoiceProcessingProductionDocumentApi | None
+    _returned_invoice_api: PublicApiInvoiceProcessingReturnedInvoiceApi | None
+    _sales_document_api: PublicApiInvoiceProcessingSalesDocumentApi | None
+    _transformation_document_api: PublicApiInvoiceProcessingTransformationDocumentApi | None
+    _writeoff_document_api: PublicApiInvoiceProcessingWriteoffDocumentApi | None
+    _incoming_service_api: PublicApiInvoiceProcessingIncomingServiceApi | None
+    _outgoing_service_api: PublicApiInvoiceProcessingOutgoingServiceApi | None
+    _account_transactions_api: PublicApiInvoiceProcessingAccountTransactionsApi | None
+    _document_transactions_api: PublicApiInvoiceProcessingDocumentTransactionsApi | None
+    _counteragents_api: PublicApiInvoiceProcessingCounteragentsApi | None
+    _invoice_nomenclature_api: PublicApiInvoiceProcessingNomenclatureApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -656,6 +927,216 @@ class _ManagerBase:
         if self._orders_api is None:
             self._orders_api = OrdersApi(api_client=self._api_client)
         return self._orders_api
+
+    # ========== Lazy-геттеры Invoice Processing ==========
+
+    async def get_disassemble_document_api(
+        self,
+    ) -> PublicApiInvoiceProcessingDisassembleDocumentApi:
+        """Получить клиент PublicApiInvoiceProcessingDisassembleDocumentApi."""
+        await self._ensure_token_manager()
+        if self._disassemble_document_api is None:
+            self._disassemble_document_api = (
+                PublicApiInvoiceProcessingDisassembleDocumentApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._disassemble_document_api
+
+    async def get_incoming_invoices_api(
+        self,
+    ) -> PublicApiInvoiceProcessingIncomingInvoicesApi:
+        """Получить клиент PublicApiInvoiceProcessingIncomingInvoicesApi."""
+        await self._ensure_token_manager()
+        if self._incoming_invoices_api is None:
+            self._incoming_invoices_api = (
+                PublicApiInvoiceProcessingIncomingInvoicesApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._incoming_invoices_api
+
+    async def get_incoming_returned_invoice_api(
+        self,
+    ) -> PublicApiInvoiceProcessingIncomingReturnedInvoiceApi:
+        """Получить клиент PublicApiInvoiceProcessingIncomingReturnedInvoiceApi."""
+        await self._ensure_token_manager()
+        if self._incoming_returned_invoice_api is None:
+            self._incoming_returned_invoice_api = (
+                PublicApiInvoiceProcessingIncomingReturnedInvoiceApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._incoming_returned_invoice_api
+
+    async def get_internal_transfer_api(
+        self,
+    ) -> PublicApiInvoiceProcessingInternalTransferApi:
+        """Получить клиент PublicApiInvoiceProcessingInternalTransferApi."""
+        await self._ensure_token_manager()
+        if self._internal_transfer_api is None:
+            self._internal_transfer_api = (
+                PublicApiInvoiceProcessingInternalTransferApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._internal_transfer_api
+
+    async def get_outgoing_invoices_api(
+        self,
+    ) -> PublicApiInvoiceProcessingOutgoingInvoicesApi:
+        """Получить клиент PublicApiInvoiceProcessingOutgoingInvoicesApi."""
+        await self._ensure_token_manager()
+        if self._outgoing_invoices_api is None:
+            self._outgoing_invoices_api = (
+                PublicApiInvoiceProcessingOutgoingInvoicesApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._outgoing_invoices_api
+
+    async def get_production_document_api(
+        self,
+    ) -> PublicApiInvoiceProcessingProductionDocumentApi:
+        """Получить клиент PublicApiInvoiceProcessingProductionDocumentApi."""
+        await self._ensure_token_manager()
+        if self._production_document_api is None:
+            self._production_document_api = (
+                PublicApiInvoiceProcessingProductionDocumentApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._production_document_api
+
+    async def get_returned_invoice_api(
+        self,
+    ) -> PublicApiInvoiceProcessingReturnedInvoiceApi:
+        """Получить клиент PublicApiInvoiceProcessingReturnedInvoiceApi."""
+        await self._ensure_token_manager()
+        if self._returned_invoice_api is None:
+            self._returned_invoice_api = (
+                PublicApiInvoiceProcessingReturnedInvoiceApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._returned_invoice_api
+
+    async def get_sales_document_api(
+        self,
+    ) -> PublicApiInvoiceProcessingSalesDocumentApi:
+        """Получить клиент PublicApiInvoiceProcessingSalesDocumentApi."""
+        await self._ensure_token_manager()
+        if self._sales_document_api is None:
+            self._sales_document_api = (
+                PublicApiInvoiceProcessingSalesDocumentApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._sales_document_api
+
+    async def get_transformation_document_api(
+        self,
+    ) -> PublicApiInvoiceProcessingTransformationDocumentApi:
+        """Получить клиент PublicApiInvoiceProcessingTransformationDocumentApi."""
+        await self._ensure_token_manager()
+        if self._transformation_document_api is None:
+            self._transformation_document_api = (
+                PublicApiInvoiceProcessingTransformationDocumentApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._transformation_document_api
+
+    async def get_writeoff_document_api(
+        self,
+    ) -> PublicApiInvoiceProcessingWriteoffDocumentApi:
+        """Получить клиент PublicApiInvoiceProcessingWriteoffDocumentApi."""
+        await self._ensure_token_manager()
+        if self._writeoff_document_api is None:
+            self._writeoff_document_api = (
+                PublicApiInvoiceProcessingWriteoffDocumentApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._writeoff_document_api
+
+    async def get_incoming_service_api(
+        self,
+    ) -> PublicApiInvoiceProcessingIncomingServiceApi:
+        """Получить клиент PublicApiInvoiceProcessingIncomingServiceApi."""
+        await self._ensure_token_manager()
+        if self._incoming_service_api is None:
+            self._incoming_service_api = (
+                PublicApiInvoiceProcessingIncomingServiceApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._incoming_service_api
+
+    async def get_outgoing_service_api(
+        self,
+    ) -> PublicApiInvoiceProcessingOutgoingServiceApi:
+        """Получить клиент PublicApiInvoiceProcessingOutgoingServiceApi."""
+        await self._ensure_token_manager()
+        if self._outgoing_service_api is None:
+            self._outgoing_service_api = (
+                PublicApiInvoiceProcessingOutgoingServiceApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._outgoing_service_api
+
+    async def get_account_transactions_api(
+        self,
+    ) -> PublicApiInvoiceProcessingAccountTransactionsApi:
+        """Получить клиент PublicApiInvoiceProcessingAccountTransactionsApi."""
+        await self._ensure_token_manager()
+        if self._account_transactions_api is None:
+            self._account_transactions_api = (
+                PublicApiInvoiceProcessingAccountTransactionsApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._account_transactions_api
+
+    async def get_document_transactions_api(
+        self,
+    ) -> PublicApiInvoiceProcessingDocumentTransactionsApi:
+        """Получить клиент PublicApiInvoiceProcessingDocumentTransactionsApi."""
+        await self._ensure_token_manager()
+        if self._document_transactions_api is None:
+            self._document_transactions_api = (
+                PublicApiInvoiceProcessingDocumentTransactionsApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._document_transactions_api
+
+    async def get_counteragents_api(
+        self,
+    ) -> PublicApiInvoiceProcessingCounteragentsApi:
+        """Получить клиент PublicApiInvoiceProcessingCounteragentsApi."""
+        await self._ensure_token_manager()
+        if self._counteragents_api is None:
+            self._counteragents_api = (
+                PublicApiInvoiceProcessingCounteragentsApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._counteragents_api
+
+    async def get_invoice_nomenclature_api(
+        self,
+    ) -> PublicApiInvoiceProcessingNomenclatureApi:
+        """Получить клиент PublicApiInvoiceProcessingNomenclatureApi."""
+        await self._ensure_token_manager()
+        if self._invoice_nomenclature_api is None:
+            self._invoice_nomenclature_api = (
+                PublicApiInvoiceProcessingNomenclatureApi(
+                    api_client=self._api_client
+                )
+            )
+        return self._invoice_nomenclature_api
 
     # ========== Инфраструктура ==========
 
