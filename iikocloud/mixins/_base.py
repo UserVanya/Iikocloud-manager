@@ -29,6 +29,7 @@ from iikocloud_client import (
     MessagesApi,
     NotificationsApi,
     OperationsApi,
+    OrdersApi,
     OrganizationsApi,
     ReportApi,
     TerminalGroupsApi,
@@ -239,6 +240,20 @@ class ApiMethod(Enum):
     CHANGE_RESERVE_ESTIMATED_START_TIME = "change_reserve_estimated_start_time"
     CHANGE_RESERVE_TABLES = "change_reserve_tables"
 
+    # Orders
+    CREATE_TABLE_ORDER = "create_table_order"
+    ADD_CUSTOMER_TO_TABLE_ORDER = "add_customer_to_table_order"
+    ADD_ITEMS_TO_TABLE_ORDER = "add_items_to_table_order"
+    ADD_TABLE_ORDER_PAYMENTS = "add_table_order_payments"
+    CANCEL_TABLE_ORDER = "cancel_table_order"
+    CHANGE_TABLE_ORDER_EXTERNAL_DATA = "change_table_order_external_data"
+    CHANGE_TABLE_ORDER_PAYMENTS = "change_table_order_payments"
+    CLOSE_TABLE_ORDER = "close_table_order"
+    GET_TABLE_ORDERS_BY_ID = "get_table_orders_by_id"
+    GET_TABLE_ORDERS_BY_TABLE = "get_table_orders_by_table"
+    INITIALIZE_TABLE_ORDERS_BY_POS_ORDERS = "initialize_table_orders_by_pos_orders"
+    INITIALIZE_TABLE_ORDERS_BY_TABLES = "initialize_table_orders_by_tables"
+
 
 @dataclass
 class ApiCredentials:
@@ -381,6 +396,18 @@ class MethodRateLimits:
     change_banquet_order_items: RateLimitConfig
     change_reserve_estimated_start_time: RateLimitConfig
     change_reserve_tables: RateLimitConfig
+    create_table_order: RateLimitConfig
+    add_customer_to_table_order: RateLimitConfig
+    add_items_to_table_order: RateLimitConfig
+    add_table_order_payments: RateLimitConfig
+    cancel_table_order: RateLimitConfig
+    change_table_order_external_data: RateLimitConfig
+    change_table_order_payments: RateLimitConfig
+    close_table_order: RateLimitConfig
+    get_table_orders_by_id: RateLimitConfig
+    get_table_orders_by_table: RateLimitConfig
+    initialize_table_orders_by_pos_orders: RateLimitConfig
+    initialize_table_orders_by_tables: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -456,6 +483,7 @@ class _ManagerBase:
     _report_api: ReportApi | None
     _webhooks_api: WebhooksApi | None
     _banquets_reserves_api: BanquetsReservesApi | None
+    _orders_api: OrdersApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -621,6 +649,13 @@ class _ManagerBase:
                 api_client=self._api_client
             )
         return self._banquets_reserves_api
+
+    async def get_orders_api(self) -> OrdersApi:
+        """Получить клиент OrdersApi."""
+        await self._ensure_token_manager()
+        if self._orders_api is None:
+            self._orders_api = OrdersApi(api_client=self._api_client)
+        return self._orders_api
 
     # ========== Инфраструктура ==========
 

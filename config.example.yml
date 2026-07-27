@@ -348,3 +348,39 @@ iikocloud:
     change_reserve_tables:
       max_requests: 100
       time_window_seconds: 60.0
+    create_table_order:
+      max_requests: 20
+      time_window_seconds: 60.0
+    add_customer_to_table_order:
+      max_requests: 100
+      time_window_seconds: 60.0
+    add_items_to_table_order:
+      max_requests: 100
+      time_window_seconds: 60.0
+    add_table_order_payments:
+      max_requests: 100
+      time_window_seconds: 60.0
+    cancel_table_order:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_table_order_external_data:
+      max_requests: 100
+      time_window_seconds: 60.0
+    change_table_order_payments:
+      max_requests: 100
+      time_window_seconds: 60.0
+    close_table_order:
+      max_requests: 100
+      time_window_seconds: 60.0
+    get_table_orders_by_id:
+      max_requests: 20
+      time_window_seconds: 60.0
+    get_table_orders_by_table:
+      max_requests: 20
+      time_window_seconds: 60.0
+    initialize_table_orders_by_pos_orders:
+      max_requests: 100
+      time_window_seconds: 60.0
+    initialize_table_orders_by_tables:
+      max_requests: 100
+      time_window_seconds: 60.0

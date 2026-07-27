@@ -440,6 +440,44 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=100, time_window_seconds=60.0
     )
 
+    # Orders
+    create_table_order: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    add_customer_to_table_order: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    add_items_to_table_order: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    add_table_order_payments: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    cancel_table_order: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_table_order_external_data: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    change_table_order_payments: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    close_table_order: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_table_orders_by_id: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    get_table_orders_by_table: RateLimitSettings = RateLimitSettings(
+        max_requests=20, time_window_seconds=60.0
+    )
+    initialize_table_orders_by_pos_orders: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    initialize_table_orders_by_tables: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+
     def compute_global_limit(self) -> RateLimitSettings:
         """Вычислить глобальный лимит как самый свободный из всех методов.
 

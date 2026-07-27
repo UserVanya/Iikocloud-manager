@@ -319,3 +319,29 @@ def test_banquets_methods_have_limits() -> None:
     for name, rps in expected.items():
         config = limits.for_method(ApiMethod(name))
         assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
+
+
+def test_orders_methods_have_limits() -> None:
+    """12 методов orders есть в ApiMethod и MethodRateLimits."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    read_names = ["get_table_orders_by_id", "get_table_orders_by_table"]
+    mutation_names = [
+        "add_customer_to_table_order",
+        "add_items_to_table_order",
+        "add_table_order_payments",
+        "change_table_order_payments",
+        "change_table_order_external_data",
+        "close_table_order",
+        "cancel_table_order",
+        "initialize_table_orders_by_pos_orders",
+        "initialize_table_orders_by_tables",
+    ]
+    expected = {"create_table_order": 20 / 60.0}
+    expected.update({name: 20 / 60.0 for name in read_names})
+    expected.update({name: 100 / 60.0 for name in mutation_names})
+
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name, rps in expected.items():
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
