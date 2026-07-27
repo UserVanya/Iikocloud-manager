@@ -69,20 +69,9 @@ from iikocloud.mixins.discounts.helpers import DiscountsHelpersMixin
 from iikocloud.mixins.drafts.helpers import DraftsHelpersMixin
 from iikocloud.mixins.employees.helpers import EmployeesHelpersMixin
 from iikocloud.mixins.invoice_processing import (
-    # Invoice Processing: interim registration of core mixins directly.
-    # Task 5 replaces these with InvoiceProcessingHelpersMixin.
-    DisassembleCoreMixin,
-    IncomingInvoicesCoreMixin,
-    IncomingReturnedCoreMixin,
-    IncomingServiceCoreMixin,
-    InternalTransferCoreMixin,
-    OutgoingInvoicesCoreMixin,
-    OutgoingServiceCoreMixin,
-    ProductionCoreMixin,
-    ReturnedCoreMixin,
-    SalesCoreMixin,
-    TransformationCoreMixin,
-    WriteoffCoreMixin,
+    # Invoice Processing: единая точка входа блока — helpers-миксин,
+    # наследующий все 16 core-миксинов домена.
+    InvoiceProcessingHelpersMixin,
 )
 from iikocloud.mixins.marketing_sources.helpers import MarketingSourcesHelpersMixin
 from iikocloud.mixins.menu.helpers import MenuHelpersMixin
@@ -130,18 +119,7 @@ class IikoCloudApiClientManager(
     WebhooksHelpersMixin,
     BanquetsHelpersMixin,
     OrdersHelpersMixin,
-    IncomingInvoicesCoreMixin,
-    OutgoingInvoicesCoreMixin,
-    DisassembleCoreMixin,
-    ProductionCoreMixin,
-    TransformationCoreMixin,
-    WriteoffCoreMixin,
-    IncomingReturnedCoreMixin,
-    InternalTransferCoreMixin,
-    ReturnedCoreMixin,
-    SalesCoreMixin,
-    IncomingServiceCoreMixin,
-    OutgoingServiceCoreMixin,
+    InvoiceProcessingHelpersMixin,
     _ManagerBase,
 ):
     """Multitone-фасад для работы с iikocloud API.
@@ -151,10 +129,8 @@ class IikoCloudApiClientManager(
     terminal_groups, menu, dictionaries, deliveries, deliveries_retrieve,
     delivery_restrictions, drafts, addresses, discounts, marketing_sources,
     employees, messages, notifications, operations, report, webhooks, banquets,
-    orders, invoice_processing (incoming/outgoing invoices + disassemble/
-    production/transformation/writeoff documents + incoming_returned/
-    internal_transfer/returned/sales documents + incoming/outgoing services
-    core — interim, до helpers-миксина).
+    orders, invoice_processing (все 16 сущностей домена через
+    InvoiceProcessingHelpersMixin).
 
     Конкурентность:
         Экземпляр безопасен для параллельных вызовов из нескольких задач
