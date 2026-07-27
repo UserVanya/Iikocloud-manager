@@ -73,8 +73,14 @@ from iikocloud.mixins.invoice_processing import (
     # Task 5 replaces these with InvoiceProcessingHelpersMixin.
     DisassembleCoreMixin,
     IncomingInvoicesCoreMixin,
+    IncomingReturnedCoreMixin,
+    IncomingServiceCoreMixin,
+    InternalTransferCoreMixin,
     OutgoingInvoicesCoreMixin,
+    OutgoingServiceCoreMixin,
     ProductionCoreMixin,
+    ReturnedCoreMixin,
+    SalesCoreMixin,
     TransformationCoreMixin,
     WriteoffCoreMixin,
 )
@@ -130,6 +136,12 @@ class IikoCloudApiClientManager(
     ProductionCoreMixin,
     TransformationCoreMixin,
     WriteoffCoreMixin,
+    IncomingReturnedCoreMixin,
+    InternalTransferCoreMixin,
+    ReturnedCoreMixin,
+    SalesCoreMixin,
+    IncomingServiceCoreMixin,
+    OutgoingServiceCoreMixin,
     _ManagerBase,
 ):
     """Multitone-фасад для работы с iikocloud API.
@@ -140,8 +152,9 @@ class IikoCloudApiClientManager(
     delivery_restrictions, drafts, addresses, discounts, marketing_sources,
     employees, messages, notifications, operations, report, webhooks, banquets,
     orders, invoice_processing (incoming/outgoing invoices + disassemble/
-    production/transformation/writeoff documents core — interim,
-    до helpers-миксина).
+    production/transformation/writeoff documents + incoming_returned/
+    internal_transfer/returned/sales documents + incoming/outgoing services
+    core — interim, до helpers-миксина).
 
     Конкурентность:
         Экземпляр безопасен для параллельных вызовов из нескольких задач
