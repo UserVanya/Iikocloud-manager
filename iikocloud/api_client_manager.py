@@ -68,6 +68,12 @@ from iikocloud.mixins.dictionaries.helpers import DictionariesHelpersMixin
 from iikocloud.mixins.discounts.helpers import DiscountsHelpersMixin
 from iikocloud.mixins.drafts.helpers import DraftsHelpersMixin
 from iikocloud.mixins.employees.helpers import EmployeesHelpersMixin
+from iikocloud.mixins.invoice_processing import (
+    # Invoice Processing: interim registration of core mixins directly.
+    # Task 5 replaces these with InvoiceProcessingHelpersMixin.
+    IncomingInvoicesCoreMixin,
+    OutgoingInvoicesCoreMixin,
+)
 from iikocloud.mixins.marketing_sources.helpers import MarketingSourcesHelpersMixin
 from iikocloud.mixins.menu.helpers import MenuHelpersMixin
 from iikocloud.mixins.messages.helpers import MessagesHelpersMixin
@@ -114,6 +120,8 @@ class IikoCloudApiClientManager(
     WebhooksHelpersMixin,
     BanquetsHelpersMixin,
     OrdersHelpersMixin,
+    IncomingInvoicesCoreMixin,
+    OutgoingInvoicesCoreMixin,
     _ManagerBase,
 ):
     """Multitone-фасад для работы с iikocloud API.
@@ -123,7 +131,8 @@ class IikoCloudApiClientManager(
     terminal_groups, menu, dictionaries, deliveries, deliveries_retrieve,
     delivery_restrictions, drafts, addresses, discounts, marketing_sources,
     employees, messages, notifications, operations, report, webhooks, banquets,
-    orders.
+    orders, invoice_processing (incoming/outgoing invoices core — interim,
+    до helpers-миксина).
 
     Конкурентность:
         Экземпляр безопасен для параллельных вызовов из нескольких задач
