@@ -13,9 +13,8 @@ account/document transactions — skip, если нет account_id/document_id.
 
 from __future__ import annotations
 
-import asyncio
 import os
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from typing import Any
@@ -33,6 +32,7 @@ from yaml import CSafeLoader
 from yaml import load as yaml_load
 
 from iikocloud import IikoCloudApiClientManager
+from tests.integration.invoice_processing.conftest import call_with_429_retry
 
 pytestmark = [
     pytest.mark.integration,
@@ -55,25 +55,6 @@ _LIST_METHODS = [
     "list_finance_incoming_services",
     "list_finance_outgoing_services",
 ]
-
-_MAX_429_RETRIES = 3
-_429_BACKOFF_SEC = 5.0
-
-
-async def _call_with_429_retry[T](call: Callable[[], Awaitable[T]]) -> T:
-    """Вызвать API-метод с retry при 429.
-
-    Стенд жёстко лимитирует invoice endpoints (429 при повторном вызове
-    в пределах пары секунд), менеджер ретраит только 401.
-    """
-    for attempt in range(_MAX_429_RETRIES + 1):
-        try:
-            return await call()
-        except ApiException as exc:
-            if exc.status != 429 or attempt == _MAX_429_RETRIES:
-                raise
-            await asyncio.sleep(_429_BACKOFF_SEC)
-    raise AssertionError("unreachable")
 
 
 def _list_request(org_id: str) -> ListRequest:
@@ -114,7 +95,7 @@ class TestInvoiceProcessingStructureReads:
     ) -> None:
         org_id = str(organization_id)  # invoice API: organizationId — строка
         method: Callable[..., Any] = getattr(manager, method_name)
-        result = await _call_with_429_retry(lambda: method(_list_request(org_id)))
+        result = await call_with_429_retry(lambda: method(_list_request(org_id)))
         assert result is not None
         assert isinstance(result, list)
 
@@ -145,12 +126,12 @@ class TestInvoiceProcessingStructureReads:
         organization_id: UUID,
     ) -> None:
         org_id = str(organization_id)
-        invoices = await _call_with_429_retry(
+        invoices = await call_with_429_retry(
             lambda: manager.list_inventory_incoming_invoices(_list_request(org_id))
         )
         if not invoices:
             pytest.skip("Нет накладных на стенде — нечего брать как document_id")
-        result = await _call_with_429_retry(
+        result = await call_with_429_retry(
             lambda: manager.list_finance_document_transactions(
                 DocumentTransactionsListRequest(
                     document_id=invoices[0].document_id, organization_id=org_id
@@ -170,12 +151,14 @@ class TestInvoiceProcessingStructureReads:
             pytest.skip("В write-секции config.test.yml не задан account_id")
         org_id = str(organization_id)
         today = datetime.now(UTC).date()
-        result = await manager.list_finance_account_transactions(
-            AccountTransactionsListRequest(
-                account_id=account_id,
-                var_from=(today - timedelta(days=365)).isoformat(),
-                organization_id=org_id,
-                to=today.isoformat(),
+        result = await call_with_429_retry(
+            lambda: manager.list_finance_account_transactions(
+                AccountTransactionsListRequest(
+                    account_id=account_id,
+                    var_from=(today - timedelta(days=365)).isoformat(),
+                    organization_id=org_id,
+                    to=today.isoformat(),
+                )
             )
         )
         assert result is not None

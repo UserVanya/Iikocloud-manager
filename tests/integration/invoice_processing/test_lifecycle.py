@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
@@ -32,12 +31,11 @@ from iikocloud_client import (
 from iikocloud_client.exceptions import ApiException
 
 from iikocloud import IikoCloudApiClientManager
+from tests.integration.invoice_processing.conftest import call_with_429_retry
 
 logger = logging.getLogger(__name__)
 
 _API_PAUSE_SEC = 1.0
-_MAX_429_RETRIES = 3
-_429_BACKOFF_SEC = 5.0
 
 pytestmark = [
     pytest.mark.integration,
@@ -45,22 +43,6 @@ pytestmark = [
     pytest.mark.danger_write,
     pytest.mark.asyncio(loop_scope="session"),
 ]
-
-
-async def _call_with_429_retry[T](call: Callable[[], Awaitable[T]]) -> T:
-    """Вызвать API-метод с retry при 429.
-
-    Стенд жёстко лимитирует invoice endpoints (429 при повторном вызове
-    в пределах пары секунд), менеджер ретраит только 401.
-    """
-    for attempt in range(_MAX_429_RETRIES + 1):
-        try:
-            return await call()
-        except ApiException as exc:
-            if exc.status != 429 or attempt == _MAX_429_RETRIES:
-                raise
-            await asyncio.sleep(_429_BACKOFF_SEC)
-    raise AssertionError("unreachable")
 
 
 def _now_iso() -> str:
@@ -101,12 +83,12 @@ class TestIncomingInvoiceLifecycle:
             logger.warning("Справочник counteragents недоступен: %s", exc.status)
 
         # 2. store/product из items существующей накладной (+ fallback counteragent)
-        invoice_list = await _call_with_429_retry(
+        invoice_list = await call_with_429_retry(
             lambda: manager.list_inventory_incoming_invoices(_list_request(org_id))
         )
         if not invoice_list:
             pytest.skip("Нет существующих накладных на стенде (источник шаблона)")
-        template = await _call_with_429_retry(
+        template = await call_with_429_retry(
             lambda: manager.get_inventory_incoming_invoice(
                 GetByIDRequest(
                     document_id=invoice_list[0].document_id, organization_id=org_id
@@ -154,8 +136,10 @@ class TestIncomingInvoiceLifecycle:
             await asyncio.sleep(_API_PAUSE_SEC)
 
             # 4. get — читается
-            fetched = await manager.get_inventory_incoming_invoice(
-                GetByIDRequest(document_id=document_id, organization_id=org_id)
+            fetched = await call_with_429_retry(
+                lambda: manager.get_inventory_incoming_invoice(
+                    GetByIDRequest(document_id=document_id, organization_id=org_id)
+                )
             )
             assert fetched is not None
 
@@ -175,11 +159,13 @@ class TestIncomingInvoiceLifecycle:
                 comment="integration test updated",
                 document_id=document_id,
             )
-            await manager.update_inventory_incoming_invoice(update_request)
+            await call_with_429_retry(
+                lambda: manager.update_inventory_incoming_invoice(update_request)
+            )
 
             await asyncio.sleep(_API_PAUSE_SEC)
 
-            # 6. post -> 7. unpost (skip при закрытом периоде — фиксируем)
+            # 6. post -> 7. unpost (skip только при закрытом периоде — фиксируем)
             try:
                 await manager.post_inventory_incoming_invoice(
                     GetByIDRequest(document_id=document_id, organization_id=org_id)
@@ -188,8 +174,11 @@ class TestIncomingInvoiceLifecycle:
                 await manager.unpost_inventory_incoming_invoice(
                     GetByIDRequest(document_id=document_id, organization_id=org_id)
                 )
-            except Exception as exc:  # noqa: BLE001
-                pytest.skip(f"post/unpost недоступен (закрытый период?): {exc}")
+            except ApiException as exc:
+                body = str(getattr(exc, "body", None) or exc)
+                if "period" in body.lower():
+                    pytest.skip(f"post/unpost недоступен (закрытый период): {body}")
+                raise
 
         finally:
             # 8. cancel в finally
