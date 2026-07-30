@@ -123,10 +123,10 @@ class MethodRateLimitsSettings(BaseModel):
 
     # Menu
     get_external_menus: RateLimitSettings = RateLimitSettings(
-        max_requests=1, time_window_seconds=1800.0
+        max_requests=10, time_window_seconds=60.0
     )
     get_external_menu_by_id: RateLimitSettings = RateLimitSettings(
-        max_requests=5, time_window_seconds=60.0
+        max_requests=1, time_window_seconds=120.0
     )
     get_stop_lists: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0

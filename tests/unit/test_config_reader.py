@@ -464,3 +464,25 @@ def test_invoice_processing_methods_have_limits() -> None:
         )
     # страховка от пропуска: ровно 93 метода
     assert len(read_names) + len(mutation_names) == 93
+
+
+@pytest.mark.unit
+def test_menu_limits_match_response_weight():
+    """get_external_menus отдаёт лёгкий список, get_external_menu_by_id — меню целиком.
+
+    Лимиты 1/1800s и 5/60s разрешали тяжёлый метод в 150 раз чаще лёгкого."""
+    settings = MethodRateLimitsSettings()
+    assert settings.get_external_menus.max_requests == 10
+    assert settings.get_external_menus.time_window_seconds == 60.0
+    assert settings.get_external_menu_by_id.max_requests == 1
+    assert settings.get_external_menu_by_id.time_window_seconds == 120.0
+
+
+@pytest.mark.unit
+def test_no_method_window_exceeds_two_minutes():
+    settings = MethodRateLimitsSettings()
+    too_slow = [
+        name for name in type(settings).model_fields
+        if getattr(settings, name).time_window_seconds > 120.0
+    ]
+    assert too_slow == []
