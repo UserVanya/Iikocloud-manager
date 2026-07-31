@@ -411,9 +411,18 @@ class ApiCredentials:
 
     @property
     def key_id(self) -> str:
-        """Fingerprint api_key:app_id для Multitone (не manual field)."""
+        """Fingerprint api_key:app_id:client_secret для Multitone (не manual field).
+
+        Обязаны участвовать все три секрета: Multitone-кэш (см.
+        ``IikoCloudApiClientManager.get_instance`` и ``TokenManager.get_instance``)
+        отдаёт закэшированный экземпляр по совпадению key_id, не сверяя переданные
+        credentials повторно. Если бы client_secret не входил в отпечаток, вызывающий
+        с верными api_key/app_id, но чужим или пустым client_secret, получил бы чужую
+        уже авторизованную сессию. Ротация любого из трёх секретов меняет key_id —
+        это осознанно: старый экземпляр не переиспользуется, создаётся новый.
+        """
         return hashlib.sha1(
-            f"{self.api_key}:{self.app_id}".encode()
+            f"{self.api_key}:{self.app_id}:{self.client_secret}".encode()
         ).hexdigest()[:16]
 
 
