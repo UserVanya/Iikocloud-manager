@@ -10,12 +10,12 @@ import pytest
 from iikocloud_client import (
     AccountTransactionsListRequest,
     AccountTransactionsResponse,
-    BarcodeItem,
     DocumentTransactionsListRequest,
     GetCounteragentsRequest,
     GetCounteragentsResponse,
-    UpdateProductBarcodesRequest,
-    UpdateProductBarcodesResponse,
+    NomenclatureProductBarcode,
+    NomenclatureProductUpdateBarcodesRequest,
+    NomenclatureProductUpdateBarcodesResponse,
 )
 
 from tests.unit.conftest import manager_with_stub_api
@@ -58,7 +58,7 @@ DOCUMENT_TRANSACTIONS_METHODS: list[tuple[str, object, str, type]] = [
 
 COUNTERAGENTS_METHODS: list[tuple[str, object, str, type]] = [
     (
-        "get_inventory_counteragents",
+        "list_inventory_counteragents",
         GetCounteragentsRequest(organization_id=ORG_ID),
         "get_counteragents_request",
         GetCounteragentsResponse,
@@ -67,14 +67,13 @@ COUNTERAGENTS_METHODS: list[tuple[str, object, str, type]] = [
 
 INVOICE_NOMENCLATURE_METHODS: list[tuple[str, object, str, type]] = [
     (
-        "update_inventory_product_barcodes",
-        UpdateProductBarcodesRequest(
-            organization_id=ORG_ID,
+        "update_nomenclature_product_barcodes",
+        NomenclatureProductUpdateBarcodesRequest(
             product_id=PRODUCT_ID,
-            barcodes=[BarcodeItem(barcode="4600000000001")],
+            barcodes=[NomenclatureProductBarcode(barcode="4600000000001", type="EAN13")],
         ),
-        "update_product_barcodes_request",
-        UpdateProductBarcodesResponse,
+        "nomenclature_product_update_barcodes_request",
+        NomenclatureProductUpdateBarcodesResponse,
     ),
 ]
 
@@ -144,7 +143,7 @@ async def test_invoice_nomenclature_methods_delegate(
     method_name: str, sdk_request: object, sdk_kwarg: str, response_cls: type
 ) -> None:
     """Метод проксирует response с request-моделью."""
-    manager, mock_api = await manager_with_stub_api("_invoice_nomenclature_api")
+    manager, mock_api = await manager_with_stub_api("_nomenclature_product_api")
     mock_response = MagicMock(spec=response_cls)
     sdk_method = AsyncMock(return_value=mock_response)
     setattr(mock_api, method_name, sdk_method)

@@ -24,30 +24,30 @@ from iikocloud_client import (
     DiscountsAndPromotionsApi,
     DraftsApi,
     EmployeesApi,
+    # Invoice Processing
+    FinanceAccountTransactionsApi,
+    FinanceDocumentTransactionsApi,
+    FinanceIncomingServiceApi,
+    FinanceOutgoingServiceApi,
+    InventoryCounteragentsApi,
+    InventoryDisassembleDocumentApi,
+    InventoryIncomingInvoicesApi,
+    InventoryIncomingReturnedInvoiceApi,
+    InventoryInternalTransferApi,
+    InventoryOutgoingInvoicesApi,
+    InventoryProductionDocumentApi,
+    InventoryReturnedInvoiceApi,
+    InventorySalesDocumentApi,
+    InventoryTransformationDocumentApi,
+    InventoryWriteoffDocumentApi,
     MarketingSourcesApi,
     MenuApi,
     MessagesApi,
+    NomenclatureNomenclatureProductApi,
     NotificationsApi,
     OperationsApi,
     OrdersApi,
     OrganizationsApi,
-    # Invoice Processing
-    PublicApiInvoiceProcessingAccountTransactionsApi,
-    PublicApiInvoiceProcessingCounteragentsApi,
-    PublicApiInvoiceProcessingDisassembleDocumentApi,
-    PublicApiInvoiceProcessingDocumentTransactionsApi,
-    PublicApiInvoiceProcessingIncomingInvoicesApi,
-    PublicApiInvoiceProcessingIncomingReturnedInvoiceApi,
-    PublicApiInvoiceProcessingIncomingServiceApi,
-    PublicApiInvoiceProcessingInternalTransferApi,
-    PublicApiInvoiceProcessingNomenclatureApi,
-    PublicApiInvoiceProcessingOutgoingInvoicesApi,
-    PublicApiInvoiceProcessingOutgoingServiceApi,
-    PublicApiInvoiceProcessingProductionDocumentApi,
-    PublicApiInvoiceProcessingReturnedInvoiceApi,
-    PublicApiInvoiceProcessingSalesDocumentApi,
-    PublicApiInvoiceProcessingTransformationDocumentApi,
-    PublicApiInvoiceProcessingWriteoffDocumentApi,
     ReportApi,
     TerminalGroupsApi,
     WebhooksApi,
@@ -123,6 +123,7 @@ class ApiMethod(Enum):
     # Menu
     GET_EXTERNAL_MENUS = "get_external_menus"
     GET_EXTERNAL_MENU_BY_ID = "get_external_menu_by_id"
+    GET_EXTERNAL_MENU_V3_BY_ID = "get_external_menu_v3_by_id"
     GET_STOP_LISTS = "get_stop_lists"
 
     # Menu — stop lists / nomenclature / combos
@@ -390,9 +391,9 @@ class ApiMethod(Enum):
     # — document_transactions
     LIST_FINANCE_DOCUMENT_TRANSACTIONS = "list_finance_document_transactions"
     # — counteragents
-    GET_INVENTORY_COUNTERAGENTS = "get_inventory_counteragents"
+    LIST_INVENTORY_COUNTERAGENTS = "list_inventory_counteragents"
     # — invoice_nomenclature
-    UPDATE_INVENTORY_PRODUCT_BARCODES = "update_inventory_product_barcodes"
+    UPDATE_NOMENCLATURE_PRODUCT_BARCODES = "update_nomenclature_product_barcodes"
 
 
 @dataclass
@@ -452,6 +453,7 @@ class MethodRateLimits:
     check_terminal_groups_availability: RateLimitConfig
     get_external_menus: RateLimitConfig
     get_external_menu_by_id: RateLimitConfig
+    get_external_menu_v3_by_id: RateLimitConfig
     get_stop_lists: RateLimitConfig
     add_products_to_stop_list: RateLimitConfig
     remove_products_from_stop_list: RateLimitConfig
@@ -665,9 +667,9 @@ class MethodRateLimits:
     # — document_transactions
     list_finance_document_transactions: RateLimitConfig
     # — counteragents
-    get_inventory_counteragents: RateLimitConfig
+    list_inventory_counteragents: RateLimitConfig
     # — invoice_nomenclature
-    update_inventory_product_barcodes: RateLimitConfig
+    update_nomenclature_product_barcodes: RateLimitConfig
 
     @classmethod
     def from_settings(cls, settings: MethodRateLimitsSettings) -> "MethodRateLimits":
@@ -746,24 +748,24 @@ class _ManagerBase:
     _orders_api: OrdersApi | None
 
     # Invoice Processing
-    _disassemble_document_api: PublicApiInvoiceProcessingDisassembleDocumentApi | None
-    _incoming_invoices_api: PublicApiInvoiceProcessingIncomingInvoicesApi | None
+    _disassemble_document_api: InventoryDisassembleDocumentApi | None
+    _incoming_invoices_api: InventoryIncomingInvoicesApi | None
     _incoming_returned_invoice_api: (
-        PublicApiInvoiceProcessingIncomingReturnedInvoiceApi | None
+        InventoryIncomingReturnedInvoiceApi | None
     )
-    _internal_transfer_api: PublicApiInvoiceProcessingInternalTransferApi | None
-    _outgoing_invoices_api: PublicApiInvoiceProcessingOutgoingInvoicesApi | None
-    _production_document_api: PublicApiInvoiceProcessingProductionDocumentApi | None
-    _returned_invoice_api: PublicApiInvoiceProcessingReturnedInvoiceApi | None
-    _sales_document_api: PublicApiInvoiceProcessingSalesDocumentApi | None
-    _transformation_document_api: PublicApiInvoiceProcessingTransformationDocumentApi | None
-    _writeoff_document_api: PublicApiInvoiceProcessingWriteoffDocumentApi | None
-    _incoming_service_api: PublicApiInvoiceProcessingIncomingServiceApi | None
-    _outgoing_service_api: PublicApiInvoiceProcessingOutgoingServiceApi | None
-    _account_transactions_api: PublicApiInvoiceProcessingAccountTransactionsApi | None
-    _document_transactions_api: PublicApiInvoiceProcessingDocumentTransactionsApi | None
-    _counteragents_api: PublicApiInvoiceProcessingCounteragentsApi | None
-    _invoice_nomenclature_api: PublicApiInvoiceProcessingNomenclatureApi | None
+    _internal_transfer_api: InventoryInternalTransferApi | None
+    _outgoing_invoices_api: InventoryOutgoingInvoicesApi | None
+    _production_document_api: InventoryProductionDocumentApi | None
+    _returned_invoice_api: InventoryReturnedInvoiceApi | None
+    _sales_document_api: InventorySalesDocumentApi | None
+    _transformation_document_api: InventoryTransformationDocumentApi | None
+    _writeoff_document_api: InventoryWriteoffDocumentApi | None
+    _incoming_service_api: FinanceIncomingServiceApi | None
+    _outgoing_service_api: FinanceOutgoingServiceApi | None
+    _account_transactions_api: FinanceAccountTransactionsApi | None
+    _document_transactions_api: FinanceDocumentTransactionsApi | None
+    _counteragents_api: InventoryCounteragentsApi | None
+    _nomenclature_product_api: NomenclatureNomenclatureProductApi | None
 
     # ========== Lazy-геттеры API-клиентов ==========
 
@@ -941,12 +943,12 @@ class _ManagerBase:
 
     async def get_disassemble_document_api(
         self,
-    ) -> PublicApiInvoiceProcessingDisassembleDocumentApi:
-        """Получить клиент PublicApiInvoiceProcessingDisassembleDocumentApi."""
+    ) -> InventoryDisassembleDocumentApi:
+        """Получить клиент InventoryDisassembleDocumentApi."""
         await self._ensure_token_manager()
         if self._disassemble_document_api is None:
             self._disassemble_document_api = (
-                PublicApiInvoiceProcessingDisassembleDocumentApi(
+                InventoryDisassembleDocumentApi(
                     api_client=self._api_client
                 )
             )
@@ -954,12 +956,12 @@ class _ManagerBase:
 
     async def get_incoming_invoices_api(
         self,
-    ) -> PublicApiInvoiceProcessingIncomingInvoicesApi:
-        """Получить клиент PublicApiInvoiceProcessingIncomingInvoicesApi."""
+    ) -> InventoryIncomingInvoicesApi:
+        """Получить клиент InventoryIncomingInvoicesApi."""
         await self._ensure_token_manager()
         if self._incoming_invoices_api is None:
             self._incoming_invoices_api = (
-                PublicApiInvoiceProcessingIncomingInvoicesApi(
+                InventoryIncomingInvoicesApi(
                     api_client=self._api_client
                 )
             )
@@ -967,12 +969,12 @@ class _ManagerBase:
 
     async def get_incoming_returned_invoice_api(
         self,
-    ) -> PublicApiInvoiceProcessingIncomingReturnedInvoiceApi:
-        """Получить клиент PublicApiInvoiceProcessingIncomingReturnedInvoiceApi."""
+    ) -> InventoryIncomingReturnedInvoiceApi:
+        """Получить клиент InventoryIncomingReturnedInvoiceApi."""
         await self._ensure_token_manager()
         if self._incoming_returned_invoice_api is None:
             self._incoming_returned_invoice_api = (
-                PublicApiInvoiceProcessingIncomingReturnedInvoiceApi(
+                InventoryIncomingReturnedInvoiceApi(
                     api_client=self._api_client
                 )
             )
@@ -980,12 +982,12 @@ class _ManagerBase:
 
     async def get_internal_transfer_api(
         self,
-    ) -> PublicApiInvoiceProcessingInternalTransferApi:
-        """Получить клиент PublicApiInvoiceProcessingInternalTransferApi."""
+    ) -> InventoryInternalTransferApi:
+        """Получить клиент InventoryInternalTransferApi."""
         await self._ensure_token_manager()
         if self._internal_transfer_api is None:
             self._internal_transfer_api = (
-                PublicApiInvoiceProcessingInternalTransferApi(
+                InventoryInternalTransferApi(
                     api_client=self._api_client
                 )
             )
@@ -993,12 +995,12 @@ class _ManagerBase:
 
     async def get_outgoing_invoices_api(
         self,
-    ) -> PublicApiInvoiceProcessingOutgoingInvoicesApi:
-        """Получить клиент PublicApiInvoiceProcessingOutgoingInvoicesApi."""
+    ) -> InventoryOutgoingInvoicesApi:
+        """Получить клиент InventoryOutgoingInvoicesApi."""
         await self._ensure_token_manager()
         if self._outgoing_invoices_api is None:
             self._outgoing_invoices_api = (
-                PublicApiInvoiceProcessingOutgoingInvoicesApi(
+                InventoryOutgoingInvoicesApi(
                     api_client=self._api_client
                 )
             )
@@ -1006,12 +1008,12 @@ class _ManagerBase:
 
     async def get_production_document_api(
         self,
-    ) -> PublicApiInvoiceProcessingProductionDocumentApi:
-        """Получить клиент PublicApiInvoiceProcessingProductionDocumentApi."""
+    ) -> InventoryProductionDocumentApi:
+        """Получить клиент InventoryProductionDocumentApi."""
         await self._ensure_token_manager()
         if self._production_document_api is None:
             self._production_document_api = (
-                PublicApiInvoiceProcessingProductionDocumentApi(
+                InventoryProductionDocumentApi(
                     api_client=self._api_client
                 )
             )
@@ -1019,12 +1021,12 @@ class _ManagerBase:
 
     async def get_returned_invoice_api(
         self,
-    ) -> PublicApiInvoiceProcessingReturnedInvoiceApi:
-        """Получить клиент PublicApiInvoiceProcessingReturnedInvoiceApi."""
+    ) -> InventoryReturnedInvoiceApi:
+        """Получить клиент InventoryReturnedInvoiceApi."""
         await self._ensure_token_manager()
         if self._returned_invoice_api is None:
             self._returned_invoice_api = (
-                PublicApiInvoiceProcessingReturnedInvoiceApi(
+                InventoryReturnedInvoiceApi(
                     api_client=self._api_client
                 )
             )
@@ -1032,12 +1034,12 @@ class _ManagerBase:
 
     async def get_sales_document_api(
         self,
-    ) -> PublicApiInvoiceProcessingSalesDocumentApi:
-        """Получить клиент PublicApiInvoiceProcessingSalesDocumentApi."""
+    ) -> InventorySalesDocumentApi:
+        """Получить клиент InventorySalesDocumentApi."""
         await self._ensure_token_manager()
         if self._sales_document_api is None:
             self._sales_document_api = (
-                PublicApiInvoiceProcessingSalesDocumentApi(
+                InventorySalesDocumentApi(
                     api_client=self._api_client
                 )
             )
@@ -1045,12 +1047,12 @@ class _ManagerBase:
 
     async def get_transformation_document_api(
         self,
-    ) -> PublicApiInvoiceProcessingTransformationDocumentApi:
-        """Получить клиент PublicApiInvoiceProcessingTransformationDocumentApi."""
+    ) -> InventoryTransformationDocumentApi:
+        """Получить клиент InventoryTransformationDocumentApi."""
         await self._ensure_token_manager()
         if self._transformation_document_api is None:
             self._transformation_document_api = (
-                PublicApiInvoiceProcessingTransformationDocumentApi(
+                InventoryTransformationDocumentApi(
                     api_client=self._api_client
                 )
             )
@@ -1058,12 +1060,12 @@ class _ManagerBase:
 
     async def get_writeoff_document_api(
         self,
-    ) -> PublicApiInvoiceProcessingWriteoffDocumentApi:
-        """Получить клиент PublicApiInvoiceProcessingWriteoffDocumentApi."""
+    ) -> InventoryWriteoffDocumentApi:
+        """Получить клиент InventoryWriteoffDocumentApi."""
         await self._ensure_token_manager()
         if self._writeoff_document_api is None:
             self._writeoff_document_api = (
-                PublicApiInvoiceProcessingWriteoffDocumentApi(
+                InventoryWriteoffDocumentApi(
                     api_client=self._api_client
                 )
             )
@@ -1071,12 +1073,12 @@ class _ManagerBase:
 
     async def get_incoming_service_api(
         self,
-    ) -> PublicApiInvoiceProcessingIncomingServiceApi:
-        """Получить клиент PublicApiInvoiceProcessingIncomingServiceApi."""
+    ) -> FinanceIncomingServiceApi:
+        """Получить клиент FinanceIncomingServiceApi."""
         await self._ensure_token_manager()
         if self._incoming_service_api is None:
             self._incoming_service_api = (
-                PublicApiInvoiceProcessingIncomingServiceApi(
+                FinanceIncomingServiceApi(
                     api_client=self._api_client
                 )
             )
@@ -1084,12 +1086,12 @@ class _ManagerBase:
 
     async def get_outgoing_service_api(
         self,
-    ) -> PublicApiInvoiceProcessingOutgoingServiceApi:
-        """Получить клиент PublicApiInvoiceProcessingOutgoingServiceApi."""
+    ) -> FinanceOutgoingServiceApi:
+        """Получить клиент FinanceOutgoingServiceApi."""
         await self._ensure_token_manager()
         if self._outgoing_service_api is None:
             self._outgoing_service_api = (
-                PublicApiInvoiceProcessingOutgoingServiceApi(
+                FinanceOutgoingServiceApi(
                     api_client=self._api_client
                 )
             )
@@ -1097,12 +1099,12 @@ class _ManagerBase:
 
     async def get_account_transactions_api(
         self,
-    ) -> PublicApiInvoiceProcessingAccountTransactionsApi:
-        """Получить клиент PublicApiInvoiceProcessingAccountTransactionsApi."""
+    ) -> FinanceAccountTransactionsApi:
+        """Получить клиент FinanceAccountTransactionsApi."""
         await self._ensure_token_manager()
         if self._account_transactions_api is None:
             self._account_transactions_api = (
-                PublicApiInvoiceProcessingAccountTransactionsApi(
+                FinanceAccountTransactionsApi(
                     api_client=self._api_client
                 )
             )
@@ -1110,12 +1112,12 @@ class _ManagerBase:
 
     async def get_document_transactions_api(
         self,
-    ) -> PublicApiInvoiceProcessingDocumentTransactionsApi:
-        """Получить клиент PublicApiInvoiceProcessingDocumentTransactionsApi."""
+    ) -> FinanceDocumentTransactionsApi:
+        """Получить клиент FinanceDocumentTransactionsApi."""
         await self._ensure_token_manager()
         if self._document_transactions_api is None:
             self._document_transactions_api = (
-                PublicApiInvoiceProcessingDocumentTransactionsApi(
+                FinanceDocumentTransactionsApi(
                     api_client=self._api_client
                 )
             )
@@ -1123,29 +1125,29 @@ class _ManagerBase:
 
     async def get_counteragents_api(
         self,
-    ) -> PublicApiInvoiceProcessingCounteragentsApi:
-        """Получить клиент PublicApiInvoiceProcessingCounteragentsApi."""
+    ) -> InventoryCounteragentsApi:
+        """Получить клиент InventoryCounteragentsApi."""
         await self._ensure_token_manager()
         if self._counteragents_api is None:
             self._counteragents_api = (
-                PublicApiInvoiceProcessingCounteragentsApi(
+                InventoryCounteragentsApi(
                     api_client=self._api_client
                 )
             )
         return self._counteragents_api
 
-    async def get_invoice_nomenclature_api(
+    async def get_nomenclature_product_api(
         self,
-    ) -> PublicApiInvoiceProcessingNomenclatureApi:
-        """Получить клиент PublicApiInvoiceProcessingNomenclatureApi."""
+    ) -> NomenclatureNomenclatureProductApi:
+        """Получить клиент NomenclatureNomenclatureProductApi."""
         await self._ensure_token_manager()
-        if self._invoice_nomenclature_api is None:
-            self._invoice_nomenclature_api = (
-                PublicApiInvoiceProcessingNomenclatureApi(
+        if self._nomenclature_product_api is None:
+            self._nomenclature_product_api = (
+                NomenclatureNomenclatureProductApi(
                     api_client=self._api_client
                 )
             )
-        return self._invoice_nomenclature_api
+        return self._nomenclature_product_api
 
     # ========== Инфраструктура ==========
 

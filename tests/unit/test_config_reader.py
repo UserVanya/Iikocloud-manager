@@ -379,7 +379,7 @@ def test_invoice_processing_methods_have_limits() -> None:
         "list_finance_outgoing_services",
         "list_finance_account_transactions",
         "list_finance_document_transactions",
-        "get_inventory_counteragents",
+        "list_inventory_counteragents",
     ]
     mutation_names = [
         # create/update/post/unpost/cancel/add_payment/set_payment_date/
@@ -449,7 +449,7 @@ def test_invoice_processing_methods_have_limits() -> None:
         "post_finance_outgoing_service",
         "unpost_finance_outgoing_service",
         "update_finance_outgoing_service",
-        "update_inventory_product_barcodes",
+        "update_nomenclature_product_barcodes",
     ]
     limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
     for name in read_names:
@@ -476,6 +476,8 @@ def test_menu_limits_match_response_weight():
     assert settings.get_external_menus.time_window_seconds == 60.0
     assert settings.get_external_menu_by_id.max_requests == 1
     assert settings.get_external_menu_by_id.time_window_seconds == 120.0
+    assert settings.get_external_menu_v3_by_id.max_requests == 1
+    assert settings.get_external_menu_v3_by_id.time_window_seconds == 120.0
 
 
 @pytest.mark.unit

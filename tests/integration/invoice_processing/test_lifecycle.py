@@ -71,7 +71,7 @@ class TestIncomingInvoiceLifecycle:
         # 1. counteragent из справочника (может быть недоступен на стенде)
         counteragent_id = None
         try:
-            counteragents = await manager.get_inventory_counteragents(
+            counteragents = await manager.list_inventory_counteragents(
                 GetCounteragentsRequest(
                     limit=1, offset=0, organization_id=org_id, type=["supplier"]
                 )

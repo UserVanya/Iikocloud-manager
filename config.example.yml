@@ -69,6 +69,9 @@ iikocloud:
     get_external_menu_by_id:
       max_requests: 5
       time_window_seconds: 60.0
+    get_external_menu_v3_by_id:
+      max_requests: 1
+      time_window_seconds: 120.0
     get_stop_lists:
       max_requests: 10
       time_window_seconds: 60.0
@@ -673,10 +676,10 @@ iikocloud:
       max_requests: 10
       time_window_seconds: 60.0
     # — counteragents
-    get_inventory_counteragents:
+    list_inventory_counteragents:
       max_requests: 10
       time_window_seconds: 60.0
     # — invoice_nomenclature
-    update_inventory_product_barcodes:
+    update_nomenclature_product_barcodes:
       max_requests: 100
       time_window_seconds: 60.0

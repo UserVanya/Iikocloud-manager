@@ -18,7 +18,9 @@ from iikocloud_client import (
     GetCombosInfoRequest,
     GetCombosInfoResponse,
     MenuRequest,
+    MenuRequestV3,
     MenusDataResponse,
+    MenuV3,
     NomenclatureRequest,
     NomenclatureResponse,
     RemoveProductsFromStopListItem,
@@ -66,6 +68,40 @@ async def test_get_external_menu_by_id_calls_api_with_request() -> None:
     mock_api.get_external_menu_by_id.assert_awaited_once_with(
         menu_request=request
     )
+
+
+async def test_get_external_menu_v3_by_id_calls_api_with_request() -> None:
+    """get_external_menu_v3_by_id delegates to SDK with MenuRequestV3."""
+    manager, mock_api = await manager_with_stub_api("_menu_api")
+
+    mock_response = MagicMock(spec=MenuV3)
+    mock_api.get_external_menu_v3_by_id = AsyncMock(return_value=mock_response)
+
+    request = MenuRequestV3(external_menu_id=MENU_ID, organization_id=ORG_ID)
+    result = await manager.get_external_menu_v3_by_id(request)
+
+    assert result is mock_response
+    mock_api.get_external_menu_v3_by_id.assert_awaited_once_with(
+        menu_request_v3=request
+    )
+
+
+async def test_get_external_menu_v3_by_id_uses_its_own_rate_limit() -> None:
+    """get_external_menu_v3_by_id routes through its own ApiMethod."""
+    manager, mock_api = await manager_with_stub_api("_menu_api")
+    mock_api.get_external_menu_v3_by_id = AsyncMock(return_value=MagicMock())
+
+    async def _passthrough(method, api_call):  # noqa: ANN001
+        return await api_call()
+
+    manager.execute_with_retry = AsyncMock(side_effect=_passthrough)
+
+    await manager.get_external_menu_v3_by_id(
+        MenuRequestV3(external_menu_id=MENU_ID, organization_id=ORG_ID)
+    )
+
+    method_arg = manager.execute_with_retry.await_args.args[0]
+    assert method_arg is ApiMethod.GET_EXTERNAL_MENU_V3_BY_ID
 
 
 async def test_get_stop_lists_calls_api_with_request() -> None:

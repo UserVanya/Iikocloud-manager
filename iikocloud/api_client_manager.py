@@ -18,30 +18,30 @@ from iikocloud_client import (
     DiscountsAndPromotionsApi,
     DraftsApi,
     EmployeesApi,
+    # Invoice Processing
+    FinanceAccountTransactionsApi,
+    FinanceDocumentTransactionsApi,
+    FinanceIncomingServiceApi,
+    FinanceOutgoingServiceApi,
+    InventoryCounteragentsApi,
+    InventoryDisassembleDocumentApi,
+    InventoryIncomingInvoicesApi,
+    InventoryIncomingReturnedInvoiceApi,
+    InventoryInternalTransferApi,
+    InventoryOutgoingInvoicesApi,
+    InventoryProductionDocumentApi,
+    InventoryReturnedInvoiceApi,
+    InventorySalesDocumentApi,
+    InventoryTransformationDocumentApi,
+    InventoryWriteoffDocumentApi,
     MarketingSourcesApi,
     MenuApi,
     MessagesApi,
+    NomenclatureNomenclatureProductApi,
     NotificationsApi,
     OperationsApi,
     OrdersApi,
     OrganizationsApi,
-    # Invoice Processing
-    PublicApiInvoiceProcessingAccountTransactionsApi,
-    PublicApiInvoiceProcessingCounteragentsApi,
-    PublicApiInvoiceProcessingDisassembleDocumentApi,
-    PublicApiInvoiceProcessingDocumentTransactionsApi,
-    PublicApiInvoiceProcessingIncomingInvoicesApi,
-    PublicApiInvoiceProcessingIncomingReturnedInvoiceApi,
-    PublicApiInvoiceProcessingIncomingServiceApi,
-    PublicApiInvoiceProcessingInternalTransferApi,
-    PublicApiInvoiceProcessingNomenclatureApi,
-    PublicApiInvoiceProcessingOutgoingInvoicesApi,
-    PublicApiInvoiceProcessingOutgoingServiceApi,
-    PublicApiInvoiceProcessingProductionDocumentApi,
-    PublicApiInvoiceProcessingReturnedInvoiceApi,
-    PublicApiInvoiceProcessingSalesDocumentApi,
-    PublicApiInvoiceProcessingTransformationDocumentApi,
-    PublicApiInvoiceProcessingWriteoffDocumentApi,
     ReportApi,
     TerminalGroupsApi,
     WebhooksApi,
@@ -196,52 +196,52 @@ class IikoCloudApiClientManager(
 
         # Invoice Processing
         self._disassemble_document_api: (
-            PublicApiInvoiceProcessingDisassembleDocumentApi | None
+            InventoryDisassembleDocumentApi | None
         ) = None
         self._incoming_invoices_api: (
-            PublicApiInvoiceProcessingIncomingInvoicesApi | None
+            InventoryIncomingInvoicesApi | None
         ) = None
         self._incoming_returned_invoice_api: (
-            PublicApiInvoiceProcessingIncomingReturnedInvoiceApi | None
+            InventoryIncomingReturnedInvoiceApi | None
         ) = None
         self._internal_transfer_api: (
-            PublicApiInvoiceProcessingInternalTransferApi | None
+            InventoryInternalTransferApi | None
         ) = None
         self._outgoing_invoices_api: (
-            PublicApiInvoiceProcessingOutgoingInvoicesApi | None
+            InventoryOutgoingInvoicesApi | None
         ) = None
         self._production_document_api: (
-            PublicApiInvoiceProcessingProductionDocumentApi | None
+            InventoryProductionDocumentApi | None
         ) = None
         self._returned_invoice_api: (
-            PublicApiInvoiceProcessingReturnedInvoiceApi | None
+            InventoryReturnedInvoiceApi | None
         ) = None
         self._sales_document_api: (
-            PublicApiInvoiceProcessingSalesDocumentApi | None
+            InventorySalesDocumentApi | None
         ) = None
         self._transformation_document_api: (
-            PublicApiInvoiceProcessingTransformationDocumentApi | None
+            InventoryTransformationDocumentApi | None
         ) = None
         self._writeoff_document_api: (
-            PublicApiInvoiceProcessingWriteoffDocumentApi | None
+            InventoryWriteoffDocumentApi | None
         ) = None
         self._incoming_service_api: (
-            PublicApiInvoiceProcessingIncomingServiceApi | None
+            FinanceIncomingServiceApi | None
         ) = None
         self._outgoing_service_api: (
-            PublicApiInvoiceProcessingOutgoingServiceApi | None
+            FinanceOutgoingServiceApi | None
         ) = None
         self._account_transactions_api: (
-            PublicApiInvoiceProcessingAccountTransactionsApi | None
+            FinanceAccountTransactionsApi | None
         ) = None
         self._document_transactions_api: (
-            PublicApiInvoiceProcessingDocumentTransactionsApi | None
+            FinanceDocumentTransactionsApi | None
         ) = None
         self._counteragents_api: (
-            PublicApiInvoiceProcessingCounteragentsApi | None
+            InventoryCounteragentsApi | None
         ) = None
-        self._invoice_nomenclature_api: (
-            PublicApiInvoiceProcessingNomenclatureApi | None
+        self._nomenclature_product_api: (
+            NomenclatureNomenclatureProductApi | None
         ) = None
 
         logger.debug(

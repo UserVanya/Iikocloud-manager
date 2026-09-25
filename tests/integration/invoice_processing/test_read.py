@@ -105,7 +105,7 @@ class TestInvoiceProcessingStructureReads:
         organization_id: UUID,
     ) -> None:
         try:
-            response = await manager.get_inventory_counteragents(
+            response = await manager.list_inventory_counteragents(
                 GetCounteragentsRequest(
                     limit=1, offset=0, organization_id=str(organization_id)
                 )

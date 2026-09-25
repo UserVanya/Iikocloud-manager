@@ -12,7 +12,9 @@ from iikocloud_client import (
     GetCombosInfoRequest,
     GetCombosInfoResponse,
     MenuRequest,
+    MenuRequestV3,
     MenusDataResponse,
+    MenuV3,
     NomenclatureRequest,
     NomenclatureResponse,
     RemoveProductsFromStopListRequest,
@@ -62,6 +64,30 @@ class MenuCoreMixin(_ManagerBase):
 
         return await self.execute_with_retry(
             ApiMethod.GET_EXTERNAL_MENU_BY_ID, api_call
+        )
+
+    async def get_external_menu_v3_by_id(
+        self,
+        request: MenuRequestV3,
+    ) -> MenuV3:
+        """Получить внешнее меню по ID через новый адрес /api/menu/v3/by_id.
+
+        iiko пометил /api/2/menu/by_id и /api/1/nomenclature устаревшими
+        в пользу этого адреса; запрос — на одну организацию.
+
+        Args:
+            request: Параметры запроса MenuRequestV3
+
+        Returns:
+            Меню MenuV3
+        """
+
+        async def api_call() -> MenuV3:
+            api = await self.get_menu_api()
+            return await api.get_external_menu_v3_by_id(menu_request_v3=request)
+
+        return await self.execute_with_retry(
+            ApiMethod.GET_EXTERNAL_MENU_V3_BY_ID, api_call
         )
 
     async def get_stop_lists(

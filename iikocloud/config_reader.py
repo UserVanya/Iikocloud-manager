@@ -128,6 +128,10 @@ class MethodRateLimitsSettings(BaseModel):
     get_external_menu_by_id: RateLimitSettings = RateLimitSettings(
         max_requests=1, time_window_seconds=120.0
     )
+    # Новый адрес /api/menu/v3/by_id отдаёт то же меню целиком — тот же предел.
+    get_external_menu_v3_by_id: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=120.0
+    )
     get_stop_lists: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0
     )
@@ -767,11 +771,11 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=10, time_window_seconds=60.0
     )
     # — counteragents
-    get_inventory_counteragents: RateLimitSettings = RateLimitSettings(
+    list_inventory_counteragents: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0
     )
     # — invoice_nomenclature
-    update_inventory_product_barcodes: RateLimitSettings = RateLimitSettings(
+    update_nomenclature_product_barcodes: RateLimitSettings = RateLimitSettings(
         max_requests=100, time_window_seconds=60.0
     )
 
