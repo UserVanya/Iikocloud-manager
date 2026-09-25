@@ -135,8 +135,8 @@ wheels = [
 
 [[package]]
 name = "iikocloud-client"
-version = "0.2.1"
-source = { git = "https://github.com/UserVanya/Iikocloud-py-SDK.git?rev=v0.2.1#4ec12f2fc67888d3e4d74158518a4612dafbf82c" }
+version = "0.2.2"
+source = { git = "https://github.com/UserVanya/Iikocloud-py-SDK.git?rev=v0.2.2#8e09379837f20bab5ea9796790d52a4a1c44488b" }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
@@ -146,7 +146,7 @@ dependencies = [
 
 [[package]]
 name = "iikocloud-manager"
-version = "0.2.1"
+version = "0.2.2"
 source = { editable = "." }
 dependencies = [
     { name = "iikocloud-client" },
@@ -166,7 +166,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "iikocloud-client", git = "https://github.com/UserVanya/Iikocloud-py-SDK.git?rev=v0.2.1" },
+    { name = "iikocloud-client", git = "https://github.com/UserVanya/Iikocloud-py-SDK.git?rev=v0.2.2" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "pyyaml", specifier = ">=6.0.3" },
