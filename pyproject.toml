@@ -1,6 +1,6 @@
 [project]
 name = "iikocloud-manager"
-version = "0.2.0"
+version = "0.2.1"
 description = "Асинхронный клиент для iikocloud API с rate limiting и автоматическим управлением токенами"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -19,7 +19,7 @@ classifiers = [
     "Framework :: AsyncIO",
 ]
 dependencies = [
-    "iikocloud-client @ git+https://github.com/UserVanya/Iikocloud-py-SDK.git@v0.2.0",
+    "iikocloud-client @ git+https://github.com/UserVanya/Iikocloud-py-SDK.git@v0.2.1",
     "pydantic>=2.0.0",
     "python-dotenv>=1.2.1",
     "pyyaml>=6.0.3",

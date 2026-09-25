@@ -35,7 +35,7 @@ async def test_close_all_allows_new_instance() -> None:
 
 
 def test_key_id_is_fingerprint_not_manual() -> None:
-    """key_id is a stable fingerprint of api_key:app_id:client_secret (not a manual field)."""
+    """key_id is a stable fingerprint of api_key:app_id:client_secret, not set by hand."""
     creds = ApiCredentials(api_key="a", app_id="b", client_secret="c")
 
     assert creds.key_id
