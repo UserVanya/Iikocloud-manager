@@ -45,12 +45,17 @@ async def test_success_acquires_global_then_method_limits() -> None:
 
 
 async def test_401_then_refresh_retries_once_and_returns() -> None:
-    """401 + successful refresh → one retry through limits, returns result."""
+    """401 + successful refresh → one retry, returns result.
+
+    The retry is the same call: it already holds its method window from the first
+    attempt, so it passes the global limiter only. Queueing it on the method bucket
+    again made a menu wait a second 120 s window after a routine token refresh.
+    """
     manager, mock_tm = await _manager_with_mock_token()
     mock_tm.refresh_token_if_401 = AsyncMock(return_value=True)
 
     method = ApiMethod.GET_ORGANIZATIONS
-    # Track limit acquires: first attempt + retry = 2 global + 2 method
+    # Track limit acquires: first attempt + retry = 2 global, but 1 method
     manager._global_limiter.acquire = AsyncMock()
     method_limiter = MagicMock()
     method_limiter.acquire = AsyncMock()
@@ -71,7 +76,7 @@ async def test_401_then_refresh_retries_once_and_returns() -> None:
     assert call_count == 2
     mock_tm.refresh_token_if_401.assert_awaited_once()
     assert manager._global_limiter.acquire.await_count == 2
-    assert method_limiter.acquire.await_count == 2
+    assert method_limiter.acquire.await_count == 1, "the retry must not queue for the method again"
 
 
 async def test_token_version_captured_after_rate_limit_wait() -> None:

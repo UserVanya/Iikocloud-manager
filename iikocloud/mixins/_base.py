@@ -1196,6 +1196,7 @@ class _ManagerBase:
            ошибочно пропущен как «уже обновлён другой корутиной»)
         4. call
         5. on 401 → refresh_token_if_401(version_before); retry once if refreshed
+           — только через глобальный лимит: окно метода вызов уже занял
         6. other errors re-raise
         """
         token_manager = await self._ensure_token_manager()
@@ -1203,7 +1204,13 @@ class _ManagerBase:
 
         retried = False
         while True:
-            await self._acquire_limits(method)
+            if retried:
+                # Повтор после 401 — тот же вызов: окно метода он занял первой попыткой.
+                # Вторая очередь метода заставила бы ждать ещё одно окно (меню — до 120 с),
+                # и вызывающий бросил бы ждать раньше. Общий предел — как у любого запроса.
+                await self._global_limiter.acquire()
+            else:
+                await self._acquire_limits(method)
             version_before = token_manager.token_version
             try:
                 result = await api_call()
