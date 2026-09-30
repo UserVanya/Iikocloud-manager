@@ -8,6 +8,7 @@ from iikocloud.api_client_manager import (
 )
 from iikocloud.config_reader import (
     IikoCloudConfig,
+    MenuWindowsSettings,
     MethodRateLimitsSettings,
     RateLimitSettings,
     clear_config_cache,
@@ -15,7 +16,8 @@ from iikocloud.config_reader import (
     get_iikocloud_config,
     parse_config_file,
 )
-from iikocloud.exceptions import IikoCloudAuthException, IikoCloudException
+from iikocloud.exceptions import IikoCloudAuthException, IikoCloudException, MenuTooEarly
+from iikocloud.menu_windows import MenuWindows
 from iikocloud.rate_limiter import (
     GlobalRateLimiter,
     RateLimitConfig,
@@ -31,6 +33,7 @@ __all__ = [
     "MethodRateLimits",
     # Configuration
     "IikoCloudConfig",
+    "MenuWindowsSettings",
     "MethodRateLimitsSettings",
     "RateLimitSettings",
     "clear_config_cache",
@@ -40,6 +43,9 @@ __all__ = [
     # Exceptions
     "IikoCloudAuthException",
     "IikoCloudException",
+    "MenuTooEarly",
+    # Menu windows (0.3.0)
+    "MenuWindows",
     # Rate Limiting
     "GlobalRateLimiter",
     "RateLimitConfig",

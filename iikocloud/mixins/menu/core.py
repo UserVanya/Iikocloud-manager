@@ -1,5 +1,7 @@
 """Menu core mixin — прямые обёртки SDK через execute_with_retry."""
 
+import logging
+
 from iikocloud_client import (
     AddProductsToStopListRequest,
     CalculateComboPriceRequest,
@@ -22,7 +24,9 @@ from iikocloud_client import (
     StopListsResponse,
 )
 
-from iikocloud.mixins._base import ApiMethod, _ManagerBase
+from iikocloud.mixins._base import ApiMethod, _is_too_many, _ManagerBase
+
+logger = logging.getLogger(__name__)
 
 
 class MenuCoreMixin(_ManagerBase):
@@ -86,9 +90,22 @@ class MenuCoreMixin(_ManagerBase):
             api = await self.get_menu_api()
             return await api.get_external_menu_v3_by_id(menu_request_v3=request)
 
-        return await self.execute_with_retry(
-            ApiMethod.GET_EXTERNAL_MENU_V3_BY_ID, api_call
-        )
+        # Окна ключа и организации (выпуск 0.3.0): не пора — сразу MenuTooEarly, без
+        # ожидания.
+        self._menu_windows.take(request.organization_id)
+        try:
+            return await self.execute_with_retry(
+                ApiMethod.GET_EXTERNAL_MENU_V3_BY_ID, api_call
+            )
+        except Exception as exc:
+            if _is_too_many(exc):
+                # iiko попросил реже — меню всего ключа ждут паузу.
+                self._menu_windows.pause()
+                logger.warning(
+                    "iiko ответил «слишком часто» на чтение меню — пауза меню ключа %s с",
+                    self._menu_windows.pause_sec,
+                )
+            raise
 
     async def get_stop_lists(
         self,

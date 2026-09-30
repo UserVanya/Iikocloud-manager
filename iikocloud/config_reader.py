@@ -11,7 +11,7 @@ from os import getenv
 from typing import Any, TypeVar, cast
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, SecretStr, field_validator
+from pydantic import BaseModel, Field, SecretStr, field_validator
 from yaml import CSafeLoader as SafeLoader
 from yaml import load
 
@@ -796,6 +796,15 @@ class MethodRateLimitsSettings(BaseModel):
         return max(limits, key=lambda s: s.max_requests / s.time_window_seconds)
 
 
+class MenuWindowsSettings(BaseModel):
+    """Окна чтения меню (выпуск 0.3.0): у ключа — общее, у организации — своё;
+    пауза после 429."""
+
+    per_key_sec: float = Field(default=30.0, gt=0)
+    per_organization_sec: float = Field(default=120.0, gt=0)
+    pause_after_429_sec: float = Field(default=300.0, gt=0)
+
+
 class IikoCloudConfig(BaseModel):
     """Конфигурация для подключения к iikocloud API."""
 
@@ -805,6 +814,8 @@ class IikoCloudConfig(BaseModel):
 
     # Rate limits для каждого метода API
     rate_limits: MethodRateLimitsSettings = MethodRateLimitsSettings()
+    # Окна чтения меню — не ждут, а отвечают «через сколько» (выпуск 0.3.0)
+    menu_windows: MenuWindowsSettings = MenuWindowsSettings()
 
 
 @lru_cache

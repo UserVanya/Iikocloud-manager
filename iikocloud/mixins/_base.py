@@ -55,6 +55,7 @@ from iikocloud_client import (
 from iikocloud_client.exceptions import UnauthorizedException
 
 from iikocloud.config_reader import MethodRateLimitsSettings
+from iikocloud.menu_windows import MenuWindows
 from iikocloud.rate_limiter import (
     GlobalRateLimiter,
     RateLimitConfig,
@@ -77,6 +78,11 @@ def as_uuid(value: str | UUID) -> UUID:
 def _requests_per_second(config: RateLimitConfig) -> float:
     """Скорость лимита в запросах в секунду."""
     return config.max_requests / config.time_window_seconds
+
+
+def _is_too_many(error: BaseException) -> bool:
+    """«Слишком часто» (429) ли это — по ``status`` исключения SDK."""
+    return getattr(error, "status", None) == 429
 
 
 def _is_unauthorized(error: BaseException) -> bool:
@@ -723,6 +729,7 @@ class _ManagerBase:
     _global_limiter: GlobalRateLimiter
     _method_limits: MethodRateLimits
     _method_limiters: dict[ApiMethod, TokenBucketRateLimiter]
+    _menu_windows: MenuWindows
 
     _authorization_api: AuthorizationApi | None
     _organizations_api: OrganizationsApi | None

@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+from typing import Any
 
 from iikocloud_client import (
     AddressesApi,
@@ -47,7 +48,8 @@ from iikocloud_client import (
     WebhooksApi,
 )
 
-from iikocloud.config_reader import IikoCloudConfig
+from iikocloud.config_reader import IikoCloudConfig, MenuWindowsSettings
+from iikocloud.menu_windows import MenuWindows
 from iikocloud.mixins._base import (
     ApiCredentials,
     ApiMethod,
@@ -83,7 +85,11 @@ from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
 from iikocloud.mixins.report.helpers import ReportHelpersMixin
 from iikocloud.mixins.terminal_groups.helpers import TerminalGroupsHelpersMixin
 from iikocloud.mixins.webhooks.helpers import WebhooksHelpersMixin
-from iikocloud.rate_limiter import GlobalRateLimiter, TokenBucketRateLimiter
+from iikocloud.rate_limiter import (
+    GlobalRateLimiter,
+    RateLimitConfig,
+    TokenBucketRateLimiter,
+)
 from iikocloud.token_manager import TokenManager
 
 logger = logging.getLogger(__name__)
@@ -146,6 +152,7 @@ class IikoCloudApiClientManager(
         credentials: ApiCredentials,
         global_limiter: GlobalRateLimiter,
         method_limits: MethodRateLimits,
+        menu_windows: MenuWindowsSettings | None = None,
     ) -> None:
         """Инициализация менеджера (внутренний метод).
 
@@ -160,6 +167,17 @@ class IikoCloudApiClientManager(
             method: TokenBucketRateLimiter(method_limits.for_method(method))
             for method in ApiMethod
         }
+
+        # Окна чтения меню (выпуск 0.3.0): не ждут, а отвечают «через сколько». Лимитер
+        # метода меню — только страховка по окну ключа: блокирующий «раз в 120 с на ключ»
+        # заставлял бы второй вопрос ждать, хотя окно его организации свободно.
+        windows = menu_windows or MenuWindowsSettings()
+        self._menu_windows = MenuWindows(
+            per_key_sec=windows.per_key_sec,
+            per_organization_sec=windows.per_organization_sec,
+            pause_sec=windows.pause_after_429_sec,
+        )
+        self._menu_backstop(windows.per_key_sec)
 
         # SDK default host (https://api-ru.iiko.services) — no host override
         self._config = Configuration()
@@ -249,13 +267,46 @@ class IikoCloudApiClientManager(
             credentials.key_id,
         )
 
+    def _menu_backstop(self, per_key_sec: float) -> None:
+        """Лимитер метода меню — по окну ключа: окна отвечают «рано» раньше, чем он
+        заставит ждать."""
+        limiter = TokenBucketRateLimiter(
+            RateLimitConfig(max_requests=1, time_window_seconds=per_key_sec)
+        )
+        self._method_limiters[ApiMethod.GET_EXTERNAL_MENU_V3_BY_ID] = limiter
+
+    def set_menu_limits(
+        self,
+        *,
+        per_key_sec: float | None = None,
+        per_organization_sec: float | None = None,
+        pause_after_429_sec: float | None = None,
+    ) -> None:
+        """Окна чтения меню на ходу, без пересоздания менеджера (выпуск 0.3.0)."""
+        self._menu_windows.resize(
+            per_key_sec=per_key_sec,
+            per_organization_sec=per_organization_sec,
+            pause_sec=pause_after_429_sec,
+        )
+        if per_key_sec is not None:
+            self._menu_backstop(per_key_sec)
+
+    def menu_state(self) -> dict[str, Any]:
+        """Окна чтения меню ключа и пауза после 429 — для экрана состояния."""
+        return self._menu_windows.state()
+
     @classmethod
     async def get_instance(
         cls,
         credentials: ApiCredentials,
         method_limits: MethodRateLimits | None = None,
+        menu_windows: MenuWindowsSettings | None = None,
     ) -> "IikoCloudApiClientManager":
-        """Получить или создать экземпляр менеджера для credentials.key_id."""
+        """Получить или создать экземпляр менеджера для credentials.key_id.
+
+        Окна меню (`menu_windows`) берутся при создании; у существующего —
+        `set_menu_limits`.
+        """
         if cls._lock is None:
             cls._lock = asyncio.Lock()
 
@@ -272,6 +323,7 @@ class IikoCloudApiClientManager(
                     credentials=credentials,
                     global_limiter=global_rl,
                     method_limits=method_limits,
+                    menu_windows=menu_windows,
                 )
             return cls._instances[key]
 
@@ -284,7 +336,7 @@ class IikoCloudApiClientManager(
             client_secret=config.client_secret.get_secret_value(),
         )
         limits = MethodRateLimits.from_settings(config.rate_limits)
-        return await cls.get_instance(creds, limits)
+        return await cls.get_instance(creds, limits, config.menu_windows)
 
     @classmethod
     async def close_all(cls) -> None:

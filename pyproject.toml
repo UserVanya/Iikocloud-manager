@@ -1,6 +1,6 @@
 [project]
 name = "iikocloud-manager"
-version = "0.2.3"
+version = "0.3.0"
 description = "Асинхронный клиент для iikocloud API с rate limiting и автоматическим управлением токенами"
 readme = "README.md"
 requires-python = ">=3.12"
