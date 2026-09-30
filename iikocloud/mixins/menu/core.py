@@ -84,6 +84,10 @@ class MenuCoreMixin(_ManagerBase):
 
         Returns:
             Меню MenuV3
+
+        Raises:
+            MenuTooEarly: окно ключа или организации ещё не открылось либо меню ключа на
+                паузе после 429 — сразу, без ожидания (выпуск 0.3.0).
         """
 
         async def api_call() -> MenuV3:
