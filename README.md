@@ -92,6 +92,37 @@ uv run python main.py
 **Смена поведения с 0.2.x:** вызывающий `get_external_menu_v3_by_id` раньше ждал окна до двух
 минут, теперь получает `MenuTooEarly` — ловите его и повторяйте через `seconds`.
 
+### Меню вместе с ответом iiko (0.4.0)
+
+Рядом с `get_external_menu_v3_by_id` — `get_external_menu_v3_by_id_with_answer(request)`: то же
+чтение меню, но кроме разобранного `MenuV3` отдаётся и тело ответа iiko как есть — например,
+чтобы показать сотруднику, что именно прислал iiko. Возвращает `MenuV3Answer`:
+
+- `menu` — меню `MenuV3`, разобранное так же, как в `get_external_menu_v3_by_id`;
+- `raw` — тело ответа байт в байт (те же пробелы, порядок полей и кириллица; сжатие передачи
+  вроде gzip снимает HTTP-клиент);
+- `content_type` — заголовок Content-Type ответа (`None`, если iiko его не прислал).
+
+Один запрос в iiko на попытку: меню разбирается из тех же байт. Окна ключа и организации,
+страховка метода по окну ключа, повтор после 401 и пауза после 429 — общие с
+`get_external_menu_v3_by_id`: прочитали меню одним методом — другой для той же организации
+ответит `MenuTooEarly`. Ошибки iiko (401, 429, 5xx) пробрасываются теми же исключениями SDK.
+Если iiko ответил успехом, но тело в `MenuV3` не разбирается, — `MenuAnswerUnreadable`: тело
+в `raw`, Content-Type в `content_type`, причина (обычно `ValidationError`) — в `__cause__`.
+
+```python
+from iikocloud import MenuAnswerUnreadable, MenuTooEarly
+
+try:
+    answer = await manager.get_external_menu_v3_by_id_with_answer(request)
+except MenuTooEarly as early:
+    ...  # повторить через early.seconds
+except MenuAnswerUnreadable as unreadable:
+    ...  # показать unreadable.raw — что прислал iiko
+else:
+    menu, raw = answer.menu, answer.raw
+```
+
 ## Тесты
 
 ```bash

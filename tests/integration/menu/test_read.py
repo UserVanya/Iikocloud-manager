@@ -86,3 +86,31 @@ class TestMenuWindows:
         assert early.value.seconds > 0
         assert manager.menu_state()["paused_for_sec"] == 0
 
+
+class TestMenuWithAnswer:
+    """Меню вместе с ответом iiko против реального API (выпуск 0.4.0)."""
+
+    async def test_the_answer_is_what_the_menu_was_read_from(
+        self,
+        manager: IikoCloudApiClientManager,
+        organization_id: UUID,
+    ) -> None:
+        """Тело ответа — JSON того же меню; следующее чтение любым способом — «рано»."""
+        import asyncio
+        import json
+
+        from iikocloud_client import MenuRequestV3
+
+        menus = (await manager.get_external_menus()).external_menus or []
+        if not menus:
+            pytest.skip("у ключа нет внешних меню")
+        request = MenuRequestV3(
+            external_menu_id=str(menus[0].id), organization_id=organization_id
+        )
+        answer = await manager.get_external_menu_v3_by_id_with_answer(request)
+        body = json.loads(answer.raw)
+        assert str(body["id"]) == str(answer.menu.id)
+        assert len(body.get("itemsGroups") or []) == len(answer.menu.items_groups or [])
+        assert answer.content_type and "json" in answer.content_type
+        with pytest.raises(MenuTooEarly):
+            await asyncio.wait_for(manager.get_external_menu_v3_by_id(request), timeout=2)

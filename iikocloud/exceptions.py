@@ -44,3 +44,27 @@ class MenuTooEarly(IikoCloudException):
         )
         self.seconds = seconds
         self.reason = reason
+
+
+class MenuAnswerUnreadable(IikoCloudException):
+    """iiko ответил на чтение меню успехом (2xx), но тело в меню V3 не разобрано
+    (выпуск 0.4.0).
+
+    ``raw`` — тело ответа байт в байт, ``content_type`` — его заголовок Content-Type
+    (``None``, если iiko его не прислал). Причина — в ``original_error`` и ``__cause__``:
+    обычно ``ValidationError`` модели, реже неверный JSON.
+    """
+
+    def __init__(
+        self,
+        raw: bytes,
+        content_type: str | None,
+        original_error: Exception | None = None,
+    ) -> None:
+        super().__init__(
+            f"ответ iiko на меню не разобран: {len(raw)} байт, "
+            f"тип содержимого — {content_type or 'не указан'}",
+            original_error,
+        )
+        self.raw = raw
+        self.content_type = content_type

@@ -16,8 +16,14 @@ from iikocloud.config_reader import (
     get_iikocloud_config,
     parse_config_file,
 )
-from iikocloud.exceptions import IikoCloudAuthException, IikoCloudException, MenuTooEarly
+from iikocloud.exceptions import (
+    IikoCloudAuthException,
+    IikoCloudException,
+    MenuAnswerUnreadable,
+    MenuTooEarly,
+)
 from iikocloud.menu_windows import MenuWindows
+from iikocloud.mixins.menu.answer import MenuV3Answer
 from iikocloud.rate_limiter import (
     GlobalRateLimiter,
     RateLimitConfig,
@@ -43,9 +49,12 @@ __all__ = [
     # Exceptions
     "IikoCloudAuthException",
     "IikoCloudException",
+    "MenuAnswerUnreadable",
     "MenuTooEarly",
     # Menu windows (0.3.0)
     "MenuWindows",
+    # Menu with the raw iiko answer (0.4.0)
+    "MenuV3Answer",
     # Rate Limiting
     "GlobalRateLimiter",
     "RateLimitConfig",

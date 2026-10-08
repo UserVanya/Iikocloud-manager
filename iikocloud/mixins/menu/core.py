@@ -1,6 +1,8 @@
 """Menu core mixin — прямые обёртки SDK через execute_with_retry."""
 
 import logging
+from collections.abc import Awaitable, Callable
+from typing import TypeVar
 
 from iikocloud_client import (
     AddProductsToStopListRequest,
@@ -23,10 +25,25 @@ from iikocloud_client import (
     StopListsRequest,
     StopListsResponse,
 )
+from iikocloud_client.rest import RESTResponse
 
+from iikocloud.exceptions import MenuAnswerUnreadable
 from iikocloud.mixins._base import ApiMethod, _is_too_many, _ManagerBase
+from iikocloud.mixins.menu.answer import MenuV3Answer
 
 logger = logging.getLogger(__name__)
+
+T = TypeVar("T")
+
+#: Типы ответа адреса /api/menu/v3/by_id — копия карты SDK из
+#: ``MenuApi.get_external_menu_v3_by_id``: чтение с ответом разбирает тело так же, как SDK.
+_MENU_V3_RESPONSE_TYPES: dict[str, str | None] = {
+    "200": "MenuV3",
+    "400": "IikoErrorResponse",
+    "401": "IikoErrorResponse",
+    "408": "IikoErrorResponse",
+    "500": "IikoErrorResponse",
+}
 
 
 class MenuCoreMixin(_ManagerBase):
@@ -94,6 +111,73 @@ class MenuCoreMixin(_ManagerBase):
             api = await self.get_menu_api()
             return await api.get_external_menu_v3_by_id(menu_request_v3=request)
 
+        return await self._read_menu_v3(request, api_call)
+
+    async def get_external_menu_v3_by_id_with_answer(
+        self,
+        request: MenuRequestV3,
+    ) -> MenuV3Answer:
+        """Получить меню V3 вместе с ответом iiko байт в байт (выпуск 0.4.0).
+
+        То же чтение, что ``get_external_menu_v3_by_id``: те же окна ключа и организации,
+        тот же предел метода, тот же повтор после 401 и та же пауза после 429. Отличие — в
+        ответе: кроме разобранного меню отдаётся тело ответа iiko как есть (``raw``) и его
+        Content-Type — например, чтобы показать сотруднику, что именно прислал iiko. За
+        одну попытку — один запрос в iiko: меню разбирается из тех же байт.
+
+        Args:
+            request: Параметры запроса MenuRequestV3
+
+        Returns:
+            MenuV3Answer — меню, тело ответа байт в байт и его Content-Type
+
+        Raises:
+            MenuTooEarly: как у ``get_external_menu_v3_by_id`` — окно ещё не открылось
+                или меню ключа на паузе после 429.
+            MenuAnswerUnreadable: iiko ответил успехом (2xx), но тело в MenuV3 не
+                разобрано; тело — в ``raw``, причина — в ``__cause__``.
+        """
+
+        async def api_call() -> MenuV3Answer:
+            api = await self.get_menu_api()
+            http = await api.get_external_menu_v3_by_id_without_preload_content(
+                menu_request_v3=request
+            )
+            # Тот же путь, что у SDK внутри get_external_menu_v3_by_id, но байты остаются
+            # у нас: прочитать тело, разобрать его тем же клиентом и той же картой типов.
+            response = RESTResponse(http)
+            raw: bytes = await response.read()  # type: ignore[no-untyped-call]
+            content_type = http.headers.get("content-type")
+            try:
+                menu = api.api_client.response_deserialize(
+                    response_data=response,
+                    response_types_map=_MENU_V3_RESPONSE_TYPES,
+                ).data
+            except Exception as exc:
+                if not 200 <= response.status <= 299:
+                    # 401, 429, 5xx — то же исключение SDK, что у
+                    # get_external_menu_v3_by_id: повтор после 401 и пауза после 429
+                    # работают как прежде.
+                    raise
+                raise MenuAnswerUnreadable(raw, content_type, exc) from exc
+            if not isinstance(menu, MenuV3):
+                # Успех без меню (пустое тело, «null») — тоже неразобранный ответ.
+                raise MenuAnswerUnreadable(raw, content_type)
+            return MenuV3Answer(menu=menu, raw=raw, content_type=content_type)
+
+        return await self._read_menu_v3(request, api_call)
+
+    async def _read_menu_v3(
+        self,
+        request: MenuRequestV3,
+        api_call: Callable[[], Awaitable[T]],
+    ) -> T:
+        """Одно чтение меню V3: окна, предел метода, повтор после 401, пауза после 429.
+
+        Общее для ``get_external_menu_v3_by_id`` и
+        ``get_external_menu_v3_by_id_with_answer``: оба читают один адрес и делят окна
+        ключа и организации и предел метода ``GET_EXTERNAL_MENU_V3_BY_ID``.
+        """
         # Окна ключа и организации (выпуск 0.3.0): не пора — сразу MenuTooEarly, без
         # ожидания.
         self._menu_windows.take(request.organization_id)

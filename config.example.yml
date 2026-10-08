@@ -685,6 +685,7 @@ iikocloud:
       max_requests: 100
       time_window_seconds: 60.0
   # Окна чтения меню нового адреса (0.3.0): не ждут, а отвечают MenuTooEarly «через N с».
+  # Общие для get_external_menu_v3_by_id и get_external_menu_v3_by_id_with_answer (0.4.0).
   menu_windows:
     per_key_sec: 30.0            # одно меню ключа — не чаще раза в столько секунд
     per_organization_sec: 120.0  # одно меню организации — не чаще раза в столько секунд
