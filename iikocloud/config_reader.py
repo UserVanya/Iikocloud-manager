@@ -366,6 +366,51 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=100, time_window_seconds=60.0
     )
 
+    # Employees — справочник сотрудников и должностей (/api/employees/v1). У iiko для
+    # этих адресов нет «группы ограничений»; пределы — как у прочих методов v1:
+    # чтение 10 в минуту, запись 100 в минуту.
+    get_employee: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_employees: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    create_employee: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_employee: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    fire_employees: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    restore_employee: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_employee_position: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_employee_positions: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+
+    # Employees — явки (/api/employees/v1/attendance)
+    list_employee_attendances: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    create_employee_attendance: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_employee_attendance: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    delete_employee_attendance: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    list_employee_attendance_types: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+
     # Messages
     check_sms_sending_possibility: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0
@@ -395,6 +440,46 @@ class MethodRateLimitsSettings(BaseModel):
         max_requests=10, time_window_seconds=60.0
     )
     get_customer_transactions_by_revision: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+
+    # Reporting (/api/reporting/v1): OLAP-отчёт по сохранённому пресету тяжёлый — 1 в минуту
+    get_income_plan: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_olap_presets: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_olap_preset_report: RateLimitSettings = RateLimitSettings(
+        max_requests=1, time_window_seconds=60.0
+    )
+
+    # Nomenclature — техкарты v3 и справочники (/api/nomenclature)
+    create_nomenclature_assembly_chart_v3: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    update_nomenclature_assembly_chart_v3: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    delete_nomenclature_assembly_chart_v3: RateLimitSettings = RateLimitSettings(
+        max_requests=100, time_window_seconds=60.0
+    )
+    get_nomenclature_assembly_chart_v3: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_nomenclature_assembly_charts_v3: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    resolve_nomenclature_assembly_chart_v3: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_nomenclature_discount_types: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    get_nomenclature_outer_economic_activity_code: RateLimitSettings = RateLimitSettings(
+        max_requests=10, time_window_seconds=60.0
+    )
+    list_nomenclature_outer_economic_activity_codes: RateLimitSettings = RateLimitSettings(
         max_requests=10, time_window_seconds=60.0
     )
 

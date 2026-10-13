@@ -123,6 +123,68 @@ else:
     menu, raw = answer.menu, answer.raw
 ```
 
+### Сотрудники (0.5.0)
+
+Раздел сотрудников собран из трёх частей; все методы — с теми же пределами (свой предел на
+метод + общий), повтором после 401 и исключениями SDK, что и прочие разделы. Пределы — в
+`rate_limits` (см. `config.example.yml`).
+
+| Что | Метод менеджера | Адрес iiko | Предел |
+|---|---|---|---|
+| Курьеры организации | `get_couriers`, помощник `list_organization_couriers(org_id)` | `/api/1/employees/couriers` | 1/мин |
+| Курьеры с проверкой роли | `get_couriers_by_role` | `/api/1/employees/couriers/by_role` | 1/мин |
+| Карточка по id (телефон, cellPhone) | `get_employee_info` | `/api/1/employees/info` | 1/мин |
+| Открыть / закрыть личную смену | `open_personal_session`, `close_personal_session` | `/api/1/employees/shift/clockin`, `clockout` | 100/мин |
+| Открыта ли смена | `get_personal_session_info`, помощник `is_personal_session_open(emp, org, tg) -> bool` | `/api/1/employees/shift/is_open` | 10/мин |
+| Где открыта смена курьера | `get_terminal_groups_of_employee` | `/api/1/employees/shifts/by_courier` | 10/мин |
+| Места активных курьеров, история мест | `get_active_courier_locations`, `get_active_courier_locations_by_terminal`, `get_courier_location_history` | `/api/1/employees/couriers/active_location…`, `locations/by_time_offset` | 10/мин |
+| Сотрудник по id | `get_employee` | `/api/employees/v1/employee/get` | 10/мин |
+| Список сотрудников | `list_employees`, помощник `list_all_employees(filters=…, fields=…)` | `/api/employees/v1/employee/list` | 10/мин |
+| Создать, изменить, уволить, вернуть | `create_employee`, `update_employee`, `fire_employees`, `restore_employee` | `/api/employees/v1/employee/*` | 100/мин |
+| Должности | `get_employee_position`, `list_employee_positions` | `/api/employees/v1/positions/*` | 10/мин |
+| Явки: список | `list_employee_attendances`, помощник `list_all_employee_attendances(org, start, end)` | `/api/employees/v1/attendance/list` | 10/мин |
+| Явки: создать, изменить, удалить | `create_employee_attendance`, `update_employee_attendance`, `delete_employee_attendance` | `/api/employees/v1/attendance/*` | 100/мин |
+| Типы явок | `list_employee_attendance_types` | `/api/employees/v1/attendance-type/list` | 10/мин |
+
+Что важно знать:
+
+- **Телефон.** В списке сотрудников он есть только если запрошен: без `fields` iiko отдаёт
+  лишь `id`, `name`, `code`, `isFired`. `list_all_employees` по умолчанию просит
+  `EMPLOYEE_CONTACT_FIELDS` (с `phone`) и обходит все страницы. В карточке
+  `get_employee` и в `get_employee_info` телефон приходит всегда (если заполнен в iiko).
+- **Явки.** Период — дата и время в ISO 8601 (например `2026-10-13T00:00:00Z`; проверено
+  на стенде). iiko создаёт только закрытые явки (`endAt` обязателен); удаление необратимо;
+  смена организации в `update_employee_attendance` даёт новую явку с новым id.
+- **Смена.** Успешный ответ «открыта ли смена» iiko помечает `error: "NO_ERROR"` —
+  `is_personal_session_open` считает его успехом, иное непустое `error` — исключение
+  `RuntimeError`.
+- **Расписания (графика смен) в облачном API iiko нет** — только явки.
+
+### Номенклатура и отчёты (0.5.0)
+
+- Техкарты v3: `create_…`, `update_…`, `delete_…`, `get_…`, `list_nomenclature_assembly_charts_v3`,
+  `resolve_nomenclature_assembly_chart_v3` (вид на дату: `assembled`, `prepared`, `tree`);
+  справочники: `list_nomenclature_discount_types`, `get_…`/`list_nomenclature_outer_economic_activity_code(s)`
+  (коды ТН ВЭД). Чтение 10/мин, запись 100/мин.
+- Отчёты `/api/reporting/v1`: `get_income_plan` (план выручки по дням, 10/мин),
+  `list_olap_presets()` (сохранённые пресеты, 10/мин), `get_olap_preset_report` (данные
+  пресета за период, 1/мин).
+
+### Смена поведения с 0.4.x (клиент iikocloud 0.3.0, описание iiko 9.8.6.3)
+
+- `list_inventory_incoming_invoices` / `list_inventory_outgoing_invoices` отдают
+  `IncomingInvoiceListItem` / `OutgoingInvoiceListItem` (так теперь описан ответ iiko).
+- `PayRequest` (оплата приходной накладной): поля `account_id`, `amount`, `payment_date`,
+  `cfo_item_id` вместо `account_from`, `account_to`, `date`, `sum`.
+- `GetCounteragentsRequest` без `organization_id` (справочник общий для ключа), с отбором
+  `is_deleted` и `revision`; у `GetPriceListRequest` обязателен `counteragent_id`.
+- Меню V3: `MenuV3OverrideTaxCategory` — поля `UUID | None` вместо строк; у вариантов
+  модификатора (`ModifierItem`) все поля, кроме `id`, необязательны — пустое поле берётся из
+  `MenuV3.modifiers` с тем же `id`.
+- Обязательными стали: `code` у создания/изменения группы и продукта номенклатуры, `name` у
+  `EmployeeCreateRequest`, `dateTo` у сохранения техкарт v1/v2, `number` у
+  `IncomingInventoryUpdateRequest`.
+
 ## Тесты
 
 ```bash

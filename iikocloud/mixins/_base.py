@@ -24,6 +24,9 @@ from iikocloud_client import (
     DiscountsAndPromotionsApi,
     DraftsApi,
     EmployeesApi,
+    EmployeesAttendanceApi,
+    EmployeesEmployeesApi,
+    EmployeesPositionsApi,
     # Invoice Processing
     FinanceAccountTransactionsApi,
     FinanceDocumentTransactionsApi,
@@ -43,12 +46,16 @@ from iikocloud_client import (
     MarketingSourcesApi,
     MenuApi,
     MessagesApi,
+    NomenclatureAssemblyChartApi,
+    NomenclatureDirectoriesApi,
     NomenclatureNomenclatureProductApi,
     NotificationsApi,
     OperationsApi,
     OrdersApi,
     OrganizationsApi,
     ReportApi,
+    ReportingIncomePlanApi,
+    ReportingOlapApi,
     TerminalGroupsApi,
     WebhooksApi,
 )
@@ -230,6 +237,23 @@ class ApiMethod(Enum):
     OPEN_PERSONAL_SESSION = "open_personal_session"
     CLOSE_PERSONAL_SESSION = "close_personal_session"
 
+    # Employees — справочник сотрудников и должностей (/api/employees/v1)
+    GET_EMPLOYEE = "get_employee"
+    LIST_EMPLOYEES = "list_employees"
+    CREATE_EMPLOYEE = "create_employee"
+    UPDATE_EMPLOYEE = "update_employee"
+    FIRE_EMPLOYEES = "fire_employees"
+    RESTORE_EMPLOYEE = "restore_employee"
+    GET_EMPLOYEE_POSITION = "get_employee_position"
+    LIST_EMPLOYEE_POSITIONS = "list_employee_positions"
+
+    # Employees — явки (/api/employees/v1/attendance)
+    LIST_EMPLOYEE_ATTENDANCES = "list_employee_attendances"
+    CREATE_EMPLOYEE_ATTENDANCE = "create_employee_attendance"
+    UPDATE_EMPLOYEE_ATTENDANCE = "update_employee_attendance"
+    DELETE_EMPLOYEE_ATTENDANCE = "delete_employee_attendance"
+    LIST_EMPLOYEE_ATTENDANCE_TYPES = "list_employee_attendance_types"
+
     # Messages
     CHECK_SMS_SENDING_POSSIBILITY = "check_sms_sending_possibility"
     CHECK_SMS_STATUS = "check_sms_status"
@@ -245,6 +269,26 @@ class ApiMethod(Enum):
     # Report
     GET_CUSTOMER_TRANSACTIONS_BY_DATE = "get_customer_transactions_by_date"
     GET_CUSTOMER_TRANSACTIONS_BY_REVISION = "get_customer_transactions_by_revision"
+
+    # Reporting (/api/reporting/v1)
+    GET_INCOME_PLAN = "get_income_plan"
+    LIST_OLAP_PRESETS = "list_olap_presets"
+    GET_OLAP_PRESET_REPORT = "get_olap_preset_report"
+
+    # Nomenclature — техкарты v3 и справочники (/api/nomenclature)
+    CREATE_NOMENCLATURE_ASSEMBLY_CHART_V3 = "create_nomenclature_assembly_chart_v3"
+    UPDATE_NOMENCLATURE_ASSEMBLY_CHART_V3 = "update_nomenclature_assembly_chart_v3"
+    DELETE_NOMENCLATURE_ASSEMBLY_CHART_V3 = "delete_nomenclature_assembly_chart_v3"
+    GET_NOMENCLATURE_ASSEMBLY_CHART_V3 = "get_nomenclature_assembly_chart_v3"
+    LIST_NOMENCLATURE_ASSEMBLY_CHARTS_V3 = "list_nomenclature_assembly_charts_v3"
+    RESOLVE_NOMENCLATURE_ASSEMBLY_CHART_V3 = "resolve_nomenclature_assembly_chart_v3"
+    LIST_NOMENCLATURE_DISCOUNT_TYPES = "list_nomenclature_discount_types"
+    GET_NOMENCLATURE_OUTER_ECONOMIC_ACTIVITY_CODE = (
+        "get_nomenclature_outer_economic_activity_code"
+    )
+    LIST_NOMENCLATURE_OUTER_ECONOMIC_ACTIVITY_CODES = (
+        "list_nomenclature_outer_economic_activity_codes"
+    )
 
     # Webhooks
     GET_WEBHOOK_SETTINGS = "get_webhook_settings"
@@ -531,6 +575,19 @@ class MethodRateLimits:
     get_terminal_groups_of_employee: RateLimitConfig
     open_personal_session: RateLimitConfig
     close_personal_session: RateLimitConfig
+    get_employee: RateLimitConfig
+    list_employees: RateLimitConfig
+    create_employee: RateLimitConfig
+    update_employee: RateLimitConfig
+    fire_employees: RateLimitConfig
+    restore_employee: RateLimitConfig
+    get_employee_position: RateLimitConfig
+    list_employee_positions: RateLimitConfig
+    list_employee_attendances: RateLimitConfig
+    create_employee_attendance: RateLimitConfig
+    update_employee_attendance: RateLimitConfig
+    delete_employee_attendance: RateLimitConfig
+    list_employee_attendance_types: RateLimitConfig
     check_sms_sending_possibility: RateLimitConfig
     check_sms_status: RateLimitConfig
     send_loyalty_sms: RateLimitConfig
@@ -539,6 +596,18 @@ class MethodRateLimits:
     get_command_status: RateLimitConfig
     get_customer_transactions_by_date: RateLimitConfig
     get_customer_transactions_by_revision: RateLimitConfig
+    get_income_plan: RateLimitConfig
+    list_olap_presets: RateLimitConfig
+    get_olap_preset_report: RateLimitConfig
+    create_nomenclature_assembly_chart_v3: RateLimitConfig
+    update_nomenclature_assembly_chart_v3: RateLimitConfig
+    delete_nomenclature_assembly_chart_v3: RateLimitConfig
+    get_nomenclature_assembly_chart_v3: RateLimitConfig
+    list_nomenclature_assembly_charts_v3: RateLimitConfig
+    resolve_nomenclature_assembly_chart_v3: RateLimitConfig
+    list_nomenclature_discount_types: RateLimitConfig
+    get_nomenclature_outer_economic_activity_code: RateLimitConfig
+    list_nomenclature_outer_economic_activity_codes: RateLimitConfig
     get_webhook_settings: RateLimitConfig
     update_webhook_settings: RateLimitConfig
     get_reserve_available_organizations: RateLimitConfig
@@ -746,10 +815,17 @@ class _ManagerBase:
     _discounts_and_promotions_api: DiscountsAndPromotionsApi | None
     _marketing_sources_api: MarketingSourcesApi | None
     _employees_api: EmployeesApi | None
+    _employees_employees_api: EmployeesEmployeesApi | None
+    _employees_attendance_api: EmployeesAttendanceApi | None
+    _employees_positions_api: EmployeesPositionsApi | None
     _messages_api: MessagesApi | None
     _notifications_api: NotificationsApi | None
     _operations_api: OperationsApi | None
     _report_api: ReportApi | None
+    _reporting_income_plan_api: ReportingIncomePlanApi | None
+    _reporting_olap_api: ReportingOlapApi | None
+    _nomenclature_assembly_chart_api: NomenclatureAssemblyChartApi | None
+    _nomenclature_directories_api: NomenclatureDirectoriesApi | None
     _webhooks_api: WebhooksApi | None
     _banquets_reserves_api: BanquetsReservesApi | None
     _orders_api: OrdersApi | None
@@ -895,6 +971,33 @@ class _ManagerBase:
             self._employees_api = EmployeesApi(api_client=self._api_client)
         return self._employees_api
 
+    async def get_employees_employees_api(self) -> EmployeesEmployeesApi:
+        """Получить клиент EmployeesEmployeesApi (справочник сотрудников, v1)."""
+        await self._ensure_token_manager()
+        if self._employees_employees_api is None:
+            self._employees_employees_api = EmployeesEmployeesApi(
+                api_client=self._api_client
+            )
+        return self._employees_employees_api
+
+    async def get_employees_attendance_api(self) -> EmployeesAttendanceApi:
+        """Получить клиент EmployeesAttendanceApi (явки, v1)."""
+        await self._ensure_token_manager()
+        if self._employees_attendance_api is None:
+            self._employees_attendance_api = EmployeesAttendanceApi(
+                api_client=self._api_client
+            )
+        return self._employees_attendance_api
+
+    async def get_employees_positions_api(self) -> EmployeesPositionsApi:
+        """Получить клиент EmployeesPositionsApi (должности, v1)."""
+        await self._ensure_token_manager()
+        if self._employees_positions_api is None:
+            self._employees_positions_api = EmployeesPositionsApi(
+                api_client=self._api_client
+            )
+        return self._employees_positions_api
+
     async def get_messages_api(self) -> MessagesApi:
         """Получить клиент MessagesApi."""
         await self._ensure_token_manager()
@@ -922,6 +1025,40 @@ class _ManagerBase:
         if self._report_api is None:
             self._report_api = ReportApi(api_client=self._api_client)
         return self._report_api
+
+    async def get_reporting_income_plan_api(self) -> ReportingIncomePlanApi:
+        """Получить клиент ReportingIncomePlanApi (план выручки)."""
+        await self._ensure_token_manager()
+        if self._reporting_income_plan_api is None:
+            self._reporting_income_plan_api = ReportingIncomePlanApi(
+                api_client=self._api_client
+            )
+        return self._reporting_income_plan_api
+
+    async def get_reporting_olap_api(self) -> ReportingOlapApi:
+        """Получить клиент ReportingOlapApi (OLAP-отчёты)."""
+        await self._ensure_token_manager()
+        if self._reporting_olap_api is None:
+            self._reporting_olap_api = ReportingOlapApi(api_client=self._api_client)
+        return self._reporting_olap_api
+
+    async def get_nomenclature_assembly_chart_api(self) -> NomenclatureAssemblyChartApi:
+        """Получить клиент NomenclatureAssemblyChartApi (техкарты)."""
+        await self._ensure_token_manager()
+        if self._nomenclature_assembly_chart_api is None:
+            self._nomenclature_assembly_chart_api = NomenclatureAssemblyChartApi(
+                api_client=self._api_client
+            )
+        return self._nomenclature_assembly_chart_api
+
+    async def get_nomenclature_directories_api(self) -> NomenclatureDirectoriesApi:
+        """Получить клиент NomenclatureDirectoriesApi (справочники номенклатуры)."""
+        await self._ensure_token_manager()
+        if self._nomenclature_directories_api is None:
+            self._nomenclature_directories_api = NomenclatureDirectoriesApi(
+                api_client=self._api_client
+            )
+        return self._nomenclature_directories_api
 
     async def get_webhooks_api(self) -> WebhooksApi:
         """Получить клиент WebhooksApi."""

@@ -7,6 +7,7 @@ from iikocloud_client import (
     GetCostPricesResponse,
     ListRequest,
     OutgoingInvoice,
+    OutgoingInvoiceListItem,
     OutgoingInvoiceRequest,
     OutgoingInvoiceSaveResponse,
     PayOutgoingInvoiceRequest,
@@ -67,10 +68,10 @@ class OutgoingInvoicesCoreMixin(_ManagerBase):
 
     async def list_inventory_outgoing_invoices(
         self, request: ListRequest
-    ) -> list[OutgoingInvoice]:
+    ) -> list[OutgoingInvoiceListItem]:
         """Список расходных накладных за период."""
 
-        async def api_call() -> list[OutgoingInvoice]:
+        async def api_call() -> list[OutgoingInvoiceListItem]:
             api = await self.get_outgoing_invoices_api()
             return await api.list_inventory_outgoing_invoices(list_request=request)
 

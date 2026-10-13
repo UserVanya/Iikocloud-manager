@@ -59,7 +59,7 @@ DOCUMENT_TRANSACTIONS_METHODS: list[tuple[str, object, str, type]] = [
 COUNTERAGENTS_METHODS: list[tuple[str, object, str, type]] = [
     (
         "list_inventory_counteragents",
-        GetCounteragentsRequest(organization_id=ORG_ID),
+        GetCounteragentsRequest(limit=1, offset=0),
         "get_counteragents_request",
         GetCounteragentsResponse,
     ),

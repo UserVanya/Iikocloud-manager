@@ -488,3 +488,65 @@ def test_no_method_window_exceeds_two_minutes():
         if getattr(settings, name).time_window_seconds > 120.0
     ]
     assert too_slow == []
+
+
+def test_employees_directory_and_attendance_methods_have_limits() -> None:
+    """13 методов справочника сотрудников, должностей и явок (выпуск 0.5.0)."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    reads = [
+        "get_employee",
+        "list_employees",
+        "get_employee_position",
+        "list_employee_positions",
+        "list_employee_attendances",
+        "list_employee_attendance_types",
+    ]
+    writes = [
+        "create_employee",
+        "update_employee",
+        "fire_employees",
+        "restore_employee",
+        "create_employee_attendance",
+        "update_employee_attendance",
+        "delete_employee_attendance",
+    ]
+    expected = {name: 10 / 60.0 for name in reads}
+    expected.update({name: 100 / 60.0 for name in writes})
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name, rps in expected.items():
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
+
+
+def test_reporting_and_nomenclature_methods_have_limits() -> None:
+    """3 метода reporting и 9 методов nomenclature (выпуск 0.5.0)."""
+    from iikocloud.mixins._base import ApiMethod, MethodRateLimits
+
+    expected = {
+        "get_income_plan": 10 / 60.0,
+        "list_olap_presets": 10 / 60.0,
+        "get_olap_preset_report": 1 / 60.0,
+        "create_nomenclature_assembly_chart_v3": 100 / 60.0,
+        "update_nomenclature_assembly_chart_v3": 100 / 60.0,
+        "delete_nomenclature_assembly_chart_v3": 100 / 60.0,
+        "get_nomenclature_assembly_chart_v3": 10 / 60.0,
+        "list_nomenclature_assembly_charts_v3": 10 / 60.0,
+        "resolve_nomenclature_assembly_chart_v3": 10 / 60.0,
+        "list_nomenclature_discount_types": 10 / 60.0,
+        "get_nomenclature_outer_economic_activity_code": 10 / 60.0,
+        "list_nomenclature_outer_economic_activity_codes": 10 / 60.0,
+    }
+    limits = MethodRateLimits.from_settings(MethodRateLimitsSettings())
+    for name, rps in expected.items():
+        config = limits.for_method(ApiMethod(name))
+        assert config.max_requests / config.time_window_seconds == pytest.approx(rps)
+
+
+def test_new_methods_do_not_loosen_the_global_limit() -> None:
+    """Общий предел — самый свободный из методов; новые методы его не поднимают."""
+    settings = MethodRateLimitsSettings()
+    global_limit = settings.compute_global_limit()
+    assert global_limit.max_requests / global_limit.time_window_seconds == pytest.approx(
+        1000 / 60.0
+    )

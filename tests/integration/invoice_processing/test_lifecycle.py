@@ -72,9 +72,7 @@ class TestIncomingInvoiceLifecycle:
         counteragent_id = None
         try:
             counteragents = await manager.list_inventory_counteragents(
-                GetCounteragentsRequest(
-                    limit=1, offset=0, organization_id=org_id, type=["supplier"]
-                )
+                GetCounteragentsRequest(limit=1, offset=0, type=["supplier"])
             )
             ca_items = counteragents.counteragents or []
             if ca_items:

@@ -106,9 +106,9 @@ class TestInvoiceProcessingStructureReads:
     ) -> None:
         try:
             response = await manager.list_inventory_counteragents(
-                GetCounteragentsRequest(
-                    limit=1, offset=0, organization_id=str(organization_id)
-                )
+                # С описания iiko 9.8.6.3 у запроса нет organizationId: справочник
+                # контрагентов — общий для ключа.
+                GetCounteragentsRequest(limit=1, offset=0)
             )
         except ApiException as exc:
             if "EXTERNAL_SYSTEM_TIMEOUT" in str(exc.body or exc):

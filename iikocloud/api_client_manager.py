@@ -19,6 +19,9 @@ from iikocloud_client import (
     DiscountsAndPromotionsApi,
     DraftsApi,
     EmployeesApi,
+    EmployeesAttendanceApi,
+    EmployeesEmployeesApi,
+    EmployeesPositionsApi,
     # Invoice Processing
     FinanceAccountTransactionsApi,
     FinanceDocumentTransactionsApi,
@@ -38,12 +41,16 @@ from iikocloud_client import (
     MarketingSourcesApi,
     MenuApi,
     MessagesApi,
+    NomenclatureAssemblyChartApi,
+    NomenclatureDirectoriesApi,
     NomenclatureNomenclatureProductApi,
     NotificationsApi,
     OperationsApi,
     OrdersApi,
     OrganizationsApi,
     ReportApi,
+    ReportingIncomePlanApi,
+    ReportingOlapApi,
     TerminalGroupsApi,
     WebhooksApi,
 )
@@ -78,11 +85,13 @@ from iikocloud.mixins.invoice_processing import (
 from iikocloud.mixins.marketing_sources.helpers import MarketingSourcesHelpersMixin
 from iikocloud.mixins.menu.helpers import MenuHelpersMixin
 from iikocloud.mixins.messages.helpers import MessagesHelpersMixin
+from iikocloud.mixins.nomenclature.helpers import NomenclatureHelpersMixin
 from iikocloud.mixins.notifications.helpers import NotificationsHelpersMixin
 from iikocloud.mixins.operations.helpers import OperationsHelpersMixin
 from iikocloud.mixins.orders.helpers import OrdersHelpersMixin
 from iikocloud.mixins.organizations.helpers import OrganizationsHelpersMixin
 from iikocloud.mixins.report.helpers import ReportHelpersMixin
+from iikocloud.mixins.reporting.helpers import ReportingHelpersMixin
 from iikocloud.mixins.terminal_groups.helpers import TerminalGroupsHelpersMixin
 from iikocloud.mixins.webhooks.helpers import WebhooksHelpersMixin
 from iikocloud.rate_limiter import (
@@ -122,6 +131,8 @@ class IikoCloudApiClientManager(
     NotificationsHelpersMixin,
     OperationsHelpersMixin,
     ReportHelpersMixin,
+    ReportingHelpersMixin,
+    NomenclatureHelpersMixin,
     WebhooksHelpersMixin,
     BanquetsHelpersMixin,
     OrdersHelpersMixin,
@@ -134,7 +145,9 @@ class IikoCloudApiClientManager(
     Domain-методы — через mixins: organizations, customers, customer_categories,
     terminal_groups, menu, dictionaries, deliveries, deliveries_retrieve,
     delivery_restrictions, drafts, addresses, discounts, marketing_sources,
-    employees, messages, notifications, operations, report, webhooks, banquets,
+    employees (курьеры, смены, справочник сотрудников и должностей, явки), messages,
+    notifications, operations, report, reporting (план выручки, OLAP-пресеты),
+    nomenclature (техкарты v3, типы скидок, коды ТН ВЭД), webhooks, banquets,
     orders, invoice_processing (все 16 сущностей домена через
     InvoiceProcessingHelpersMixin).
 
@@ -204,10 +217,17 @@ class IikoCloudApiClientManager(
         self._discounts_and_promotions_api: DiscountsAndPromotionsApi | None = None
         self._marketing_sources_api: MarketingSourcesApi | None = None
         self._employees_api: EmployeesApi | None = None
+        self._employees_employees_api: EmployeesEmployeesApi | None = None
+        self._employees_attendance_api: EmployeesAttendanceApi | None = None
+        self._employees_positions_api: EmployeesPositionsApi | None = None
         self._messages_api: MessagesApi | None = None
         self._notifications_api: NotificationsApi | None = None
         self._operations_api: OperationsApi | None = None
         self._report_api: ReportApi | None = None
+        self._reporting_income_plan_api: ReportingIncomePlanApi | None = None
+        self._reporting_olap_api: ReportingOlapApi | None = None
+        self._nomenclature_assembly_chart_api: NomenclatureAssemblyChartApi | None = None
+        self._nomenclature_directories_api: NomenclatureDirectoriesApi | None = None
         self._webhooks_api: WebhooksApi | None = None
         self._banquets_reserves_api: BanquetsReservesApi | None = None
         self._orders_api: OrdersApi | None = None

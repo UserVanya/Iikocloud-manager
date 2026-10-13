@@ -23,6 +23,7 @@ from iikocloud.exceptions import (
     MenuTooEarly,
 )
 from iikocloud.menu_windows import MenuWindows
+from iikocloud.mixins.employees.helpers import EMPLOYEE_CONTACT_FIELDS
 from iikocloud.mixins.menu.answer import MenuV3Answer
 from iikocloud.rate_limiter import (
     GlobalRateLimiter,
@@ -55,6 +56,8 @@ __all__ = [
     "MenuWindows",
     # Menu with the raw iiko answer (0.4.0)
     "MenuV3Answer",
+    # Employees: card fields with the phone for list_all_employees (0.5.0)
+    "EMPLOYEE_CONTACT_FIELDS",
     # Rate Limiting
     "GlobalRateLimiter",
     "RateLimitConfig",

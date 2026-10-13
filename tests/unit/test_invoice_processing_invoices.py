@@ -115,9 +115,9 @@ INCOMING_METHODS: list[tuple[str, object, str, type]] = [
         PayRequest(
             organization_id=ORG_ID,
             document_id=DOC_ID,
-            account_from=ACCOUNT_ID,
-            var_date=DATE,
-            sum=100.0,
+            account_id=ACCOUNT_ID,
+            payment_date=DATE,
+            amount=100.0,
         ),
         "pay_request",
         AccountingTransactionUserResponse,

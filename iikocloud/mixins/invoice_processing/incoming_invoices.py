@@ -4,6 +4,7 @@ from iikocloud_client import (
     AccountingTransactionUserResponse,
     GetByIDRequest,
     IncomingInvoice,
+    IncomingInvoiceListItem,
     IncomingInvoiceRequest,
     IncomingInvoiceSaveResponse,
     ListRequest,
@@ -65,10 +66,10 @@ class IncomingInvoicesCoreMixin(_ManagerBase):
 
     async def list_inventory_incoming_invoices(
         self, request: ListRequest
-    ) -> list[IncomingInvoice]:
+    ) -> list[IncomingInvoiceListItem]:
         """Список приходных накладных за период."""
 
-        async def api_call() -> list[IncomingInvoice]:
+        async def api_call() -> list[IncomingInvoiceListItem]:
             api = await self.get_incoming_invoices_api()
             return await api.list_inventory_incoming_invoices(list_request=request)
 
